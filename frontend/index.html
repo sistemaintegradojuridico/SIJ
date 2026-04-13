@@ -25,7 +25,7 @@
 
 <script>
 
-const API = "COLE_AQUI_URL_DO_RENDER"
+const API = "https://sij-backend.onrender.com"
 
 let token = ""
 
@@ -47,13 +47,13 @@ async function login() {
     alert("Login feito!")
     listar()
   } else {
-    alert("Erro no login")
+    alert(data.error || "Erro no login")
   }
 }
 
 // CADASTRO
 async function register() {
-  await fetch(API + "/register", {
+  const res = await fetch(API + "/register", {
     method: "POST",
     headers: {"Content-Type":"application/json"},
     body: JSON.stringify({
@@ -62,7 +62,13 @@ async function register() {
     })
   })
 
-  alert("Conta criada!")
+  const data = await res.json()
+
+  if(data.ok){
+    alert("Conta criada!")
+  } else {
+    alert("Erro: " + data.error)
+  }
 }
 
 // CRIAR PROCESSO
