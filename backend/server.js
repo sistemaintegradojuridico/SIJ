@@ -11,8 +11,32 @@ app.use(express.json())
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false } // 🔥 IMPORTANTE pro Render
+  ssl: { rejectUnauthorized: false }
 })
+
+// 🔥 CRIA TABELAS AUTOMATICAMENTE
+async function initDB() {
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS users (
+      id SERIAL PRIMARY KEY,
+      email TEXT UNIQUE,
+      password TEXT
+    );
+  `)
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS processos (
+      id SERIAL PRIMARY KEY,
+      titulo TEXT,
+      descricao TEXT,
+      user_id INTEGER
+    );
+  `)
+
+  console.log("Banco pronto 🚀")
+}
+
+initDB()
 
 // 🔐 Middleware
 function auth(req, res, next) {
@@ -28,11 +52,10 @@ function auth(req, res, next) {
   }
 }
 
-// 🧑‍💻 Cadastro
+// Cadastro
 app.post('/register', async (req, res) => {
   try {
     const { email, password } = req.body
-
     const hash = await bcrypt.hash(password, 10)
 
     await pool.query(
@@ -46,7 +69,7 @@ app.post('/register', async (req, res) => {
   }
 })
 
-// 🔑 Login
+// Login
 app.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body
@@ -77,52 +100,40 @@ app.post('/login', async (req, res) => {
   }
 })
 
-// 📁 Criar processo
+// Criar processo
 app.post('/processos', auth, async (req, res) => {
-  try {
-    const { titulo, descricao } = req.body
+  const { titulo, descricao } = req.body
 
-    await pool.query(
-      'INSERT INTO processos (titulo, descricao, user_id) VALUES ($1,$2,$3)',
-      [titulo, descricao, req.user.id]
-    )
+  await pool.query(
+    'INSERT INTO processos (titulo, descricao, user_id) VALUES ($1,$2,$3)',
+    [titulo, descricao, req.user.id]
+  )
 
-    res.json({ ok: true })
-  } catch (err) {
-    res.status(500).json({ error: err.message })
-  }
+  res.json({ ok: true })
 })
 
-// 📄 Listar processos
+// Listar
 app.get('/processos', auth, async (req, res) => {
-  try {
-    const result = await pool.query(
-      'SELECT * FROM processos WHERE user_id=$1',
-      [req.user.id]
-    )
+  const result = await pool.query(
+    'SELECT * FROM processos WHERE user_id=$1',
+    [req.user.id]
+  )
 
-    res.json(result.rows)
-  } catch (err) {
-    res.status(500).json({ error: err.message })
-  }
+  res.json(result.rows)
 })
 
-// ❌ Deletar
+// Deletar
 app.delete('/processos/:id', auth, async (req, res) => {
-  try {
-    await pool.query(
-      'DELETE FROM processos WHERE id=$1 AND user_id=$2',
-      [req.params.id, req.user.id]
-    )
+  await pool.query(
+    'DELETE FROM processos WHERE id=$1 AND user_id=$2',
+    [req.params.id, req.user.id]
+  )
 
-    res.json({ ok: true })
-  } catch (err) {
-    res.status(500).json({ error: err.message })
-  }
+  res.json({ ok: true })
 })
 
 app.get('/', (req, res) => {
-  res.send('SIJ backend rodando 🚀')
+  res.send('SIJ rodando 🚀')
 })
 
-app.listen(3000, () => console.log('Servidor rodando na porta 3000'))
+app.listen(3000, () => console.log('Servidor rodando'))
