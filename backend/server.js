@@ -10,7 +10,8 @@ app.use(cors())
 app.use(express.json())
 
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false } // 🔥 IMPORTANTE pro Render
 })
 
 // 🔐 Middleware
@@ -27,68 +28,101 @@ function auth(req, res, next) {
   }
 }
 
-// 👤 Cadastro
+// 🧑‍💻 Cadastro
 app.post('/register', async (req, res) => {
-  const { email, password } = req.body
-  const hash = await bcrypt.hash(password, 10)
+  try {
+    const { email, password } = req.body
 
-  await pool.query(
-    'INSERT INTO users (email, password) VALUES ($1, $2)',
-    [email, hash]
-  )
+    const hash = await bcrypt.hash(password, 10)
 
-  res.json({ ok: true })
+    await pool.query(
+      'INSERT INTO users (email, password) VALUES ($1, $2)',
+      [email, hash]
+    )
+
+    res.json({ ok: true })
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
 })
 
 // 🔑 Login
 app.post('/login', async (req, res) => {
-  const { email, password } = req.body
+  try {
+    const { email, password } = req.body
 
-  const user = await pool.query(
-    'SELECT * FROM users WHERE email=$1',
-    [email]
-  )
+    const user = await pool.query(
+      'SELECT * FROM users WHERE email=$1',
+      [email]
+    )
 
-  if (!user.rows.length) return res.status(400).json({ error: 'Usuário não encontrado' })
+    if (!user.rows.length) {
+      return res.status(400).json({ error: 'Usuário não encontrado' })
+    }
 
-  const valid = await bcrypt.compare(password, user.rows[0].password)
-  if (!valid) return res.status(400).json({ error: 'Senha inválida' })
+    const valid = await bcrypt.compare(password, user.rows[0].password)
 
-  const token = jwt.sign({ id: user.rows[0].id }, process.env.JWT_SECRET)
+    if (!valid) {
+      return res.status(400).json({ error: 'Senha inválida' })
+    }
 
-  res.json({ token })
+    const token = jwt.sign(
+      { id: user.rows[0].id },
+      process.env.JWT_SECRET
+    )
+
+    res.json({ token })
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
 })
 
 // 📁 Criar processo
 app.post('/processos', auth, async (req, res) => {
-  const { titulo, descricao } = req.body
+  try {
+    const { titulo, descricao } = req.body
 
-  await pool.query(
-    'INSERT INTO processos (titulo, descricao, user_id) VALUES ($1,$2,$3)',
-    [titulo, descricao, req.user.id]
-  )
+    await pool.query(
+      'INSERT INTO processos (titulo, descricao, user_id) VALUES ($1,$2,$3)',
+      [titulo, descricao, req.user.id]
+    )
 
-  res.json({ ok: true })
+    res.json({ ok: true })
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
 })
 
-// 📄 Listar
+// 📄 Listar processos
 app.get('/processos', auth, async (req, res) => {
-  const result = await pool.query(
-    'SELECT * FROM processos WHERE user_id=$1',
-    [req.user.id]
-  )
+  try {
+    const result = await pool.query(
+      'SELECT * FROM processos WHERE user_id=$1',
+      [req.user.id]
+    )
 
-  res.json(result.rows)
+    res.json(result.rows)
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
 })
 
 // ❌ Deletar
 app.delete('/processos/:id', auth, async (req, res) => {
-  await pool.query(
-    'DELETE FROM processos WHERE id=$1 AND user_id=$2',
-    [req.params.id, req.user.id]
-  )
+  try {
+    await pool.query(
+      'DELETE FROM processos WHERE id=$1 AND user_id=$2',
+      [req.params.id, req.user.id]
+    )
 
-  res.json({ ok: true })
+    res.json({ ok: true })
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
 })
 
-app.listen(3000, () => console.log('Servidor rodando'))
+app.get('/', (req, res) => {
+  res.send('SIJ backend rodando 🚀')
+})
+
+app.listen(3000, () => console.log('Servidor rodando na porta 3000'))
