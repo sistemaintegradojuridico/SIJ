@@ -1,81 +1,39 @@
-import express from "express"
-import pkg from "pg"
-import cors from "cors"
-import jwt from "jsonwebtoken"
-
-const { Pool } = pkg
+const express = require("express")
+const cors = require("cors")
+const jwt = require("jsonwebtoken")
+const bcrypt = require("bcryptjs")
+const { Pool } = require("pg")
 
 const app = express()
 app.use(cors())
 app.use(express.json())
 
-// 🔥 BANCO
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: { rejectUnauthorized: false }
 })
 
-// 🔥 CRIA TABELAS AUTOMATICAMENTE
-async function initDB() {
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS users (
-      id SERIAL PRIMARY KEY,
-      email TEXT UNIQUE,
-      password TEXT
-    );
-  `)
+const SECRET = process.env.JWT_SECRET || "segredo"
 
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS processos (
-      id SERIAL PRIMARY KEY,
-      titulo TEXT,
-      descricao TEXT
-    );
-  `)
-
-  console.log("Banco pronto 🚀")
-}
-initDB()
-
-// 🔥 TESTE RAIZ (NUNCA MAIS DÁ NOT FOUND)
+// TESTE
 app.get("/", (req, res) => {
   res.send("SIJ backend rodando 🚀")
 })
 
-// LOGIN
-app.post("/login", async (req, res) => {
-  const { email, password } = req.body
-
-  if (!email || !password) {
-    return res.json({ error: "Preencha email e senha" })
-  }
-
-  const result = await pool.query(
-    "SELECT * FROM users WHERE email=$1 AND password=$2",
-    [email, password]
-  )
-
-  if (result.rows.length === 0) {
-    return res.json({ error: "Usuário inválido" })
-  }
-
-  const token = jwt.sign({ id: result.rows[0].id }, process.env.JWT_SECRET)
-
-  res.json({ token })
-})
-
 // REGISTER
 app.post("/register", async (req, res) => {
-  const { email, password } = req.body
-
-  if (!email || !password) {
-    return res.json({ error: "Preencha tudo" })
-  }
-
   try {
+    const { email, password } = req.body
+
+    if (!email || !password) {
+      return res.json({ error: "Preencha todos campos" })
+    }
+
+    const hash = await bcrypt.hash(password, 10)
+
     await pool.query(
-      "INSERT INTO users (email, password) VALUES ($1, $2)",
-      [email, password]
+      "INSERT INTO users (email, password) VALUES ($1,$2)",
+      [email, hash]
     )
 
     res.json({ ok: true })
@@ -84,28 +42,76 @@ app.post("/register", async (req, res) => {
   }
 })
 
-// CRIAR PROCESSO
-app.post("/processos", async (req, res) => {
-  const { titulo, descricao } = req.body
+// LOGIN
+app.post("/login", async (req, res) => {
+  const { email, password } = req.body
 
-  if (!titulo || !descricao) {
-    return res.json({ error: "Preencha tudo" })
+  const user = await pool.query(
+    "SELECT * FROM users WHERE email=$1",
+    [email]
+  )
+
+  if (user.rows.length === 0) {
+    return res.json({ error: "Usuário não encontrado" })
   }
 
+  const valid = await bcrypt.compare(password, user.rows[0].password)
+
+  if (!valid) {
+    return res.json({ error: "Senha inválida" })
+  }
+
+  const token = jwt.sign({ id: user.rows[0].id }, SECRET)
+
+  res.json({ token })
+})
+
+// MIDDLEWARE
+function auth(req, res, next) {
+  const token = req.headers.authorization
+
+  if (!token) return res.status(401).json({ error: "Sem token" })
+
+  try {
+    const decoded = jwt.verify(token, SECRET)
+    req.userId = decoded.id
+    next()
+  } catch {
+    res.status(401).json({ error: "Token inválido" })
+  }
+}
+
+// CRIAR PROCESSO
+app.post("/processos", auth, async (req, res) => {
+  const { titulo, descricao } = req.body
+
   await pool.query(
-    "INSERT INTO processos (titulo, descricao) VALUES ($1, $2)",
-    [titulo, descricao]
+    "INSERT INTO processos (titulo, descricao, user_id) VALUES ($1,$2,$3)",
+    [titulo, descricao, req.userId]
   )
 
   res.json({ ok: true })
 })
 
-// LISTAR PROCESSOS
-app.get("/processos", async (req, res) => {
-  const result = await pool.query("SELECT * FROM processos ORDER BY id DESC")
-  res.json(result.rows)
+// LISTAR
+app.get("/processos", auth, async (req, res) => {
+  const data = await pool.query(
+    "SELECT * FROM processos WHERE user_id=$1 ORDER BY id DESC",
+    [req.userId]
+  )
+
+  res.json(data.rows)
 })
 
-// 🔥 PORTA DO RENDER
+// EXCLUIR
+app.delete("/processos/:id", auth, async (req, res) => {
+  await pool.query(
+    "DELETE FROM processos WHERE id=$1 AND user_id=$2",
+    [req.params.id, req.userId]
+  )
+
+  res.json({ ok: true })
+})
+
 const PORT = process.env.PORT || 10000
 app.listen(PORT, () => console.log("Servidor rodando 🚀"))
