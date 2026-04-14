@@ -8,6 +8,7 @@ const app = express()
 app.use(cors())
 app.use(express.json())
 
+// CONEXÃO BANCO
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: { rejectUnauthorized: false }
@@ -15,12 +16,44 @@ const pool = new Pool({
 
 const SECRET = process.env.JWT_SECRET || "segredo"
 
+// =================================
+// CRIAR TABELAS AUTOMÁTICO
+// =================================
+async function criarTabelas() {
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS users (
+        id SERIAL PRIMARY KEY,
+        email TEXT UNIQUE NOT NULL,
+        password TEXT NOT NULL
+      );
+    `)
+
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS processos (
+        id SERIAL PRIMARY KEY,
+        titulo TEXT,
+        descricao TEXT,
+        user_id INTEGER REFERENCES users(id)
+      );
+    `)
+
+    console.log("Tabelas prontas 🚀")
+  } catch (err) {
+    console.log("Erro ao criar tabelas:", err)
+  }
+}
+
+// =================================
 // TESTE
+// =================================
 app.get("/", (req, res) => {
   res.send("SIJ backend rodando 🚀")
 })
 
+// =================================
 // REGISTER
+// =================================
 app.post("/register", async (req, res) => {
   try {
     const { email, password } = req.body
@@ -42,31 +75,39 @@ app.post("/register", async (req, res) => {
   }
 })
 
+// =================================
 // LOGIN
+// =================================
 app.post("/login", async (req, res) => {
-  const { email, password } = req.body
+  try {
+    const { email, password } = req.body
 
-  const user = await pool.query(
-    "SELECT * FROM users WHERE email=$1",
-    [email]
-  )
+    const user = await pool.query(
+      "SELECT * FROM users WHERE email=$1",
+      [email]
+    )
 
-  if (user.rows.length === 0) {
-    return res.json({ error: "Usuário não encontrado" })
+    if (user.rows.length === 0) {
+      return res.json({ error: "Usuário não encontrado" })
+    }
+
+    const valid = await bcrypt.compare(password, user.rows[0].password)
+
+    if (!valid) {
+      return res.json({ error: "Senha inválida" })
+    }
+
+    const token = jwt.sign({ id: user.rows[0].id }, SECRET)
+
+    res.json({ token })
+  } catch (err) {
+    res.json({ error: "Erro no login" })
   }
-
-  const valid = await bcrypt.compare(password, user.rows[0].password)
-
-  if (!valid) {
-    return res.json({ error: "Senha inválida" })
-  }
-
-  const token = jwt.sign({ id: user.rows[0].id }, SECRET)
-
-  res.json({ token })
 })
 
-// MIDDLEWARE
+// =================================
+// MIDDLEWARE AUTH
+// =================================
 function auth(req, res, next) {
   const token = req.headers.authorization
 
@@ -81,37 +122,63 @@ function auth(req, res, next) {
   }
 }
 
+// =================================
 // CRIAR PROCESSO
+// =================================
 app.post("/processos", auth, async (req, res) => {
-  const { titulo, descricao } = req.body
+  try {
+    const { titulo, descricao } = req.body
 
-  await pool.query(
-    "INSERT INTO processos (titulo, descricao, user_id) VALUES ($1,$2,$3)",
-    [titulo, descricao, req.userId]
-  )
+    await pool.query(
+      "INSERT INTO processos (titulo, descricao, user_id) VALUES ($1,$2,$3)",
+      [titulo, descricao, req.userId]
+    )
 
-  res.json({ ok: true })
+    res.json({ ok: true })
+  } catch (err) {
+    res.json({ error: "Erro ao criar processo" })
+  }
 })
 
-// LISTAR
+// =================================
+// LISTAR PROCESSOS
+// =================================
 app.get("/processos", auth, async (req, res) => {
-  const data = await pool.query(
-    "SELECT * FROM processos WHERE user_id=$1 ORDER BY id DESC",
-    [req.userId]
-  )
+  try {
+    const data = await pool.query(
+      "SELECT * FROM processos WHERE user_id=$1 ORDER BY id DESC",
+      [req.userId]
+    )
 
-  res.json(data.rows)
+    res.json(data.rows)
+  } catch (err) {
+    res.json({ error: "Erro ao listar" })
+  }
 })
 
-// EXCLUIR
+// =================================
+// EXCLUIR PROCESSO
+// =================================
 app.delete("/processos/:id", auth, async (req, res) => {
-  await pool.query(
-    "DELETE FROM processos WHERE id=$1 AND user_id=$2",
-    [req.params.id, req.userId]
-  )
+  try {
+    await pool.query(
+      "DELETE FROM processos WHERE id=$1 AND user_id=$2",
+      [req.params.id, req.userId]
+    )
 
-  res.json({ ok: true })
+    res.json({ ok: true })
+  } catch (err) {
+    res.json({ error: "Erro ao excluir" })
+  }
 })
+
+// =================================
+// INICIAR SERVIDOR
+// =================================
+criarTabelas()
 
 const PORT = process.env.PORT || 10000
-app.listen(PORT, () => console.log("Servidor rodando 🚀"))
+
+app.listen(PORT, () => {
+  console.log("Servidor rodando 🚀")
+})
