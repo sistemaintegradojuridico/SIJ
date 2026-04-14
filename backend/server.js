@@ -1,9 +1,9 @@
-require('dotenv').config()
-const express = require('express')
-const cors = require('cors')
-const bcrypt = require('bcrypt')
-const jwt = require('jsonwebtoken')
-const { Pool } = require('pg')
+import express from "express"
+import pkg from "pg"
+import cors from "cors"
+import jwt from "jsonwebtoken"
+
+const { Pool } = pkg
 
 const app = express()
 app.use(cors())
@@ -38,102 +38,56 @@ async function initDB() {
 
 initDB()
 
-// 🔐 Middleware
-function auth(req, res, next) {
-  const token = req.headers.authorization
-  if (!token) return res.status(401).json({ error: 'Sem token' })
+// LOGIN
+app.post("/login", async (req, res) => {
+  const { email, password } = req.body
 
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET)
-    req.user = decoded
-    next()
-  } catch {
-    res.status(401).json({ error: 'Token inválido' })
+  const user = await pool.query(
+    "SELECT * FROM users WHERE email=$1 AND password=$2",
+    [email, password]
+  )
+
+  if (user.rows.length === 0) {
+    return res.json({ error: "Usuário não encontrado" })
   }
-}
 
-// Cadastro
-app.post('/register', async (req, res) => {
+  const token = jwt.sign({ id: user.rows[0].id }, process.env.JWT_SECRET)
+
+  res.json({ token })
+})
+
+// REGISTER
+app.post("/register", async (req, res) => {
+  const { email, password } = req.body
+
   try {
-    const { email, password } = req.body
-    const hash = await bcrypt.hash(password, 10)
-
     await pool.query(
-      'INSERT INTO users (email, password) VALUES ($1, $2)',
-      [email, hash]
+      "INSERT INTO users (email, password) VALUES ($1, $2)",
+      [email, password]
     )
 
     res.json({ ok: true })
   } catch (err) {
-    res.status(500).json({ error: err.message })
+    res.json({ error: "Usuário já existe" })
   }
 })
 
-// Login
-app.post('/login', async (req, res) => {
-  try {
-    const { email, password } = req.body
-
-    const user = await pool.query(
-      'SELECT * FROM users WHERE email=$1',
-      [email]
-    )
-
-    if (!user.rows.length) {
-      return res.status(400).json({ error: 'Usuário não encontrado' })
-    }
-
-    const valid = await bcrypt.compare(password, user.rows[0].password)
-
-    if (!valid) {
-      return res.status(400).json({ error: 'Senha inválida' })
-    }
-
-    const token = jwt.sign(
-      { id: user.rows[0].id },
-      process.env.JWT_SECRET
-    )
-
-    res.json({ token })
-  } catch (err) {
-    res.status(500).json({ error: err.message })
-  }
-})
-
-// Criar processo
-app.post('/processos', auth, async (req, res) => {
+// CRIAR PROCESSO
+app.post("/processos", async (req, res) => {
   const { titulo, descricao } = req.body
 
   await pool.query(
-    'INSERT INTO processos (titulo, descricao, user_id) VALUES ($1,$2,$3)',
-    [titulo, descricao, req.user.id]
+    "INSERT INTO processos (titulo, descricao) VALUES ($1, $2)",
+    [titulo, descricao]
   )
 
   res.json({ ok: true })
 })
 
-// Listar
-app.get('/processos', auth, async (req, res) => {
-  const result = await pool.query(
-    'SELECT * FROM processos WHERE user_id=$1',
-    [req.user.id]
-  )
-
+// LISTAR
+app.get("/processos", async (req, res) => {
+  const result = await pool.query("SELECT * FROM processos")
   res.json(result.rows)
 })
 
-// Deletar
-app.delete('/processos/:id', auth, async (req, res) => {
-  await pool.query(
-    'DELETE FROM processos WHERE id=$1 AND user_id=$2',
-    [req.params.id, req.user.id]
-  )
-
-  res.json({ ok: true })
-})
-
-app.get('/', (req, res) => {
-  res.send('SIJ rodando 🚀')
-})
-
-app.listen(3000, () => console.log('Servidor rodando'))
+app.listen(10000, () => console.log("Servidor rodando 🚀"))
