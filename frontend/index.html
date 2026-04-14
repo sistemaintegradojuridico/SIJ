@@ -8,43 +8,50 @@
 body {
     margin: 0;
     font-family: Arial, sans-serif;
-    background: linear-gradient(135deg, #3b0a1a, #6e0f2c, #2a0012);
+
+    /* FUNDO VINHO COM TEXTURA */
+    background:
+        radial-gradient(circle at 20% 20%, rgba(255,255,255,0.05) 1px, transparent 1px),
+        radial-gradient(circle at 80% 80%, rgba(255,255,255,0.04) 1px, transparent 1px),
+        linear-gradient(135deg, #3a0015, #5c0125, #2a0012);
+
+    background-size: 30px 30px, 40px 40px, cover;
+
     height: 100vh;
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
 }
 
-/* LOGO / NOME */
-.logo {
-    color: white;
-    font-size: 32px;
-    font-weight: bold;
-    margin-bottom: 25px;
-    letter-spacing: 2px;
+/* CARD CENTRAL */
+.container {
+    width: 280px;
+    background: #f4f4f4;
+    padding: 25px;
+    border-radius: 12px;
+    text-align: center;
+
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
 }
 
-/* CARD */
-.container {
-    background: white;
-    padding: 30px;
-    border-radius: 12px;
-    width: 300px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-    text-align: center;
+/* LOGO */
+.logo {
+    font-size: 22px;
+    margin-bottom: 15px;
+    color: #5c0125;
+    font-weight: bold;
 }
 
 /* INPUTS */
 input {
     width: 100%;
     padding: 10px;
-    margin: 8px 0;
+    margin: 6px 0;
     border-radius: 6px;
     border: 1px solid #ccc;
 }
 
-/* BOTÕES */
+/* BOTÃO */
 button {
     width: 100%;
     padding: 10px;
@@ -59,41 +66,44 @@ button {
 
 /* LINK */
 .link {
-    margin-top: 10px;
+    margin-top: 8px;
     font-size: 13px;
     color: #7a0f2c;
     cursor: pointer;
 }
 
-/* ÁREA SISTEMA */
+/* APP */
 #app {
     display: none;
-    margin-top: 20px;
 }
-
 </style>
 </head>
 
 <body>
 
-<div class="logo">⚖️ SIJ</div>
+<div class="container">
 
-<div class="container" id="loginBox">
-    <h3>Login</h3>
-    <input id="email" placeholder="Email">
-    <input id="password" type="password" placeholder="Senha">
-    <button onclick="login()">Entrar</button>
-    <div class="link" onclick="register()">Criar conta</div>
-</div>
+    <div class="logo">⚖️ SIJ</div>
 
-<div class="container" id="app">
-    <h3>Criar Processo</h3>
-    <input id="titulo" placeholder="Título">
-    <input id="descricao" placeholder="Descrição">
-    <button onclick="criar()">Salvar</button>
+    <!-- LOGIN -->
+    <div id="loginBox">
+        <input id="email" placeholder="Email">
+        <input id="password" type="password" placeholder="Senha">
+        <button onclick="login()">Entrar</button>
+        <div class="link" onclick="register()">Criar conta</div>
+    </div>
 
-    <h3>Processos</h3>
-    <ul id="lista"></ul>
+    <!-- SISTEMA -->
+    <div id="app">
+        <h4>Criar Processo</h4>
+        <input id="titulo" placeholder="Título">
+        <input id="descricao" placeholder="Descrição">
+        <button onclick="criar()">Salvar</button>
+
+        <h4>Processos</h4>
+        <ul id="lista"></ul>
+    </div>
+
 </div>
 
 <script>
@@ -102,13 +112,13 @@ let token = ""
 
 // LOGIN
 async function login() {
+    const email = document.getElementById("email").value
+    const password = document.getElementById("password").value
+
     const res = await fetch(API + "/login", {
         method: "POST",
         headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({
-            email: document.getElementById("email").value,
-            password: document.getElementById("password").value
-        })
+        body: JSON.stringify({email, password})
     })
 
     const data = await res.json()
