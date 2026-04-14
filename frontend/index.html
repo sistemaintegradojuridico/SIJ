@@ -12,61 +12,32 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-
-  /* 🔥 FUNDO VINHO COM TEXTURA */
-  background: radial-gradient(circle at top, #5a0f1c, #2b0208);
-  position: relative;
-  overflow: hidden;
-}
-
-/* textura suave */
-body::before {
-  content: "";
-  position: absolute;
-  width: 200%;
-  height: 200%;
-  background: repeating-linear-gradient(
-    45deg,
-    rgba(255,255,255,0.02),
-    rgba(255,255,255,0.02) 2px,
-    transparent 2px,
-    transparent 6px
-  );
-  animation: move 20s linear infinite;
-}
-
-@keyframes move {
-  from { transform: translate(0,0); }
-  to { transform: translate(-200px,-200px); }
+  background: radial-gradient(circle at top, #5a0f1c, #1a0004);
 }
 
 /* CARD */
 .container {
-  background: rgba(255,255,255,0.08);
-  backdrop-filter: blur(15px);
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(12px);
   padding: 25px;
   border-radius: 12px;
-  width: 320px;
+  width: 330px;
   color: white;
-  box-shadow: 0 0 30px rgba(0,0,0,0.5);
-  z-index: 1;
+  box-shadow: 0 0 30px rgba(0,0,0,0.6);
 }
 
 h1 {
   text-align: center;
-  margin-bottom: 10px;
 }
 
 input {
   width: 100%;
   padding: 10px;
-  margin: 5px 0;
+  margin: 6px 0;
   border: none;
   border-radius: 6px;
-  outline: none;
 }
 
-/* BOTÕES */
 button {
   width: 100%;
   padding: 10px;
@@ -74,29 +45,11 @@ button {
   border: none;
   border-radius: 6px;
   cursor: pointer;
-  font-weight: bold;
-  transition: 0.2s;
 }
 
-/* botão principal vinho */
-.btn-main {
-  background: linear-gradient(135deg, #8b1e2d, #4a0d16);
+.btn {
+  background: linear-gradient(135deg, #8b1e2d, #3a0911);
   color: white;
-}
-
-.btn-main:hover {
-  transform: scale(1.03);
-  box-shadow: 0 0 10px rgba(255,0,0,0.4);
-}
-
-/* botão secundário */
-.btn-sec {
-  background: rgba(255,255,255,0.1);
-  color: white;
-}
-
-.btn-sec:hover {
-  background: rgba(255,255,255,0.2);
 }
 
 .section {
@@ -119,43 +72,36 @@ button {
 <div class="container">
   <h1>⚖️ SIJ</h1>
 
-  <!-- LOGIN -->
-  <div>
-    <h3>Login</h3>
-    <input id="email" placeholder="Email">
-    <input id="senha" type="password" placeholder="Senha">
-    <button class="btn-main" onclick="login()">Entrar</button>
-  </div>
+  <h3>Login</h3>
+  <input id="email" placeholder="Email">
+  <input id="senha" type="password" placeholder="Senha">
+  <button class="btn" onclick="login()">Entrar</button>
 
-  <!-- CADASTRO -->
   <div class="section">
     <h3>Cadastrar</h3>
     <input id="email2" placeholder="Email">
     <input id="senha2" type="password" placeholder="Senha">
-    <button class="btn-sec" onclick="register()">Criar conta</button>
+    <button class="btn" onclick="register()">Criar conta</button>
   </div>
 
-  <!-- PROCESSOS -->
   <div class="section">
-    <h3>Criar Processo</h3>
+    <h3>Processos</h3>
     <input id="titulo" placeholder="Título">
     <input id="descricao" placeholder="Descrição">
-    <button class="btn-main" onclick="criar()">Salvar</button>
+    <button class="btn" onclick="criar()">Salvar</button>
 
     <div id="processos"></div>
   </div>
 </div>
 
 <script>
-const API = "https://sij-backend.onrender.com"
-
-let token = null
+const API = ""
 
 async function login() {
   const email = document.getElementById("email").value
   const password = document.getElementById("senha").value
 
-  const res = await fetch(API + "/login", {
+  const res = await fetch("/login", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, password })
@@ -164,8 +110,7 @@ async function login() {
   const data = await res.json()
 
   if (data.token) {
-    token = data.token
-    alert("Login feito!")
+    alert("Login OK")
     listar()
   } else {
     alert(data.error)
@@ -176,7 +121,7 @@ async function register() {
   const email = document.getElementById("email2").value
   const password = document.getElementById("senha2").value
 
-  const res = await fetch(API + "/register", {
+  const res = await fetch("/register", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, password })
@@ -185,7 +130,7 @@ async function register() {
   const data = await res.json()
 
   if (data.ok) {
-    alert("Conta criada!")
+    alert("Conta criada")
   } else {
     alert(data.error)
   }
@@ -195,17 +140,23 @@ async function criar() {
   const titulo = document.getElementById("titulo").value
   const descricao = document.getElementById("descricao").value
 
-  await fetch(API + "/processos", {
+  const res = await fetch("/processos", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ titulo, descricao })
   })
 
-  listar()
+  const data = await res.json()
+
+  if (data.ok) {
+    listar()
+  } else {
+    alert(data.error)
+  }
 }
 
 async function listar() {
-  const res = await fetch(API + "/processos")
+  const res = await fetch("/processos")
   const dados = await res.json()
 
   const div = document.getElementById("processos")
