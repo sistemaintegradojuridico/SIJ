@@ -2,8 +2,6 @@ import express from "express"
 import pkg from "pg"
 import cors from "cors"
 import jwt from "jsonwebtoken"
-import path from "path"
-import { fileURLToPath } from "url"
 
 const { Pool } = pkg
 
@@ -11,17 +9,13 @@ const app = express()
 app.use(cors())
 app.use(express.json())
 
-// 🔥 CONFIG CAMINHO
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
-
 // 🔥 BANCO
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: { rejectUnauthorized: false }
 })
 
-// 🔥 CRIA TABELAS
+// 🔥 CRIA TABELAS AUTOMATICAMENTE
 async function initDB() {
   await pool.query(`
     CREATE TABLE IF NOT EXISTS users (
@@ -43,9 +37,18 @@ async function initDB() {
 }
 initDB()
 
+// 🔥 TESTE RAIZ (NUNCA MAIS DÁ NOT FOUND)
+app.get("/", (req, res) => {
+  res.send("SIJ backend rodando 🚀")
+})
+
 // LOGIN
 app.post("/login", async (req, res) => {
   const { email, password } = req.body
+
+  if (!email || !password) {
+    return res.json({ error: "Preencha email e senha" })
+  }
 
   const result = await pool.query(
     "SELECT * FROM users WHERE email=$1 AND password=$2",
@@ -76,7 +79,7 @@ app.post("/register", async (req, res) => {
     )
 
     res.json({ ok: true })
-  } catch {
+  } catch (err) {
     res.json({ error: "Email já existe" })
   }
 })
@@ -97,19 +100,12 @@ app.post("/processos", async (req, res) => {
   res.json({ ok: true })
 })
 
-// LISTAR
+// LISTAR PROCESSOS
 app.get("/processos", async (req, res) => {
   const result = await pool.query("SELECT * FROM processos ORDER BY id DESC")
   res.json(result.rows)
 })
 
-// 🔥 SERVIR FRONTEND
-app.use(express.static(path.join(__dirname, "frontend")))
-
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "frontend", "index.html"))
-})
-
-// PORTA DO RENDER
+// 🔥 PORTA DO RENDER
 const PORT = process.env.PORT || 10000
 app.listen(PORT, () => console.log("Servidor rodando 🚀"))
