@@ -104,3 +104,35 @@ app.delete("/processos/:id", auth, async (req,res)=>{
 
 const PORT = process.env.PORT || 10000
 app.listen(PORT, ()=> console.log("Servidor rodando"))
+
+const { Pool } = require("pg")
+
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false }
+})
+
+// CRIAR TABELAS AUTOMATICAMENTE
+async function initDB() {
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS users (
+      id SERIAL PRIMARY KEY,
+      email TEXT UNIQUE NOT NULL,
+      password TEXT NOT NULL
+    );
+  `)
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS processos (
+      id SERIAL PRIMARY KEY,
+      titulo TEXT NOT NULL,
+      descricao TEXT,
+      user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+  `)
+
+  console.log("Banco pronto 🚀")
+}
+
+initDB()
