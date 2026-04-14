@@ -7,87 +7,143 @@
 <style>
 body {
   font-family: Arial;
-  background: linear-gradient(135deg, #0f172a, #1e3a8a, #6d28d9);
-  height: 100vh;
   margin: 0;
+  height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
+
+  /* 🔥 FUNDO VINHO COM TEXTURA */
+  background: radial-gradient(circle at top, #5a0f1c, #2b0208);
+  position: relative;
+  overflow: hidden;
 }
 
+/* textura suave */
+body::before {
+  content: "";
+  position: absolute;
+  width: 200%;
+  height: 200%;
+  background: repeating-linear-gradient(
+    45deg,
+    rgba(255,255,255,0.02),
+    rgba(255,255,255,0.02) 2px,
+    transparent 2px,
+    transparent 6px
+  );
+  animation: move 20s linear infinite;
+}
+
+@keyframes move {
+  from { transform: translate(0,0); }
+  to { transform: translate(-200px,-200px); }
+}
+
+/* CARD */
 .container {
-  background: white;
-  padding: 30px;
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(15px);
+  padding: 25px;
   border-radius: 12px;
   width: 320px;
-  text-align: center;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  color: white;
+  box-shadow: 0 0 30px rgba(0,0,0,0.5);
+  z-index: 1;
 }
 
 h1 {
-  color: white;
-  position: absolute;
-  top: 40px;
   text-align: center;
-  width: 100%;
+  margin-bottom: 10px;
 }
 
 input {
   width: 100%;
   padding: 10px;
   margin: 5px 0;
+  border: none;
+  border-radius: 6px;
+  outline: none;
 }
 
+/* BOTÕES */
 button {
   width: 100%;
   padding: 10px;
-  margin-top: 5px;
-  background: linear-gradient(90deg, #1e3a8a, #6d28d9);
-  color: white;
+  margin-top: 8px;
   border: none;
+  border-radius: 6px;
   cursor: pointer;
+  font-weight: bold;
+  transition: 0.2s;
 }
 
-button:hover {
-  opacity: 0.9;
+/* botão principal vinho */
+.btn-main {
+  background: linear-gradient(135deg, #8b1e2d, #4a0d16);
+  color: white;
 }
 
-.hidden {
-  display: none;
+.btn-main:hover {
+  transform: scale(1.03);
+  box-shadow: 0 0 10px rgba(255,0,0,0.4);
+}
+
+/* botão secundário */
+.btn-sec {
+  background: rgba(255,255,255,0.1);
+  color: white;
+}
+
+.btn-sec:hover {
+  background: rgba(255,255,255,0.2);
+}
+
+.section {
+  margin-top: 15px;
+  border-top: 1px solid rgba(255,255,255,0.2);
+  padding-top: 10px;
+}
+
+#processos div {
+  background: rgba(255,255,255,0.1);
+  padding: 8px;
+  margin-top: 5px;
+  border-radius: 6px;
 }
 </style>
 </head>
 
 <body>
 
-<h1>⚖️ SIJ</h1>
-
 <div class="container">
+  <h1>⚖️ SIJ</h1>
 
-<h3>Login</h3>
-<input id="email" placeholder="Email">
-<input id="password" type="password" placeholder="Senha">
-<button onclick="login()">Entrar</button>
+  <!-- LOGIN -->
+  <div>
+    <h3>Login</h3>
+    <input id="email" placeholder="Email">
+    <input id="senha" type="password" placeholder="Senha">
+    <button class="btn-main" onclick="login()">Entrar</button>
+  </div>
 
-<hr>
+  <!-- CADASTRO -->
+  <div class="section">
+    <h3>Cadastrar</h3>
+    <input id="email2" placeholder="Email">
+    <input id="senha2" type="password" placeholder="Senha">
+    <button class="btn-sec" onclick="register()">Criar conta</button>
+  </div>
 
-<h3>Cadastrar</h3>
-<button onclick="register()">Criar conta</button>
+  <!-- PROCESSOS -->
+  <div class="section">
+    <h3>Criar Processo</h3>
+    <input id="titulo" placeholder="Título">
+    <input id="descricao" placeholder="Descrição">
+    <button class="btn-main" onclick="criar()">Salvar</button>
 
-<hr>
-
-<div id="area" class="hidden">
-  <h3>Novo Processo</h3>
-  <input id="titulo" placeholder="Título">
-  <input id="descricao" placeholder="Descrição">
-  <button onclick="criar()">Salvar</button>
-
-  <h3>Lista</h3>
-  <ul id="lista"></ul>
-
-  <button onclick="logout()">Sair</button>
-</div>
-
+    <div id="processos"></div>
+  </div>
 </div>
 
 <script>
@@ -95,122 +151,69 @@ const API = "https://sij-backend.onrender.com"
 
 let token = null
 
-// LOGIN
-async function login(){
-
+async function login() {
   const email = document.getElementById("email").value
-  const password = document.getElementById("password").value
-
-  if(!email || !password){
-    alert("Preencha tudo!")
-    return
-  }
+  const password = document.getElementById("senha").value
 
   const res = await fetch(API + "/login", {
     method: "POST",
-    headers: {"Content-Type":"application/json"},
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, password })
   })
 
   const data = await res.json()
 
-  if(data.token){
+  if (data.token) {
     token = data.token
     alert("Login feito!")
-    document.getElementById("area").classList.remove("hidden")
     listar()
   } else {
-    alert(data.error || "Erro no login")
+    alert(data.error)
   }
 }
 
-// CADASTRO
-async function register(){
-
-  const email = document.getElementById("email").value
-  const password = document.getElementById("password").value
-
-  if(!email || !password){
-    alert("Preencha email e senha!")
-    return
-  }
-
-  if(password.length < 4){
-    alert("Senha muito curta!")
-    return
-  }
+async function register() {
+  const email = document.getElementById("email2").value
+  const password = document.getElementById("senha2").value
 
   const res = await fetch(API + "/register", {
     method: "POST",
-    headers: {"Content-Type":"application/json"},
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, password })
   })
 
   const data = await res.json()
 
-  if(data.ok){
+  if (data.ok) {
     alert("Conta criada!")
   } else {
-    alert("Erro: " + data.error)
+    alert(data.error)
   }
 }
 
-// CRIAR PROCESSO
-async function criar(){
-
+async function criar() {
   const titulo = document.getElementById("titulo").value
   const descricao = document.getElementById("descricao").value
 
-  if(!titulo){
-    alert("Digite um título!")
-    return
-  }
-
-  const res = await fetch(API + "/processos", {
+  await fetch(API + "/processos", {
     method: "POST",
-    headers: {
-      "Content-Type":"application/json",
-      "Authorization": "Bearer " + token
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ titulo, descricao })
   })
 
-  const data = await res.json()
-
-  if(data.ok){
-    alert("Salvo!")
-    listar()
-  } else {
-    alert("Erro ao salvar")
-  }
+  listar()
 }
 
-// LISTAR
-async function listar(){
+async function listar() {
+  const res = await fetch(API + "/processos")
+  const dados = await res.json()
 
-  const res = await fetch(API + "/processos", {
-    headers: {
-      "Authorization": "Bearer " + token
-    }
+  const div = document.getElementById("processos")
+  div.innerHTML = ""
+
+  dados.forEach(p => {
+    div.innerHTML += `<div><b>${p.titulo}</b><br>${p.descricao}</div>`
   })
-
-  const data = await res.json()
-
-  const lista = document.getElementById("lista")
-  lista.innerHTML = ""
-
-  data.forEach(p => {
-    const li = document.createElement("li")
-    li.innerText = p.titulo + " - " + p.descricao
-    lista.appendChild(li)
-  })
-}
-
-// LOGOUT
-function logout(){
-  token = null
-  document.getElementById("area").classList.add("hidden")
-  alert("Saiu!")
 }
 </script>
 
