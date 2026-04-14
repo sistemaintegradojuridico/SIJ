@@ -2,6 +2,8 @@ import express from "express"
 import pkg from "pg"
 import cors from "cors"
 import jwt from "jsonwebtoken"
+import path from "path"
+import { fileURLToPath } from "url"
 
 const { Pool } = pkg
 
@@ -9,12 +11,17 @@ const app = express()
 app.use(cors())
 app.use(express.json())
 
+// 🔥 CONFIG CAMINHO
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+
+// 🔥 BANCO
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: { rejectUnauthorized: false }
 })
 
-// 🔥 CRIA TABELAS AUTOMATICAMENTE
+// 🔥 CRIA TABELAS
 async function initDB() {
   await pool.query(`
     CREATE TABLE IF NOT EXISTS users (
@@ -28,30 +35,28 @@ async function initDB() {
     CREATE TABLE IF NOT EXISTS processos (
       id SERIAL PRIMARY KEY,
       titulo TEXT,
-      descricao TEXT,
-      user_id INTEGER
+      descricao TEXT
     );
   `)
 
   console.log("Banco pronto 🚀")
 }
-
 initDB()
 
 // LOGIN
 app.post("/login", async (req, res) => {
   const { email, password } = req.body
 
-  const user = await pool.query(
+  const result = await pool.query(
     "SELECT * FROM users WHERE email=$1 AND password=$2",
     [email, password]
   )
 
-  if (user.rows.length === 0) {
-    return res.json({ error: "Usuário não encontrado" })
+  if (result.rows.length === 0) {
+    return res.json({ error: "Usuário inválido" })
   }
 
-  const token = jwt.sign({ id: user.rows[0].id }, process.env.JWT_SECRET)
+  const token = jwt.sign({ id: result.rows[0].id }, process.env.JWT_SECRET)
 
   res.json({ token })
 })
@@ -60,6 +65,10 @@ app.post("/login", async (req, res) => {
 app.post("/register", async (req, res) => {
   const { email, password } = req.body
 
+  if (!email || !password) {
+    return res.json({ error: "Preencha tudo" })
+  }
+
   try {
     await pool.query(
       "INSERT INTO users (email, password) VALUES ($1, $2)",
@@ -67,14 +76,18 @@ app.post("/register", async (req, res) => {
     )
 
     res.json({ ok: true })
-  } catch (err) {
-    res.json({ error: "Usuário já existe" })
+  } catch {
+    res.json({ error: "Email já existe" })
   }
 })
 
 // CRIAR PROCESSO
 app.post("/processos", async (req, res) => {
   const { titulo, descricao } = req.body
+
+  if (!titulo || !descricao) {
+    return res.json({ error: "Preencha tudo" })
+  }
 
   await pool.query(
     "INSERT INTO processos (titulo, descricao) VALUES ($1, $2)",
@@ -86,8 +99,17 @@ app.post("/processos", async (req, res) => {
 
 // LISTAR
 app.get("/processos", async (req, res) => {
-  const result = await pool.query("SELECT * FROM processos")
+  const result = await pool.query("SELECT * FROM processos ORDER BY id DESC")
   res.json(result.rows)
 })
 
-app.listen(10000, () => console.log("Servidor rodando 🚀"))
+// 🔥 SERVIR FRONTEND
+app.use(express.static(path.join(__dirname, "frontend")))
+
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "frontend", "index.html"))
+})
+
+// PORTA DO RENDER
+const PORT = process.env.PORT || 10000
+app.listen(PORT, () => console.log("Servidor rodando 🚀"))
