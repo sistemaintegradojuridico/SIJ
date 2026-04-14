@@ -9,11 +9,11 @@ body {
     margin: 0;
     font-family: Arial, sans-serif;
 
-    /* FUNDO VINHO COM TEXTURA */
+    /* VINHO MAIS ELEGANTE (PUXANDO PRO ROXO) */
     background:
-        radial-gradient(circle at 20% 20%, rgba(255,255,255,0.05) 1px, transparent 1px),
-        radial-gradient(circle at 80% 80%, rgba(255,255,255,0.04) 1px, transparent 1px),
-        linear-gradient(135deg, #3a0015, #5c0125, #2a0012);
+        radial-gradient(circle at 20% 20%, rgba(255,255,255,0.04) 1px, transparent 1px),
+        radial-gradient(circle at 80% 80%, rgba(255,255,255,0.03) 1px, transparent 1px),
+        linear-gradient(135deg, #2b0013, #4b0022, #1a000d);
 
     background-size: 30px 30px, 40px 40px, cover;
 
@@ -23,32 +23,32 @@ body {
     justify-content: center;
 }
 
-/* CARD CENTRAL */
+/* CARD */
 .container {
-    width: 280px;
-    background: #f4f4f4;
+    width: 260px;
+    background: #f7f7f7;
     padding: 25px;
     border-radius: 12px;
     text-align: center;
-
-    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.6);
 }
 
 /* LOGO */
 .logo {
-    font-size: 22px;
+    font-size: 20px;
     margin-bottom: 15px;
-    color: #5c0125;
+    color: #4b0022;
     font-weight: bold;
 }
 
-/* INPUTS */
+/* INPUT */
 input {
     width: 100%;
     padding: 10px;
     margin: 6px 0;
     border-radius: 6px;
     border: 1px solid #ccc;
+    text-align: center; /* CENTRALIZA TEXTO */
 }
 
 /* BOTÃO */
@@ -58,21 +58,28 @@ button {
     margin-top: 10px;
     border: none;
     border-radius: 6px;
-    background: linear-gradient(135deg, #7a0f2c, #b3123f);
+    background: linear-gradient(135deg, #5c0125, #8a0f3a);
     color: white;
     font-weight: bold;
     cursor: pointer;
 }
 
-/* LINK */
+/* LINKS */
 .link {
     margin-top: 8px;
     font-size: 13px;
-    color: #7a0f2c;
+    color: #5c0125;
     cursor: pointer;
 }
 
-/* APP */
+/* ESQUECI SENHA */
+.forgot {
+    font-size: 12px;
+    margin-top: 5px;
+    color: #777;
+    cursor: pointer;
+}
+
 #app {
     display: none;
 }
@@ -89,6 +96,11 @@ button {
     <div id="loginBox">
         <input id="email" placeholder="Email">
         <input id="password" type="password" placeholder="Senha">
+
+        <div class="forgot" onclick="alert('Função será ativada em breve')">
+            Esqueci minha senha
+        </div>
+
         <button onclick="login()">Entrar</button>
         <div class="link" onclick="register()">Criar conta</div>
     </div>
