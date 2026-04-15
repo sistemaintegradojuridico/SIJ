@@ -7,61 +7,54 @@
 <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
 
 <style>
-body{
-  margin:0;
-  font-family:'Segoe UI',sans-serif;
-  background:#f6f7fb;
+body{margin:0;font-family:sans-serif;background:#f5f6fa}
+
+/* LOGIN */
+#login{
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
 }
+.box{
+  background:white;
+  padding:30px;
+  border-radius:10px;
+  width:300px;
+}
+input,button,textarea{
+  width:100%;
+  margin-top:10px;
+  padding:8px;
+}
+button{
+  background:#3b82f6;
+  color:white;
+  border:none;
+}
+
+/* APP */
+#app{display:none}
 
 /* SIDEBAR */
 .sidebar{
   width:220px;
   height:100vh;
-  position:fixed;
-  background:#1e293b;
-  color:#cbd5e1;
-  padding-top:20px;
-}
-
-.sidebar h2{
-  padding:0 20px;
+  background:#0f172a;
   color:white;
-  font-size:18px;
+  position:fixed;
 }
-
-.menu{
-  margin-top:20px;
-}
-
 .menu div{
-  padding:12px 20px;
+  padding:12px;
   cursor:pointer;
-  display:flex;
-  align-items:center;
-  gap:10px;
 }
-
-.menu div:hover{
-  background:#334155;
-}
+.menu div:hover{background:#1e293b}
 
 /* TOP */
 .top{
   margin-left:220px;
-  height:60px;
+  padding:10px;
   background:white;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:0 20px;
-  border-bottom:1px solid #eee;
-}
-
-.search{
-  background:#f1f5f9;
-  padding:8px 12px;
-  border-radius:6px;
-  width:300px;
 }
 
 /* MAIN */
@@ -70,125 +63,103 @@ body{
   padding:20px;
 }
 
-/* DASH */
-.cards{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:15px;
-}
-
 .card{
   background:white;
-  padding:20px;
-  border-radius:10px;
-  border:1px solid #eee;
-}
-
-/* TABELA */
-.table{
-  width:100%;
-  background:white;
-  border-radius:10px;
-  border:1px solid #eee;
-  margin-top:15px;
-}
-
-.row{
-  display:flex;
-  justify-content:space-between;
-  padding:12px;
-  border-bottom:1px solid #eee;
+  padding:10px;
+  margin-top:10px;
 }
 
 /* CRM */
-.kanban{
+.colunas{
   display:flex;
-  gap:15px;
+  gap:10px;
 }
-
-.coluna{
-  background:#f1f5f9;
+.col{
+  background:#e2e8f0;
   padding:10px;
-  width:250px;
-  border-radius:8px;
+  width:200px;
 }
-
-.card-kanban{
+.item{
   background:white;
-  padding:10px;
-  margin-top:10px;
-  border-radius:6px;
-}
-
-/* MODELOS */
-textarea{
-  width:100%;
-  height:200px;
-  margin-top:10px;
+  padding:8px;
+  margin-top:5px;
 }
 </style>
 </head>
 
 <body>
 
+<!-- LOGIN -->
+<div id="login">
+  <div class="box">
+    <h3>Login</h3>
+    <input id="email" placeholder="Email">
+    <input id="senha" type="password" placeholder="Senha">
+    <button onclick="entrar()">Entrar</button>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+
 <div class="sidebar">
-  <h2>SIJ PRO</h2>
+  <h3 style="padding:10px">SIJ PRO</h3>
 
   <div class="menu">
-    <div onclick="trocar('dash')"><i class="ri-home-line"></i> Dashboard</div>
-    <div onclick="trocar('agenda')"><i class="ri-calendar-line"></i> Agenda</div>
-    <div onclick="trocar('atividades')"><i class="ri-check-line"></i> Atividades</div>
-    <div onclick="trocar('crm')"><i class="ri-layout-grid-line"></i> CRM</div>
-    <div onclick="trocar('contatos')"><i class="ri-user-line"></i> Contatos</div>
-    <div onclick="trocar('processos')"><i class="ri-file-line"></i> Processos</div>
-    <div onclick="trocar('intimacoes')"><i class="ri-notification-line"></i> Intimações</div>
-    <div onclick="trocar('parceiros')"><i class="ri-group-line"></i> Parceiros</div>
-    <div onclick="trocar('modelos')"><i class="ri-file-text-line"></i> Modelos</div>
+    <div onclick="trocar('dash')">Dashboard</div>
+    <div onclick="trocar('agenda')">Agenda</div>
+    <div onclick="trocar('atividades')">Atividades</div>
+    <div onclick="trocar('crm')">CRM</div>
+    <div onclick="trocar('contatos')">Contatos</div>
+    <div onclick="trocar('processos')">Processos</div>
+    <div onclick="trocar('intimacoes')">Intimações</div>
+    <div onclick="trocar('parceiros')">Parceiros</div>
+    <div onclick="trocar('modelos')">Modelos</div>
   </div>
 </div>
 
 <div class="top">
-  <input class="search" placeholder="Digite / para pesquisar">
-  <div>Olá, Usuário</div>
+  <input placeholder="Pesquisar">
 </div>
 
 <div class="main">
 
-<!-- DASHBOARD -->
+<!-- DASH -->
 <div id="dash">
   <h2>Dashboard</h2>
-  <div class="cards">
-    <div class="card">Tarefas concluídas: 52</div>
-    <div class="card">Pontos: 2549</div>
-    <div class="card">Pendentes: 32</div>
-    <div class="card">Meta: 80%</div>
-  </div>
+</div>
+
+<!-- AGENDA -->
+<div id="agenda" style="display:none">
+  <h2>Agenda</h2>
+  <input id="tarefaAgenda" placeholder="Nova tarefa">
+  <button onclick="addAgenda()">Adicionar</button>
+  <div id="listaAgenda"></div>
 </div>
 
 <!-- ATIVIDADES -->
 <div id="atividades" style="display:none">
   <h2>Atividades</h2>
-  <button>Nova tarefa</button>
-
-  <div class="table">
-    <div class="row">Elaborar petição inicial</div>
-    <div class="row">Analisar caso cliente</div>
-  </div>
+  <input id="atividadeInput" placeholder="Nova atividade">
+  <button onclick="addAtividade()">Adicionar</button>
+  <div id="listaAtividades"></div>
 </div>
 
 <!-- CRM -->
 <div id="crm" style="display:none">
   <h2>CRM</h2>
+  <input id="crmInput" placeholder="Novo cliente">
+  <button onclick="addCRM()">Adicionar</button>
 
-  <div class="kanban">
-    <div class="coluna">
+  <div class="colunas">
+    <div class="col">
       <b>Negociação</b>
-      <div class="card-kanban">Cliente INSS</div>
+      <div id="negociacao"></div>
     </div>
 
-    <div class="coluna">
+    <div class="col">
       <b>Judicial</b>
-      <div class="card-kanban">Processo ativo</div>
+      <div id="judicial"></div>
     </div>
   </div>
 </div>
@@ -196,39 +167,33 @@ textarea{
 <!-- CONTATOS -->
 <div id="contatos" style="display:none">
   <h2>Contatos</h2>
-
-  <div class="table">
-    <div class="row">João da Silva</div>
-    <div class="row">INSS</div>
-  </div>
+  <input id="contatoInput" placeholder="Nome">
+  <button onclick="addContato()">Adicionar</button>
+  <div id="listaContatos"></div>
 </div>
 
 <!-- PROCESSOS -->
 <div id="processos" style="display:none">
   <h2>Processos</h2>
-
-  <div class="table">
-    <div class="row">Processo 0001 - INSS</div>
-    <div class="row">Processo 0002 - Cliente</div>
-  </div>
+  <input id="processoInput" placeholder="Processo">
+  <button onclick="addProcesso()">Adicionar</button>
+  <div id="listaProcessos"></div>
 </div>
 
 <!-- INTIMAÇÕES -->
 <div id="intimacoes" style="display:none">
   <h2>Intimações</h2>
-
-  <div class="table">
-    <div class="row">Intimação TRF4</div>
-  </div>
+  <input id="intimacaoInput">
+  <button onclick="addIntimacao()">Adicionar</button>
+  <div id="listaIntimacoes"></div>
 </div>
 
 <!-- PARCEIROS -->
 <div id="parceiros" style="display:none">
   <h2>Parceiros</h2>
-
-  <div class="table">
-    <div class="row">Parceiro A</div>
-  </div>
+  <input id="parceiroInput">
+  <button onclick="addParceiro()">Adicionar</button>
+  <div id="listaParceiros"></div>
 </div>
 
 <!-- MODELOS -->
@@ -243,31 +208,66 @@ textarea{
 </div>
 
 </div>
+</div>
 
 <script>
+function entrar(){
+  document.getElementById("login").style.display="none"
+  document.getElementById("app").style.display="block"
+}
+
 function trocar(id){
-  let telas = ["dash","agenda","atividades","crm","contatos","processos","intimacoes","parceiros","modelos"]
-  telas.forEach(t=>{
-    let el = document.getElementById(t)
-    if(el) el.style.display="none"
-  })
+  document.querySelectorAll(".main > div").forEach(d=>d.style.display="none")
   document.getElementById(id).style.display="block"
 }
 
-let modelos=[]
+/* AGENDA */
+function addAgenda(){
+  let val = tarefaAgenda.value
+  listaAgenda.innerHTML += `<div class="card">${val}</div>`
+}
 
+/* ATIVIDADE */
+function addAtividade(){
+  let val = atividadeInput.value
+  listaAtividades.innerHTML += `<div class="card">${val}</div>`
+}
+
+/* CRM */
+function addCRM(){
+  let val = crmInput.value
+  negociacao.innerHTML += `<div class="item">${val}</div>`
+}
+
+/* CONTATO */
+function addContato(){
+  let val = contatoInput.value
+  listaContatos.innerHTML += `<div class="card">${val}</div>`
+}
+
+/* PROCESSO */
+function addProcesso(){
+  let val = processoInput.value
+  listaProcessos.innerHTML += `<div class="card">${val}</div>`
+}
+
+/* INTIMAÇÃO */
+function addIntimacao(){
+  let val = intimacaoInput.value
+  listaIntimacoes.innerHTML += `<div class="card">${val}</div>`
+}
+
+/* PARCEIRO */
+function addParceiro(){
+  let val = parceiroInput.value
+  listaParceiros.innerHTML += `<div class="card">${val}</div>`
+}
+
+/* MODELOS */
 function salvarModelo(){
-  let titulo = document.getElementById("tituloModelo").value
-  let texto = document.getElementById("textoModelo").value
-
-  modelos.push({titulo,texto})
-
-  let lista = document.getElementById("listaModelos")
-  lista.innerHTML=""
-
-  modelos.forEach(m=>{
-    lista.innerHTML += `<div class="row"><b>${m.titulo}</b></div>`
-  })
+  let titulo = tituloModelo.value
+  let texto = textoModelo.value
+  listaModelos.innerHTML += `<div class="card"><b>${titulo}</b></div>`
 }
 </script>
 
