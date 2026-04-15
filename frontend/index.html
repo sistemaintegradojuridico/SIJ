@@ -13,19 +13,17 @@ body{
 }
 
 /* LOGIN */
-.center{
-  width:320px;
+#login{
+  width:300px;
   margin:120px auto;
   text-align:center;
 }
 
 /* APP */
 .container{
-  width:350px;
+  width:90%;
+  max-width:600px;
   margin:20px auto;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
 }
 
 input, select, button{
@@ -33,7 +31,8 @@ input, select, button{
   padding:12px;
   margin:6px 0;
   border:none;
-  border-radius:10px;
+  border-radius:8px;
+  box-sizing:border-box;
 }
 
 button{
@@ -45,34 +44,32 @@ button{
 
 /* CARD */
 .card{
-  width:90%;
   background:white;
   color:black;
   padding:15px;
-  margin:10px auto;
-  border-radius:12px;
-  text-align:left;
+  margin:15px auto;
+  border-radius:10px;
 }
 
 /* STATUS */
 .status{
-  padding:4px 10px;
+  padding:5px 12px;
   border-radius:20px;
   font-size:12px;
   display:inline-block;
-  margin-bottom:8px;
+  margin-bottom:10px;
   cursor:pointer;
 }
 
-.ativo{background:green;color:white;}
-.vencer{background:orange;color:white;}
-.finalizado{background:gray;color:white;}
-.deferido{background:blue;color:white;}
-.indeferido{background:red;color:white;}
+.ativo{background:#28a745;color:white;}
+.vencer{background:#ffc107;color:black;}
+.finalizado{background:#6c757d;color:white;}
+.deferido{background:#007bff;color:white;}
+.indeferido{background:#dc3545;color:white;}
 
 .small{
   font-size:11px;
-  color:gray;
+  color:#666;
 }
 
 .hidden{display:none;}
@@ -85,7 +82,7 @@ h3{text-align:center;}
 <body>
 
 <!-- LOGIN -->
-<div id="login" class="center">
+<div id="login">
   <h2>SIJ PRO</h2>
   <input id="email" placeholder="Email">
   <input id="senha" type="password" placeholder="Senha">
@@ -118,14 +115,8 @@ h3{text-align:center;}
 
 </div>
 
-<h3>Prazos próximos</h3>
-<div id="alertas"></div>
-
 <h3>Processos</h3>
 <div id="lista"></div>
-
-<h3>Estatística do mês</h3>
-<div id="stats"></div>
 
 </div>
 
@@ -133,29 +124,24 @@ h3{text-align:center;}
 
 let editando = null
 
-// ===== LOGIN =====
 function entrar(){
   if(email.value && senha.value){
     localStorage.setItem("logado","sim")
     iniciar()
-  }else{
-    alert("Preencha email e senha")
   }
 }
 
 function sair(){
-  localStorage.removeItem("logado")
+  localStorage.clear()
   location.reload()
 }
 
-// ===== INICIAR =====
 function iniciar(){
-  document.getElementById("login").classList.add("hidden")
-  document.getElementById("app").classList.remove("hidden")
+  login.classList.add("hidden")
+  app.classList.remove("hidden")
   listar()
 }
 
-// ===== BANCO =====
 function getDados(){
   return JSON.parse(localStorage.getItem("dados") || "[]")
 }
@@ -164,15 +150,11 @@ function setDados(d){
   localStorage.setItem("dados", JSON.stringify(d))
 }
 
-// ===== DATA =====
-function hoje(){
-  return new Date().toLocaleDateString()
-}
-
-// ===== SALVAR =====
 function salvar(){
 
   let lista = getDados()
+
+  let file = arquivo.files[0]
 
   if(editando){
     let p = lista.find(x=>x.id===editando)
@@ -182,30 +164,52 @@ function salvar(){
     p.parte = parte.value
     p.descricao = descricao.value
     p.prazo = prazo.value
-    p.arquivo = arquivo.files[0]?.name || p.arquivo
-
-    editando = null
 
   }else{
-    lista.push({
-      id: Date.now(),
-      titulo: titulo.value,
-      area: area.value,
-      parte: parte.value,
-      descricao: descricao.value,
-      prazo: prazo.value,
-      data: hoje(),
-      arquivo: arquivo.files[0]?.name || "nenhum",
-      status:"ativo"
-    })
+
+    let reader = new FileReader()
+
+    reader.onload = function(e){
+
+      lista.push({
+        id: Date.now(),
+        titulo: titulo.value,
+        area: area.value,
+        parte: parte.value,
+        descricao: descricao.value,
+        prazo: prazo.value,
+        data: new Date().toLocaleDateString(),
+        arquivo: e.target.result || null,
+        status:"ativo"
+      })
+
+      setDados(lista)
+      listar()
+    }
+
+    if(file){
+      reader.readAsDataURL(file)
+    }else{
+      lista.push({
+        id: Date.now(),
+        titulo: titulo.value,
+        area: area.value,
+        parte: parte.value,
+        descricao: descricao.value,
+        prazo: prazo.value,
+        data: new Date().toLocaleDateString(),
+        arquivo:null,
+        status:"ativo"
+      })
+
+      setDados(lista)
+      listar()
+    }
   }
 
-  setDados(lista)
   limpar()
-  listar()
 }
 
-// ===== LIMPAR =====
 function limpar(){
   titulo.value=""
   parte.value=""
@@ -213,7 +217,6 @@ function limpar(){
   prazo.value=""
 }
 
-// ===== STATUS =====
 function trocarStatus(id){
   let lista = getDados()
   let p = lista.find(x=>x.id===id)
@@ -226,7 +229,6 @@ function trocarStatus(id){
   listar()
 }
 
-// ===== EDITAR =====
 function editar(id){
   let lista = getDados()
   let p = lista.find(x=>x.id===id)
@@ -240,26 +242,18 @@ function editar(id){
   editando = id
 }
 
-// ===== EXCLUIR =====
 function excluir(id){
   let lista = getDados().filter(p=>p.id!==id)
   setDados(lista)
   listar()
 }
 
-// ===== LISTAR =====
 function listar(){
 
   let dados = getDados()
   lista.innerHTML=""
-  alertas.innerHTML=""
-
-  let hojeData = new Date()
-  let deferidos = 0
 
   dados.forEach(p=>{
-
-    if(p.status === "deferido") deferidos++
 
     lista.innerHTML += `
       <div class="card">
@@ -272,7 +266,8 @@ function listar(){
         Área: ${p.area}<br>
         Parte: ${p.parte}<br>
         Prazo: ${p.prazo || "sem prazo"}<br>
-        Arquivo: ${p.arquivo}<br>
+
+        ${p.arquivo ? `<a href="${p.arquivo}" target="_blank">📎 Ver Anexo</a><br>` : ""}
 
         <div class="small">Criado em ${p.data}</div>
 
@@ -282,34 +277,11 @@ function listar(){
 
       </div>
     `
-
-    if(p.prazo){
-      let prazoData = new Date(p.prazo)
-      let diff = (prazoData - hojeData)/(1000*60*60*24)
-
-      if(diff <= 3){
-        alertas.innerHTML += `
-          <div class="card">
-            ⚠️ ${p.titulo} vence em ${Math.ceil(diff)} dia(s)
-          </div>
-        `
-      }
-    }
-
   })
-
-  stats.innerHTML = `
-    <div class="card">
-      Deferidos no mês: ${deferidos}
-    </div>
-  `
 }
 
-// ===== CONTROLE DE LOGIN =====
 if(localStorage.getItem("logado") === "sim"){
   iniciar()
-}else{
-  document.getElementById("login").classList.remove("hidden")
 }
 
 </script>
