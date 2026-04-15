@@ -12,7 +12,7 @@ body{
   color:white;
 }
 
-/* TEXTURA */
+/* textura */
 body::after{
   content:"";
   position:fixed;
@@ -20,10 +20,9 @@ body::after{
   height:100%;
   background:radial-gradient(circle at 20% 30%, rgba(255,255,255,0.05), transparent),
              radial-gradient(circle at 80% 70%, rgba(255,255,255,0.05), transparent);
-  pointer-events:none;
 }
 
-/* LOGIN CENTRAL */
+/* LOGIN */
 #login{
   position:absolute;
   top:50%;
@@ -43,7 +42,6 @@ input, select, button{
   box-sizing:border-box;
 }
 
-/* BOTÃO */
 button{
   background:linear-gradient(90deg,#ff416c,#ff4b2b);
   color:white;
@@ -72,7 +70,7 @@ button{
   background:#292944;
 }
 
-/* CONTEÚDO */
+/* MAIN */
 .main{
   flex:1;
   padding:20px;
@@ -113,9 +111,7 @@ button{
   color:#555;
 }
 
-.hidden{
-  display:none !important;
-}
+.hidden{display:none;}
 </style>
 
 </head>
@@ -142,8 +138,9 @@ button{
 
 <div class="main">
 
+<!-- FORM -->
 <div id="novo" class="form hidden">
-<h3>Novo Processo</h3>
+<h3>Novo / Editar Processo</h3>
 
 <input id="titulo" placeholder="Título">
 
@@ -163,6 +160,7 @@ button{
 <button onclick="salvar()">Salvar</button>
 </div>
 
+<!-- LISTA -->
 <div id="processos">
 <h3>Processos</h3>
 <div id="lista"></div>
@@ -178,19 +176,21 @@ let editando = null
 function entrar(){
   if(email.value && senha.value){
     localStorage.setItem("logado","sim")
-
-    document.getElementById("login").classList.add("hidden")
-    document.getElementById("app").classList.remove("hidden")
-
-    listar()
+    iniciar()
   }
 }
 
 function sair(){
   localStorage.removeItem("logado")
-
   document.getElementById("app").classList.add("hidden")
   document.getElementById("login").classList.remove("hidden")
+}
+
+function iniciar(){
+  document.getElementById("login").classList.add("hidden")
+  document.getElementById("app").classList.remove("hidden")
+  mostrar("processos")
+  listar()
 }
 
 function mostrar(tela){
@@ -211,26 +211,36 @@ function salvar(){
 
   let lista = getDados()
   let file = arquivo.files[0]
-
   let reader = new FileReader()
 
   reader.onload = function(e){
 
-    lista.push({
-      id: Date.now(),
-      titulo: titulo.value,
-      area: area.value,
-      parte: parte.value,
-      descricao: descricao.value,
-      prazo: prazo.value,
-      data: new Date().toLocaleDateString(),
-      arquivo: e.target.result || null,
-      status:"ativo"
-    })
+    if(editando){
+      let p = lista.find(x=>x.id===editando)
+      p.titulo = titulo.value
+      p.area = area.value
+      p.parte = parte.value
+      p.descricao = descricao.value
+      p.prazo = prazo.value
+    }else{
+      lista.push({
+        id: Date.now(),
+        titulo: titulo.value,
+        area: area.value,
+        parte: parte.value,
+        descricao: descricao.value,
+        prazo: prazo.value,
+        data: new Date().toLocaleDateString(),
+        arquivo: e.target.result || null,
+        status:"ativo"
+      })
+    }
 
     setDados(lista)
     listar()
     mostrar("processos")
+    limpar()
+    editando = null
   }
 
   if(file){
@@ -238,6 +248,45 @@ function salvar(){
   }else{
     reader.onload({target:{result:null}})
   }
+}
+
+function limpar(){
+  titulo.value=""
+  parte.value=""
+  descricao.value=""
+  prazo.value=""
+}
+
+function trocarStatus(id){
+  let lista = getDados()
+  let p = lista.find(x=>x.id===id)
+
+  const ordem = ["ativo","vencer","finalizado","deferido","indeferido"]
+  let i = ordem.indexOf(p.status)
+  p.status = ordem[(i+1)%ordem.length]
+
+  setDados(lista)
+  listar()
+}
+
+function editar(id){
+  let lista = getDados()
+  let p = lista.find(x=>x.id===id)
+
+  titulo.value = p.titulo
+  area.value = p.area
+  parte.value = p.parte
+  descricao.value = p.descricao
+  prazo.value = p.prazo
+
+  editando = id
+  mostrar("novo")
+}
+
+function excluir(id){
+  let lista = getDados().filter(p=>p.id!==id)
+  setDados(lista)
+  listar()
 }
 
 function listar(){
@@ -250,7 +299,7 @@ function listar(){
     lista.innerHTML += `
       <div class="card">
 
-        <div class="status ${p.status}">
+        <div class="status ${p.status}" onclick="trocarStatus(${p.id})">
           ${p.status}
         </div>
 
@@ -263,15 +312,20 @@ function listar(){
 
         <div class="small">Criado em ${p.data}</div>
 
+        <br>
+        <button onclick="editar(${p.id})">Editar</button>
+        <button onclick="excluir(${p.id})">Excluir</button>
+
       </div>
     `
   })
 }
 
-/* CONTROLE CORRETO */
+/* LOGIN CONTROLE */
 window.onload = function(){
-  document.getElementById("app").classList.add("hidden")
-  document.getElementById("login").classList.remove("hidden")
+  if(localStorage.getItem("logado") === "sim"){
+    iniciar()
+  }
 }
 
 </script>
