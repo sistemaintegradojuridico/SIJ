@@ -2,7 +2,7 @@
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
-<title>SIJ</title>
+<title>SIJ PRO</title>
 
 <style>
 body{
@@ -12,8 +12,6 @@ body{
   flex-direction:column;
   align-items:center;
   justify-content:center;
-
-  /* FUNDO ROXO VINHO COM TEXTURA */
   background: radial-gradient(circle at top, #7a1f3d, #2a0015);
   font-family: Arial;
 }
@@ -32,79 +30,158 @@ body::after{
 /* LOGO */
 .logo{
   text-align:center;
-  margin-bottom:20px;
+  margin-bottom:25px;
+  z-index:1;
 }
 
 .logo img{
-  width:90px;
-  border-radius:50%;
-  box-shadow:0 0 20px rgba(255,255,255,0.3);
+  width:140px;
+  filter: drop-shadow(0 0 20px rgba(255,255,255,0.3));
 }
 
 .logo h1{
   color:#f5d58c;
-  font-size:18px;
-  letter-spacing:2px;
+  font-size:20px;
+  letter-spacing:3px;
   margin-top:10px;
 }
 
 /* CAIXA */
 .container{
   background: rgba(255,255,255,0.08);
-  padding:25px;
-  border-radius:12px;
-  backdrop-filter: blur(10px);
-  box-shadow:0 10px 30px rgba(0,0,0,0.4);
-  width:260px;
+  padding:30px;
+  border-radius:15px;
+  backdrop-filter: blur(12px);
+  box-shadow:0 10px 40px rgba(0,0,0,0.5);
+  width:280px;
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  z-index:1;
 }
 
 /* INPUTS */
 input{
-  width:100%;
-  padding:10px;
+  width:90%;
+  padding:12px;
   margin:8px 0;
   border:none;
-  border-radius:6px;
+  border-radius:8px;
   outline:none;
+  text-align:center;
 }
 
 /* BOTÃO */
 button{
-  width:100%;
-  padding:10px;
+  width:95%;
+  padding:12px;
   border:none;
-  border-radius:6px;
+  border-radius:8px;
   background: linear-gradient(90deg,#ff416c,#ff4b2b);
   color:white;
   cursor:pointer;
   margin-top:10px;
+  font-weight:bold;
 }
 
 /* LINK */
 .link{
   text-align:center;
-  margin-top:10px;
+  margin-top:12px;
   color:#eee;
   cursor:pointer;
-  font-size:13px;
+  font-size:14px;
 }
 
+/* ESCONDER */
+.hidden{
+  display:none;
+}
 </style>
 </head>
 
 <body>
 
+<!-- LOGO -->
 <div class="logo">
   <img src="logo.png">
   <h1>SISTEMA INTEGRADO JURÍDICO</h1>
 </div>
 
+<!-- CAIXA -->
 <div class="container">
-  <input placeholder="Email">
-  <input type="password" placeholder="Senha">
-  <button>Entrar</button>
-  <div class="link">Criar conta</div>
+
+  <!-- LOGIN -->
+  <div id="loginBox">
+    <input id="email" placeholder="Email">
+    <input id="senha" type="password" placeholder="Senha">
+    <button onclick="login()">Entrar</button>
+    <div class="link" onclick="mostrarCadastro()">Criar conta</div>
+  </div>
+
+  <!-- CADASTRO -->
+  <div id="cadastroBox" class="hidden">
+    <input id="novoEmail" placeholder="Email">
+    <input id="novaSenha" type="password" placeholder="Senha">
+    <button onclick="register()">Cadastrar</button>
+    <div class="link" onclick="voltarLogin()">Voltar</div>
+  </div>
+
 </div>
+
+<script>
+const API = "https://sij-backend.onrender.com" // tua API
+
+function mostrarCadastro(){
+  document.getElementById("loginBox").classList.add("hidden")
+  document.getElementById("cadastroBox").classList.remove("hidden")
+}
+
+function voltarLogin(){
+  document.getElementById("cadastroBox").classList.add("hidden")
+  document.getElementById("loginBox").classList.remove("hidden")
+}
+
+async function register(){
+  const email = document.getElementById("novoEmail").value
+  const password = document.getElementById("novaSenha").value
+
+  const res = await fetch(API + "/register", {
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({ email, password })
+  })
+
+  const data = await res.json()
+
+  if(res.ok){
+    alert("Conta criada!")
+    voltarLogin()
+  }else{
+    alert(data.error)
+  }
+}
+
+async function login(){
+  const email = document.getElementById("email").value
+  const password = document.getElementById("senha").value
+
+  const res = await fetch(API + "/login", {
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({ email, password })
+  })
+
+  const data = await res.json()
+
+  if(res.ok){
+    alert("Login feito 🚀")
+  }else{
+    alert(data.error || "Erro no login")
+  }
+}
+</script>
 
 </body>
 </html>
