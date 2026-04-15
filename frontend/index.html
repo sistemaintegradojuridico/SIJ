@@ -86,11 +86,12 @@ body{
   border:1px solid #eee;
 }
 
-/* FORM */
+/* PROCESSOS */
 .form{
   display:flex;
   gap:10px;
   margin-top:15px;
+  flex-wrap:wrap;
 }
 
 .form input{
@@ -108,7 +109,6 @@ body{
   cursor:pointer;
 }
 
-/* LISTA */
 .lista{
   margin-top:20px;
 }
@@ -122,11 +122,17 @@ body{
 }
 
 /* PERFIL */
+.perfil img{
+  width:80px;
+  height:80px;
+  border-radius:50%;
+  margin-bottom:10px;
+}
+
 .perfil input{
   display:block;
   margin:10px 0;
   padding:8px;
-  width:250px;
 }
 
 .perfil button{
@@ -153,53 +159,62 @@ body{
   <div class="logo">SIJ PRO</div>
 
   <div class="user" onclick="trocar('perfil')">
-    <img id="foto" src="https://i.imgur.com/6VBx3io.png">
-    <span id="nome">Usuário</span>
+    <img id="fotoTopo" src="https://i.imgur.com/6VBx3io.png">
+    <span id="nomeTopo">Usuário</span>
   </div>
 </div>
 
 <div class="main">
 
+<!-- DASH -->
 <div id="dash">
   <h2>Dashboard</h2>
 
   <div class="cards">
-    <div class="card">Processos: 12</div>
+    <div class="card">Processos: <span id="countProc">0</span></div>
     <div class="card">Tarefas: 5</div>
     <div class="card">Prazos: 3</div>
     <div class="card">Financeiro: R$ 2.500</div>
   </div>
 </div>
 
+<!-- PROCESSOS -->
 <div id="processos" style="display:none">
   <h2>Processos</h2>
 
   <div class="form">
     <input id="titulo" placeholder="Título">
     <input id="parte" placeholder="Parte">
+    <input type="file" id="anexo">
     <button onclick="add()">Adicionar</button>
   </div>
 
   <div id="lista" class="lista"></div>
 </div>
 
+<!-- AGENDA -->
 <div id="agenda" style="display:none">
   <h2>Agenda</h2>
-  <p>Calendário entra depois</p>
+  <p>(vamos colocar calendário real depois)</p>
 </div>
 
+<!-- PERFIL -->
 <div id="perfil" style="display:none" class="perfil">
   <h2>Perfil</h2>
+
+  <img id="previewFoto" src="https://i.imgur.com/6VBx3io.png">
 
   <input id="nomeInput" placeholder="Nome">
   <input type="file" id="fotoInput">
 
-  <button onclick="salvarPerfil()">Salvar</button>
+  <button onclick="salvarPerfil()">Salvar Perfil</button>
 </div>
 
 </div>
 
 <script>
+let processos = []
+
 function trocar(id){
   ["dash","processos","agenda","perfil"].forEach(p=>{
     document.getElementById(p).style.display="none"
@@ -208,38 +223,63 @@ function trocar(id){
 }
 
 function add(){
-  let lista = document.getElementById("lista")
+  let titulo = document.getElementById("titulo").value
+  let parte = document.getElementById("parte").value
+  let file = document.getElementById("anexo").files[0]
 
-  lista.innerHTML += `
-    <div class="item">
-      <b>${titulo.value}</b><br>
-      ${parte.value}
-    </div>
-  `
+  let url = file ? URL.createObjectURL(file) : null
+
+  processos.push({titulo,parte,anexo:url})
+
+  render()
+}
+
+function render(){
+  let lista = document.getElementById("lista")
+  lista.innerHTML=""
+
+  processos.forEach(p=>{
+    lista.innerHTML += `
+      <div class="item">
+        <b>${p.titulo}</b><br>
+        Parte: ${p.parte}<br>
+        ${p.anexo ? `<a href="${p.anexo}" target="_blank">Ver anexo</a>` : "Sem anexo"}
+      </div>
+    `
+  })
+
+  document.getElementById("countProc").innerText = processos.length
 }
 
 function salvarPerfil(){
-  let nomeVal = nomeInput.value
-  let fotoFile = fotoInput.files[0]
+  let nome = document.getElementById("nomeInput").value
+  let foto = document.getElementById("fotoInput").files[0]
 
-  if(nomeVal){
-    localStorage.setItem("nome",nomeVal)
-    nome.innerText = nomeVal
+  if(nome){
+    localStorage.setItem("nome",nome)
+    document.getElementById("nomeTopo").innerText = nome
   }
 
-  if(fotoFile){
-    let url = URL.createObjectURL(fotoFile)
+  if(foto){
+    let url = URL.createObjectURL(foto)
     localStorage.setItem("foto",url)
-    foto.src = url
+
+    document.getElementById("fotoTopo").src = url
+    document.getElementById("previewFoto").src = url
   }
 }
 
 window.onload = ()=>{
-  if(localStorage.getItem("nome")){
-    nome.innerText = localStorage.getItem("nome")
+  let nome = localStorage.getItem("nome")
+  let foto = localStorage.getItem("foto")
+
+  if(nome){
+    document.getElementById("nomeTopo").innerText = nome
   }
-  if(localStorage.getItem("foto")){
-    foto.src = localStorage.getItem("foto")
+
+  if(foto){
+    document.getElementById("fotoTopo").src = foto
+    document.getElementById("previewFoto").src = foto
   }
 }
 </script>
