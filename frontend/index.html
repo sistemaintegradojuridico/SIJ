@@ -10,7 +10,18 @@ body{
   font-family:Arial;
 }
 
-/* FUNDO LOGIN */
+/* TEMAS */
+.dark{
+  background:#2b0d2b;
+  color:white;
+}
+
+.light{
+  background:#f4f6f9;
+  color:black;
+}
+
+/* LOGIN */
 #login{
   height:100vh;
   display:flex;
@@ -19,10 +30,8 @@ body{
   background:linear-gradient(135deg,#5a0f3b,#7b1e57,#3d0c2e);
 }
 
-/* CARD LOGIN */
 .login-box{
   background:rgba(255,255,255,0.08);
-  backdrop-filter:blur(10px);
   padding:30px;
   border-radius:15px;
   width:300px;
@@ -30,80 +39,72 @@ body{
   color:white;
 }
 
-input{
+input, select{
   width:100%;
   padding:12px;
   margin:8px 0;
   border-radius:8px;
   border:none;
+  box-sizing:border-box;
 }
 
-button{
+/* BOTÃO ROXO */
+.btn{
   width:100%;
   padding:12px;
   border:none;
   border-radius:8px;
-  background:#ff4b2b;
+  background:#4b006e;
   color:white;
   cursor:pointer;
-}
-
-/* LINKS */
-.links{
-  margin-top:10px;
-  font-size:13px;
-}
-
-.links span{
-  cursor:pointer;
-  display:block;
 }
 
 /* APP */
-#app{
-  display:none;
-}
+#app{display:none;}
 
-/* SIDEBAR */
 .sidebar{
   width:220px;
   height:100vh;
-  background:#5a0f3b;
+  background:#4b006e;
   color:white;
   padding:20px;
   position:fixed;
-}
-
-.sidebar h2{
-  text-align:center;
 }
 
 .sidebar button{
   width:100%;
   margin:8px 0;
   background:rgba(255,255,255,0.1);
+  border:none;
+  padding:10px;
+  border-radius:8px;
+  color:white;
+  cursor:pointer;
 }
 
-/* MAIN */
 .main{
   margin-left:220px;
   padding:20px;
-  background:#f4f6f9;
-  min-height:100vh;
 }
 
-/* CARD PROCESSO */
+/* FORM */
+.form{
+  max-width:400px;
+}
+
+/* CARD */
 .card{
   background:white;
   padding:15px;
   border-radius:10px;
   margin-bottom:15px;
+  position:relative;
   box-shadow:0 2px 8px rgba(0,0,0,0.1);
 }
 
 /* STATUS */
 .status{
-  padding:5px 10px;
+  padding:4px 10px;
   border-radius:20px;
   font-size:12px;
   color:white;
@@ -115,10 +116,29 @@ button{
 .deferido{background:#007bff;}
 .indeferido{background:#dc3545;}
 
+/* BOTÕES CARD */
+.actions{
+  position:absolute;
+  top:10px;
+  right:10px;
+}
+
+.actions button{
+  margin-left:5px;
+  padding:5px 8px;
+  font-size:12px;
+  border:none;
+  border-radius:5px;
+  cursor:pointer;
+}
+
+.edit{background:#4b006e;color:white;}
+.delete{background:#dc3545;color:white;}
+
 </style>
 </head>
 
-<body>
+<body class="light">
 
 <!-- LOGIN -->
 <div id="login">
@@ -128,11 +148,11 @@ button{
     <input id="email" placeholder="Email">
     <input id="senha" type="password" placeholder="Senha">
 
-    <button onclick="entrar()">Entrar</button>
+    <button class="btn" onclick="entrar()">Entrar</button>
 
-    <div class="links">
-      <span onclick="alert('Cadastro em breve')">Criar conta</span>
-      <span onclick="alert('Senha enviada para email (simulado)')">Esqueci minha senha</span>
+    <div style="margin-top:10px;font-size:13px">
+      <div onclick="alert('Cadastro em breve')" style="cursor:pointer">Criar conta</div>
+      <div onclick="alert('Email enviado (simulado)')" style="cursor:pointer">Esqueci minha senha</div>
     </div>
   </div>
 </div>
@@ -144,7 +164,8 @@ button{
   <h2>SIJ</h2>
 
   <button onclick="mostrar('lista')">Processos</button>
-  <button onclick="mostrar('novo')">Novo Processo</button>
+  <button onclick="mostrar('novo')">Novo</button>
+  <button onclick="trocarTema()">🌗 Tema</button>
   <button onclick="sair()">Sair</button>
 </div>
 
@@ -153,7 +174,7 @@ button{
 <h2>Processos</h2>
 
 <!-- FORM -->
-<div id="novo" style="display:none;">
+<div id="novo" class="form" style="display:none;">
 <input id="titulo" placeholder="Título">
 <select id="area">
 <option>Cível</option>
@@ -163,7 +184,16 @@ button{
 </select>
 <input id="parte" placeholder="Parte">
 <input id="prazo" type="date">
-<button onclick="salvar()">Salvar</button>
+
+<select id="status">
+<option value="ativo">Ativo</option>
+<option value="vencer">A vencer</option>
+<option value="finalizado">Finalizado</option>
+<option value="deferido">Deferido</option>
+<option value="indeferido">Indeferido</option>
+</select>
+
+<button class="btn" onclick="salvar()">Salvar</button>
 </div>
 
 <!-- LISTA -->
@@ -191,10 +221,7 @@ function sair(){
 
 function mostrar(t){
   novo.style.display="none"
-
-  if(t==="novo"){
-    novo.style.display="block"
-  }
+  if(t==="novo") novo.style.display="block"
 }
 
 function salvar(){
@@ -206,6 +233,7 @@ function salvar(){
     p.area=area.value
     p.parte=parte.value
     p.prazo=prazo.value
+    p.status=status.value
   }else{
     dados.push({
       id:Date.now(),
@@ -213,7 +241,7 @@ function salvar(){
       area:area.value,
       parte:parte.value,
       prazo:prazo.value,
-      status:"ativo",
+      status:status.value,
       data:new Date().toLocaleDateString()
     })
   }
@@ -230,16 +258,16 @@ function listar(){
   dados.forEach(p=>{
     lista.innerHTML+=`
     <div class="card">
-      <span class="status ${p.status}">${p.status}</span><br>
+      <div class="actions">
+        <button class="edit" onclick="editar(${p.id})">Editar</button>
+        <button class="delete" onclick="excluir(${p.id})">Excluir</button>
+      </div>
+
+      <span class="status ${p.status}">${p.status}</span><br><br>
       <b>${p.titulo}</b><br>
       ${p.area} - ${p.parte}<br>
       Prazo: ${p.prazo || "—"}<br>
       <small>Criado: ${p.data}</small>
-
-      <br><br>
-
-      <button onclick="editar(${p.id})">Editar</button>
-      <button onclick="excluir(${p.id})">Excluir</button>
     </div>`
   })
 }
@@ -252,6 +280,7 @@ function editar(id){
   area.value=p.area
   parte.value=p.parte
   prazo.value=p.prazo
+  status.value=p.status
 
   editando=id
   mostrar("novo")
@@ -262,6 +291,16 @@ function excluir(id){
   dados = dados.filter(p=>p.id!==id)
   localStorage.setItem("dados",JSON.stringify(dados))
   listar()
+}
+
+function trocarTema(){
+  if(document.body.classList.contains("dark")){
+    document.body.classList.remove("dark")
+    document.body.classList.add("light")
+  }else{
+    document.body.classList.remove("light")
+    document.body.classList.add("dark")
+  }
 }
 
 </script>
