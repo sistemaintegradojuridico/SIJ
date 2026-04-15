@@ -7,150 +7,133 @@
 <style>
 body{
   margin:0;
-  font-family: Arial;
-  background: linear-gradient(135deg,#4b004f,#7a003c,#2b0033);
-  color:white;
-}
-
-/* LOGIN */
-.center{
-  display:flex;
-  justify-content:center;
-  align-items:center;
+  font-family:Arial;
   height:100vh;
-  flex-direction:column;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  background: linear-gradient(135deg,#2b0a2e,#5a0f3d,#7b1e4f);
 }
 
-.box{
-  background:rgba(255,255,255,0.1);
-  padding:30px;
-  border-radius:15px;
-  width:300px;
+/* LOGO */
+.logo{
   text-align:center;
+  margin-bottom:15px;
+}
+
+.logo img{
+  width:120px;
+  margin-bottom:10px;
+}
+
+/* TÍTULO */
+h1{
+  text-align:center;
+  color:#ffd700;
+  margin-bottom:20px;
+  font-size:20px;
+}
+
+/* CAIXA */
+.container{
+  background:rgba(255,255,255,0.08);
+  padding:25px;
+  border-radius:15px;
+  width:280px;
   backdrop-filter:blur(10px);
+  box-shadow:0 0 25px rgba(0,0,0,0.4);
 }
 
-input{
-  width:100%;
-  padding:10px;
-  margin:10px 0;
-  border:none;
-  border-radius:8px;
-}
-
-button{
+/* INPUT + BOTÃO IGUAIS */
+input, button{
   width:100%;
   padding:12px;
+  margin:8px 0;
   border:none;
   border-radius:8px;
+  box-sizing:border-box;
+  font-size:14px;
+}
+
+/* INPUT */
+input{
+  background:white;
+}
+
+/* BOTÃO */
+button{
   background:linear-gradient(90deg,#ff416c,#ff4b2b);
   color:white;
   cursor:pointer;
+  font-weight:bold;
 }
 
+/* LINK */
 .link{
+  text-align:center;
   margin-top:10px;
+  color:white;
   cursor:pointer;
+  font-size:13px;
 }
 
-/* SISTEMA */
-.app{
-  display:none;
-}
-
-.sidebar{
-  width:220px;
-  height:100vh;
-  background:#1a001f;
-  position:fixed;
-  padding:20px;
-}
-
-.sidebar h2{
-  margin-bottom:30px;
-}
-
-.menu{
-  cursor:pointer;
-  margin:10px 0;
-}
-
-.content{
-  margin-left:240px;
-  padding:20px;
-}
-
-/* CARDS */
-.card{
-  background:rgba(255,255,255,0.1);
-  padding:20px;
-  border-radius:10px;
-  margin-bottom:20px;
-}
-
+/* ESCONDER */
 .hidden{
   display:none;
 }
+
+/* APP */
+#appBox{
+  display:none;
+  color:white;
+  text-align:center;
+}
 </style>
+
 </head>
 
 <body>
 
-<!-- LOGIN -->
-<div id="loginScreen" class="center">
-  <h1>SIJ PRO</h1>
-  <div class="box">
-    <input id="email" placeholder="Email">
-    <input id="senha" type="password" placeholder="Senha">
-    <button onclick="login()">Entrar</button>
-    <div class="link" onclick="register()">Criar conta</div>
-  </div>
-</div>
+<div>
 
-<!-- APP -->
-<div id="app" class="app">
-
-  <div class="sidebar">
-    <h2>SIJ</h2>
-    <div class="menu" onclick="mostrar('dashboard')">Dashboard</div>
-    <div class="menu" onclick="mostrar('processos')">Processos</div>
-    <div class="menu" onclick="mostrar('ia')">IA Petição</div>
-    <div class="menu" onclick="logout()">Sair</div>
+  <!-- LOGO -->
+  <div class="logo">
+    <img src="logo.png">
   </div>
 
-  <div class="content">
+  <h1>SISTEMA INTEGRADO JURÍDICO</h1>
 
-    <!-- DASHBOARD -->
-    <div id="dashboard">
-      <h1>Dashboard</h1>
-      <div class="card">Bem vindo ao sistema 👊</div>
+  <div class="container">
+
+    <!-- LOGIN -->
+    <div id="loginBox">
+      <input id="email" placeholder="Email">
+      <input id="senha" type="password" placeholder="Senha">
+      <button onclick="login()">Entrar</button>
+      <div class="link" onclick="mostrarCadastro()">Criar conta</div>
     </div>
 
-    <!-- PROCESSOS -->
-    <div id="processos" class="hidden">
-      <h1>Processos</h1>
-
-      <div class="card">
-        <input id="titulo" placeholder="Título">
-        <input id="descricao" placeholder="Descrição">
-        <button onclick="criar()">Salvar</button>
-      </div>
-
-      <div id="lista"></div>
+    <!-- CADASTRO -->
+    <div id="cadastroBox" class="hidden">
+      <input id="novoEmail" placeholder="Email">
+      <input id="novaSenha" type="password" placeholder="Senha">
+      <button onclick="register()">Cadastrar</button>
+      <div class="link" onclick="voltarLogin()">Voltar</div>
     </div>
 
-    <!-- IA -->
-    <div id="ia" class="hidden">
-      <h1>Gerar Petição IA</h1>
+  </div>
 
-      <div class="card">
-        <input id="tema" placeholder="Tema da petição">
-        <button onclick="gerarIA()">Gerar</button>
-      </div>
+  <!-- APP -->
+  <div id="appBox">
+    <h2>Bem-vindo ao SIJ 🚀</h2>
 
-      <div class="card" id="resIA"></div>
-    </div>
+    <input id="titulo" placeholder="Título do processo">
+    <input id="descricao" placeholder="Descrição">
+    <button onclick="criar()">Salvar</button>
 
+    <h3>Processos</h3>
+    <div id="lista"></div>
   </div>
 
 </div>
@@ -161,44 +144,58 @@ const API = "https://sij-backend.onrender.com"
 
 let token = null
 
-function mostrar(tela){
-  document.getElementById("dashboard").classList.add("hidden")
-  document.getElementById("processos").classList.add("hidden")
-  document.getElementById("ia").classList.add("hidden")
+function mostrarCadastro(){
+  loginBox.classList.add("hidden")
+  cadastroBox.classList.remove("hidden")
+}
 
-  document.getElementById(tela).classList.remove("hidden")
+function voltarLogin(){
+  cadastroBox.classList.add("hidden")
+  loginBox.classList.remove("hidden")
 }
 
 async function register(){
-  const email = document.getElementById("email").value
-  const password = document.getElementById("senha").value
-
-  await fetch(API+"/register",{
+  const res = await fetch(API + "/register", {
     method:"POST",
     headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({email,password})
-  })
-
-  alert("Conta criada!")
-}
-
-async function login(){
-  const email = document.getElementById("email").value
-  const password = document.getElementById("senha").value
-
-  const res = await fetch(API+"/login",{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({email,password})
+    body: JSON.stringify({
+      email: novoEmail.value,
+      password: novaSenha.value
+    })
   })
 
   const data = await res.json()
 
   if(res.ok){
+    alert("Conta criada!")
+    voltarLogin()
+  }else{
+    alert(data.error)
+  }
+}
+
+async function login(){
+  const res = await fetch(API + "/login", {
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({
+      email: email.value,
+      password: senha.value
+    })
+  })
+
+  const data = await res.json()
+
+  if(res.ok){
+    alert("Login feito 🚀")
+
     token = data.token
 
-    document.getElementById("loginScreen").style.display="none"
-    document.getElementById("app").style.display="block"
+    document.querySelector(".container").style.display="none"
+    document.querySelector(".logo").style.display="none"
+    document.querySelector("h1").style.display="none"
+
+    document.getElementById("appBox").style.display="block"
 
     listar()
   }else{
@@ -206,71 +203,49 @@ async function login(){
   }
 }
 
-function logout(){
-  location.reload()
-}
-
 async function criar(){
-  const titulo = document.getElementById("titulo").value
-  const descricao = document.getElementById("descricao").value
-
-  await fetch(API+"/processos",{
+  await fetch(API + "/processos", {
     method:"POST",
     headers:{
       "Content-Type":"application/json",
       "Authorization":token
     },
-    body:JSON.stringify({titulo,descricao})
+    body: JSON.stringify({
+      titulo: titulo.value,
+      descricao: descricao.value
+    })
   })
 
   listar()
 }
 
 async function listar(){
-  const res = await fetch(API+"/processos",{
-    headers:{Authorization:token}
+  const res = await fetch(API + "/processos", {
+    headers:{ "Authorization":token }
   })
 
-  const data = await res.json()
+  const dados = await res.json()
 
-  const lista = document.getElementById("lista")
   lista.innerHTML=""
 
-  data.forEach(p=>{
-    lista.innerHTML+=`
-      <div class="card">
+  dados.forEach(p=>{
+    lista.innerHTML += `
+      <div style="margin:10px;padding:10px;background:#fff;color:#000;border-radius:8px">
         <b>${p.titulo}</b><br>
         ${p.descricao}<br>
-        <button onclick="excluir(${p.id})">Excluir</button>
+        <button onclick="deletar('${p.id}')">Excluir</button>
       </div>
     `
   })
 }
 
-async function excluir(id){
-  await fetch(API+"/processos/"+id,{
+async function deletar(id){
+  await fetch(API + "/processos/"+id, {
     method:"DELETE",
-    headers:{Authorization:token}
+    headers:{ "Authorization":token }
   })
 
   listar()
-}
-
-async function gerarIA(){
-  const tema = document.getElementById("tema").value
-
-  const res = await fetch(API+"/ia",{
-    method:"POST",
-    headers:{
-      "Content-Type":"application/json",
-      "Authorization":token
-    },
-    body:JSON.stringify({tema})
-  })
-
-  const data = await res.json()
-
-  document.getElementById("resIA").innerText = data.texto
 }
 
 </script>
