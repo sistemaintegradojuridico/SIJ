@@ -8,32 +8,22 @@
 body{
   margin:0;
   font-family:Arial;
-  height:100vh;
-  display:flex;
-  align-items:center;
-  justify-content:center;
   background: linear-gradient(135deg,#2b0a2e,#5a0f3d,#7b1e4f);
-}
-
-.container{
-  background:rgba(255,255,255,0.08);
-  padding:30px 25px;
-  border-radius:15px;
-  width:260px;
-  backdrop-filter:blur(12px);
-  box-shadow:0 0 25px rgba(0,0,0,0.4);
+  color:white;
   text-align:center;
 }
 
-h1{color:#ffd700}
+.container{
+  width:300px;
+  margin:40px auto;
+}
 
-input, button{
+input, select, button{
   width:100%;
   padding:12px;
   margin:6px 0;
   border:none;
   border-radius:8px;
-  box-sizing:border-box;
 }
 
 button{
@@ -41,21 +31,6 @@ button{
   color:white;
   font-weight:bold;
   cursor:pointer;
-}
-
-.link{
-  color:white;
-  font-size:13px;
-  cursor:pointer;
-}
-
-.hidden{display:none}
-
-#appBox{
-  display:none;
-  color:white;
-  text-align:center;
-  width:320px;
 }
 
 .card{
@@ -71,45 +46,29 @@ button{
 
 <body>
 
-<div>
-
-<div class="container" id="authBox">
-
-<h1>SIJ</h1>
-
-<div id="loginBox">
-<input id="email" placeholder="Email">
-<input id="senha" type="password" placeholder="Senha">
-<button onclick="login()">Entrar</button>
-
-<div class="link" onclick="mostrarCadastro()">Criar conta</div>
-<div class="link" onclick="esqueciSenha()">Esqueci minha senha</div>
-</div>
-
-<div id="cadastroBox" class="hidden">
-<input id="novoEmail" placeholder="Email">
-<input id="novaSenha" type="password" placeholder="Senha">
-<button onclick="register()">Cadastrar</button>
-<div class="link" onclick="voltarLogin()">Voltar</div>
-</div>
-
-</div>
-
-<!-- APP -->
-<div id="appBox">
-
-<h2>SIJ</h2>
+<div class="container">
 
 <button onclick="logout()">Sair</button>
 
 <input id="titulo" placeholder="Título">
+
+<select id="area">
+  <option>Cível</option>
+  <option>Previdenciário</option>
+  <option>Família</option>
+  <option>Trabalhista</option>
+  <option>Penal</option>
+</select>
+
+<input id="parte" placeholder="Nome da parte">
+
 <input id="descricao" placeholder="Descrição">
+
 <input id="prazo" type="date">
 
-<!-- ANEXO -->
 <input id="arquivo" type="file">
 
-<button onclick="criar()">Salvar</button>
+<button onclick="salvar()">Salvar</button>
 
 <h3>Prazos próximos</h3>
 <div id="alertas"></div>
@@ -119,93 +78,67 @@ button{
 
 </div>
 
-</div>
-
 <script>
 
 const API = "https://sij-backend.onrender.com"
-let token = null
-
-function mostrarCadastro(){
-  loginBox.classList.add("hidden")
-  cadastroBox.classList.remove("hidden")
-}
-
-function voltarLogin(){
-  cadastroBox.classList.add("hidden")
-  loginBox.classList.remove("hidden")
-}
+let token = localStorage.getItem("token")
+let editandoId = null
 
 function logout(){
-  token = null
-  appBox.style.display="none"
-  authBox.style.display="block"
+  localStorage.removeItem("token")
+  location.reload()
 }
 
-async function register(){
-  await fetch(API + "/register",{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body: JSON.stringify({
-      email: novoEmail.value,
-      password: novaSenha.value
-    })
-  })
-  alert("Conta criada!")
-  voltarLogin()
+function hoje(){
+  return new Date().toISOString().split("T")[0]
 }
 
-async function login(){
-  const res = await fetch(API + "/login",{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body: JSON.stringify({
-      email: email.value,
-      password: senha.value
+async function salvar(){
+
+  const dados = {
+    titulo: titulo.value,
+    area: area.value,
+    parte: parte.value,
+    descricao: descricao.value,
+    prazo: prazo.value,
+    dataCriacao: hoje(),
+    arquivo: arquivo.files[0]?.name || null
+  }
+
+  if(editandoId){
+    await fetch(API + "/processos/" + editandoId,{
+      method:"PUT",
+      headers:{
+        "Content-Type":"application/json",
+        "Authorization":token
+      },
+      body: JSON.stringify(dados)
     })
-  })
-
-  const data = await res.json()
-
-  if(res.ok){
-    token = data.token
-    authBox.style.display="none"
-    appBox.style.display="block"
-    listar()
+    editandoId = null
   }else{
-    alert("Erro login")
-  }
-}
-
-function esqueciSenha(){
-  const emailUser = prompt("Digite seu email:")
-  if(emailUser){
-    alert("Senha enviada para: " + emailUser)
-  }
-}
-
-async function criar(){
-
-  const arquivo = document.getElementById("arquivo").files[0]
-
-  await fetch(API + "/processos",{
-    method:"POST",
-    headers:{
-      "Content-Type":"application/json",
-      "Authorization":token
-    },
-    body: JSON.stringify({
-      titulo: titulo.value,
-      descricao: descricao.value,
-      prazo: prazo.value,
-      arquivo: arquivo ? arquivo.name : null
+    await fetch(API + "/processos",{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json",
+        "Authorization":token
+      },
+      body: JSON.stringify(dados)
     })
-  })
+  }
 
+  limpar()
   listar()
 }
 
+function limpar(){
+  titulo.value=""
+  parte.value=""
+  descricao.value=""
+  prazo.value=""
+}
+
 async function listar(){
+
   const res = await fetch(API + "/processos",{
     headers:{ "Authorization":token }
   })
@@ -215,33 +148,56 @@ async function listar(){
   lista.innerHTML=""
   alertas.innerHTML=""
 
-  const hoje = new Date()
+  const hojeData = new Date()
 
   dados.forEach(p=>{
 
     lista.innerHTML += `
       <div class="card">
         <b>${p.titulo}</b><br>
-        ${p.descricao}<br>
+        Área: ${p.area}<br>
+        Parte: ${p.parte}<br>
+        Criado em: ${p.dataCriacao}<br>
         Prazo: ${p.prazo || "sem prazo"}<br>
-        Arquivo: ${p.arquivo || "nenhum"}<br>
+        Arquivo: ${p.arquivo || "nenhum"}<br><br>
+
+        <button onclick="editar('${p.id}')">Editar</button>
         <button onclick="deletar('${p.id}')">Excluir</button>
       </div>
     `
 
     if(p.prazo){
       const dataPrazo = new Date(p.prazo)
-      const diff = (dataPrazo - hoje) / (1000*60*60*24)
+      const diff = (dataPrazo - hojeData) / (1000*60*60*24)
 
-      if(diff <= 2){
+      if(diff <= 3){
         alertas.innerHTML += `
           <div class="card">
-            ⚠️ ${p.titulo} vence em breve!
+            ⚠️ ${p.titulo} vence em ${Math.ceil(diff)} dia(s)
           </div>
         `
       }
     }
 
+  })
+}
+
+function editar(id){
+
+  fetch(API + "/processos",{
+    headers:{ "Authorization":token }
+  })
+  .then(r=>r.json())
+  .then(dados=>{
+    const p = dados.find(x=>x.id == id)
+
+    titulo.value = p.titulo
+    area.value = p.area
+    parte.value = p.parte
+    descricao.value = p.descricao
+    prazo.value = p.prazo
+
+    editandoId = id
   })
 }
 
@@ -252,6 +208,8 @@ async function deletar(id){
   })
   listar()
 }
+
+listar()
 
 </script>
 
