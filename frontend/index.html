@@ -10,7 +10,6 @@
 
 :root{
   --roxo:#2e1065;
-  --roxo2:#5b21b6;
   --bg:#f4f6fb;
   --card:#ffffff;
   --text:#1f2937;
@@ -52,13 +51,14 @@ body{
 input{
   width:100%;
   padding:12px;
-  margin:6px 0;
+  margin:8px 0;
   border-radius:8px;
   border:none;
 }
 
 button{
-  padding:10px;
+  width:100%;
+  padding:12px;
   border:none;
   border-radius:8px;
   background:#2e1065;
@@ -105,17 +105,35 @@ button{
   gap:15px;
 }
 
-.user-box{
+.user{
   display:flex;
   align-items:center;
   gap:10px;
+  cursor:pointer;
 }
 
-.user-box img{
+.user img{
   width:35px;
   height:35px;
   border-radius:50%;
   object-fit:cover;
+}
+
+/* DROPDOWN */
+.dropdown{
+  position:absolute;
+  right:20px;
+  top:60px;
+  background:var(--card);
+  border-radius:10px;
+  padding:10px;
+  display:none;
+  box-shadow:0 5px 15px rgba(0,0,0,0.1);
+}
+
+.dropdown button{
+  width:100%;
+  margin-top:5px;
 }
 
 /* MAIN */
@@ -128,9 +146,10 @@ button{
   background:var(--card);
   padding:15px;
   border-radius:10px;
-  margin-bottom:15px;
+  margin-bottom:10px;
 }
 
+/* LISTA */
 .linha{
   display:flex;
   justify-content:space-between;
@@ -149,12 +168,7 @@ button{
 .vencer{background:#eab308;color:black}
 .finalizado{background:#6b7280}
 
-.small{
-  padding:5px 8px;
-  font-size:11px;
-}
-
-.delete{background:#ef4444}
+.delete{background:#ef4444;padding:5px 8px;font-size:11px}
 
 </style>
 </head>
@@ -167,9 +181,7 @@ button{
     <h2>SIJ PRO</h2>
     <input id="email" placeholder="Email">
     <input id="senha" type="password" placeholder="Senha">
-
     <input type="file" id="foto">
-
     <button onclick="entrar()">Entrar</button>
   </div>
 </div>
@@ -187,24 +199,31 @@ button{
   <input placeholder="Buscar..." style="width:300px">
 
   <div class="top-right">
+
     <i class="fa-solid fa-moon" onclick="toggleTema()"></i>
 
-    <div class="user-box">
+    <div class="user" onclick="toggleMenu()">
       <img id="userFoto">
       <span id="userEmail"></span>
     </div>
 
-    <button onclick="sair()">Sair</button>
   </div>
 
 </div>
 
+<div class="dropdown" id="menuUser">
+  <button onclick="tela('perfil')">Perfil</button>
+  <button onclick="sair()">Sair</button>
+</div>
+
 <div class="main">
 
+<!-- DASHBOARD -->
 <div id="dashboard">
 <h2>Dashboard</h2>
 </div>
 
+<!-- PROCESSOS -->
 <div id="processos" style="display:none">
 <h2>Processos</h2>
 
@@ -221,6 +240,21 @@ button{
 <button onclick="addProc()">Salvar</button>
 
 <div id="listaProc"></div>
+
+</div>
+
+<!-- PERFIL -->
+<div id="perfil" style="display:none">
+<h2>Meu Perfil</h2>
+
+<div class="card">
+  <img id="perfilFoto" width="80"><br><br>
+
+  <input id="novoEmail" placeholder="Novo email">
+  <input type="file" id="novaFoto">
+
+  <button onclick="salvarPerfil()">Salvar Alterações</button>
+</div>
 
 </div>
 
@@ -249,13 +283,10 @@ function entrar(){
     reader.readAsDataURL(file)
 
   }else{
-
-    let user = {
+    localStorage.user = JSON.stringify({
       email:email.value,
       foto:"https://i.imgur.com/6VBx3io.png"
-    }
-
-    localStorage.user = JSON.stringify(user)
+    })
     iniciar()
   }
 }
@@ -265,17 +296,23 @@ function iniciar(){
   login.style.display="none"
   app.style.display="block"
 
-  let user = JSON.parse(localStorage.user)
+  let u = JSON.parse(localStorage.user)
 
-  userEmail.innerText = user.email
-  userFoto.src = user.foto
+  userEmail.innerText = u.email
+  userFoto.src = u.foto
+  perfilFoto.src = u.foto
 
   render()
 }
 
-/* AUTO LOGIN */
 if(localStorage.user){
   iniciar()
+}
+
+/* MENU */
+function toggleMenu(){
+  menuUser.style.display =
+  menuUser.style.display === "block" ? "none" : "block"
 }
 
 /* SAIR */
@@ -288,6 +325,35 @@ function sair(){
 function tela(x){
   document.querySelectorAll(".main > div").forEach(e=>e.style.display="none")
   document.getElementById(x).style.display="block"
+  menuUser.style.display="none"
+}
+
+/* PERFIL */
+function salvarPerfil(){
+
+  let u = JSON.parse(localStorage.user)
+
+  if(novoEmail.value){
+    u.email = novoEmail.value
+  }
+
+  let file = novaFoto.files[0]
+
+  if(file){
+    let reader = new FileReader()
+    reader.onload = function(e){
+      u.foto = e.target.result
+      salvarUser(u)
+    }
+    reader.readAsDataURL(file)
+  }else{
+    salvarUser(u)
+  }
+}
+
+function salvarUser(u){
+  localStorage.user = JSON.stringify(u)
+  iniciar()
 }
 
 /* PROCESSOS */
@@ -317,7 +383,7 @@ function renderProc(){
 
       <div>
         <span class="status ${x.s}">${x.s}</span>
-        <button class="small delete" onclick="delProc(${i})">Excluir</button>
+        <button class="delete" onclick="delProc(${i})">Excluir</button>
       </div>
     </div>`
   })
