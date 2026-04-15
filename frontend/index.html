@@ -17,10 +17,10 @@ body{
 
 .container{
   background:rgba(255,255,255,0.08);
-  padding:25px;
+  padding:30px 25px;
   border-radius:15px;
-  width:300px;
-  backdrop-filter:blur(10px);
+  width:260px;
+  backdrop-filter:blur(12px);
   box-shadow:0 0 25px rgba(0,0,0,0.4);
   text-align:center;
 }
@@ -30,16 +30,17 @@ h1{color:#ffd700}
 input, button{
   width:100%;
   padding:12px;
-  margin:8px 0;
+  margin:6px 0;
   border:none;
   border-radius:8px;
+  box-sizing:border-box;
 }
 
 button{
   background:linear-gradient(90deg,#ff416c,#ff4b2b);
   color:white;
-  cursor:pointer;
   font-weight:bold;
+  cursor:pointer;
 }
 
 .link{
@@ -54,7 +55,7 @@ button{
   display:none;
   color:white;
   text-align:center;
-  width:300px;
+  width:320px;
 }
 
 .card{
@@ -105,6 +106,9 @@ button{
 <input id="descricao" placeholder="Descrição">
 <input id="prazo" type="date">
 
+<!-- ANEXO -->
+<input id="arquivo" type="file">
+
 <button onclick="criar()">Salvar</button>
 
 <h3>Prazos próximos</h3>
@@ -139,7 +143,7 @@ function logout(){
 }
 
 async function register(){
-  const res = await fetch(API + "/register",{
+  await fetch(API + "/register",{
     method:"POST",
     headers:{"Content-Type":"application/json"},
     body: JSON.stringify({
@@ -165,10 +169,8 @@ async function login(){
 
   if(res.ok){
     token = data.token
-
     authBox.style.display="none"
     appBox.style.display="block"
-
     listar()
   }else{
     alert("Erro login")
@@ -177,13 +179,15 @@ async function login(){
 
 function esqueciSenha(){
   const emailUser = prompt("Digite seu email:")
-
   if(emailUser){
-    alert("Senha enviada para: " + emailUser + "\n(Depois a gente conecta email real)")
+    alert("Senha enviada para: " + emailUser)
   }
 }
 
 async function criar(){
+
+  const arquivo = document.getElementById("arquivo").files[0]
+
   await fetch(API + "/processos",{
     method:"POST",
     headers:{
@@ -193,7 +197,8 @@ async function criar(){
     body: JSON.stringify({
       titulo: titulo.value,
       descricao: descricao.value,
-      prazo: prazo.value
+      prazo: prazo.value,
+      arquivo: arquivo ? arquivo.name : null
     })
   })
 
@@ -214,17 +219,16 @@ async function listar(){
 
   dados.forEach(p=>{
 
-    // PROCESSOS
     lista.innerHTML += `
       <div class="card">
         <b>${p.titulo}</b><br>
         ${p.descricao}<br>
         Prazo: ${p.prazo || "sem prazo"}<br>
+        Arquivo: ${p.arquivo || "nenhum"}<br>
         <button onclick="deletar('${p.id}')">Excluir</button>
       </div>
     `
 
-    // ALERTAS
     if(p.prazo){
       const dataPrazo = new Date(p.prazo)
       const diff = (dataPrazo - hoje) / (1000*60*60*24)
