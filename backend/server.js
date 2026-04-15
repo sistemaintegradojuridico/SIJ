@@ -4,7 +4,11 @@ const { Pool } = require("pg")
 const jwt = require("jsonwebtoken")
 const bcrypt = require("bcryptjs")
 const nodemailer = require("nodemailer")
-const OpenAI = require("openai")
+
+let OpenAI = null
+if(process.env.OPENAI_API_KEY){
+  OpenAI = require("openai")
+}
 
 const app = express()
 app.use(cors())
@@ -15,23 +19,17 @@ const pool = new Pool({
   ssl: { rejectUnauthorized: false }
 })
 
-const SECRET = process.env.JWT_SECRET
+const SECRET = process.env.JWT_SECRET || "123"
 
-// EMAIL
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
-  }
-})
+// IA segura (não quebra se não tiver chave)
+let openai = null
+if(process.env.OPENAI_API_KEY){
+  openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY
+  })
+}
 
-// IA
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
-})
-
-// ================= DB INIT
+// ================= DB
 async function initDB() {
   await pool.query(`
     CREATE TABLE IF NOT EXISTS users (
@@ -47,8 +45,7 @@ async function initDB() {
       id SERIAL PRIMARY KEY,
       titulo TEXT,
       descricao TEXT,
-      user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      user_id INTEGER REFERENCES users(id) ON DELETE CASCADE
     );
   `)
 
@@ -57,12 +54,11 @@ async function initDB() {
 initDB()
 
 // ================= AUTH
-function auth(req, res, next){
+function auth(req,res,next){
   const token = req.headers.authorization
   if(!token) return res.status(401).json({error:"Sem token"})
-
   try{
-    const decoded = jwt.verify(token, SECRET)
+    const decoded = jwt.verify(token,SECRET)
     req.userId = decoded.id
     next()
   }catch{
@@ -72,7 +68,7 @@ function auth(req, res, next){
 
 // ================= TESTE
 app.get("/", (req,res)=>{
-  res.send("SIJ PRO rodando 🚀")
+  res.send("SIJ rodando 🚀")
 })
 
 // ================= REGISTER
@@ -97,48 +93,17 @@ app.post("/login", async (req,res)=>{
     [email]
   )
 
-  if(user.rows.length===0) return res.status(401).json({error:"Usuário não encontrado"})
+  if(user.rows.length===0)
+    return res.status(401).json({error:"Usuário não encontrado"})
 
   const valid = await bcrypt.compare(password,user.rows[0].password)
 
-  if(!valid) return res.status(401).json({error:"Senha inválida"})
+  if(!valid)
+    return res.status(401).json({error:"Senha inválida"})
 
   const token = jwt.sign({id:user.rows[0].id},SECRET)
 
   res.json({token})
-})
-
-// ================= RECUPERAR SENHA
-app.post("/forgot", async (req,res)=>{
-  const {email} = req.body
-  const token = Math.random().toString(36).substring(2)
-
-  await pool.query(
-    "UPDATE users SET reset_token=$1 WHERE email=$2",
-    [token,email]
-  )
-
-  await transporter.sendMail({
-    from: process.env.EMAIL_USER,
-    to: email,
-    subject: "Recuperação de senha",
-    text: `Seu token: ${token}`
-  })
-
-  res.json({ok:true})
-})
-
-// ================= RESET
-app.post("/reset", async (req,res)=>{
-  const {token,newPassword} = req.body
-  const hash = await bcrypt.hash(newPassword,10)
-
-  await pool.query(
-    "UPDATE users SET password=$1, reset_token=NULL WHERE reset_token=$2",
-    [hash,token]
-  )
-
-  res.json({ok:true})
 })
 
 // ================= PROCESSOS
@@ -169,8 +134,12 @@ app.delete("/processos/:id", auth, async (req,res)=>{
   res.json({ok:true})
 })
 
-// ================= IA PETIÇÃO
+// ================= IA (SEGURA)
 app.post("/ia/peticao", auth, async (req,res)=>{
+  if(!openai){
+    return res.json({texto:"IA não configurada ainda"})
+  }
+
   const {tema} = req.body
 
   const completion = await openai.chat.completions.create({
@@ -185,4 +154,4 @@ app.post("/ia/peticao", auth, async (req,res)=>{
 })
 
 const PORT = process.env.PORT || 3000
-app.listen(PORT, ()=> console.log("Servidor PRO rodando 🚀"))
+app.listen(PORT, ()=> console.log("Servidor rodando 🚀"))
