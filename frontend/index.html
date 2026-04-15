@@ -12,56 +12,29 @@ body{
   display:flex;
   align-items:center;
   justify-content:center;
-
   background: linear-gradient(135deg,#2b0a2e,#5a0f3d,#7b1e4f);
 }
 
-/* LOGO */
-.logo{
-  text-align:center;
-  margin-bottom:15px;
-}
-
-.logo img{
-  width:120px;
-  margin-bottom:10px;
-}
-
-/* TÍTULO */
-h1{
-  text-align:center;
-  color:#ffd700;
-  margin-bottom:20px;
-  font-size:20px;
-}
-
-/* CAIXA */
 .container{
   background:rgba(255,255,255,0.08);
   padding:25px;
   border-radius:15px;
-  width:280px;
+  width:300px;
   backdrop-filter:blur(10px);
   box-shadow:0 0 25px rgba(0,0,0,0.4);
+  text-align:center;
 }
 
-/* INPUT + BOTÃO IGUAIS */
+h1{color:#ffd700}
+
 input, button{
   width:100%;
   padding:12px;
   margin:8px 0;
   border:none;
   border-radius:8px;
-  box-sizing:border-box;
-  font-size:14px;
 }
 
-/* INPUT */
-input{
-  background:white;
-}
-
-/* BOTÃO */
 button{
   background:linear-gradient(90deg,#ff416c,#ff4b2b);
   color:white;
@@ -69,25 +42,27 @@ button{
   font-weight:bold;
 }
 
-/* LINK */
 .link{
-  text-align:center;
-  margin-top:10px;
   color:white;
-  cursor:pointer;
   font-size:13px;
+  cursor:pointer;
 }
 
-/* ESCONDER */
-.hidden{
-  display:none;
-}
+.hidden{display:none}
 
-/* APP */
 #appBox{
   display:none;
   color:white;
   text-align:center;
+  width:300px;
+}
+
+.card{
+  background:white;
+  color:black;
+  padding:10px;
+  margin:10px 0;
+  border-radius:8px;
 }
 </style>
 
@@ -97,51 +72,54 @@ button{
 
 <div>
 
-  <!-- LOGO -->
-  <div class="logo">
-    <img src="logo.png">
-  </div>
+<div class="container" id="authBox">
 
-  <h1>SISTEMA INTEGRADO JURÍDICO</h1>
+<h1>SIJ</h1>
 
-  <div class="container">
+<div id="loginBox">
+<input id="email" placeholder="Email">
+<input id="senha" type="password" placeholder="Senha">
+<button onclick="login()">Entrar</button>
 
-    <!-- LOGIN -->
-    <div id="loginBox">
-      <input id="email" placeholder="Email">
-      <input id="senha" type="password" placeholder="Senha">
-      <button onclick="login()">Entrar</button>
-      <div class="link" onclick="mostrarCadastro()">Criar conta</div>
-    </div>
+<div class="link" onclick="mostrarCadastro()">Criar conta</div>
+<div class="link" onclick="esqueciSenha()">Esqueci minha senha</div>
+</div>
 
-    <!-- CADASTRO -->
-    <div id="cadastroBox" class="hidden">
-      <input id="novoEmail" placeholder="Email">
-      <input id="novaSenha" type="password" placeholder="Senha">
-      <button onclick="register()">Cadastrar</button>
-      <div class="link" onclick="voltarLogin()">Voltar</div>
-    </div>
+<div id="cadastroBox" class="hidden">
+<input id="novoEmail" placeholder="Email">
+<input id="novaSenha" type="password" placeholder="Senha">
+<button onclick="register()">Cadastrar</button>
+<div class="link" onclick="voltarLogin()">Voltar</div>
+</div>
 
-  </div>
+</div>
 
-  <!-- APP -->
-  <div id="appBox">
-    <h2>Bem-vindo ao SIJ 🚀</h2>
+<!-- APP -->
+<div id="appBox">
 
-    <input id="titulo" placeholder="Título do processo">
-    <input id="descricao" placeholder="Descrição">
-    <button onclick="criar()">Salvar</button>
+<h2>SIJ</h2>
 
-    <h3>Processos</h3>
-    <div id="lista"></div>
-  </div>
+<button onclick="logout()">Sair</button>
+
+<input id="titulo" placeholder="Título">
+<input id="descricao" placeholder="Descrição">
+<input id="prazo" type="date">
+
+<button onclick="criar()">Salvar</button>
+
+<h3>Prazos próximos</h3>
+<div id="alertas"></div>
+
+<h3>Processos</h3>
+<div id="lista"></div>
+
+</div>
 
 </div>
 
 <script>
 
 const API = "https://sij-backend.onrender.com"
-
 let token = null
 
 function mostrarCadastro(){
@@ -154,8 +132,14 @@ function voltarLogin(){
   loginBox.classList.remove("hidden")
 }
 
+function logout(){
+  token = null
+  appBox.style.display="none"
+  authBox.style.display="block"
+}
+
 async function register(){
-  const res = await fetch(API + "/register", {
+  const res = await fetch(API + "/register",{
     method:"POST",
     headers:{"Content-Type":"application/json"},
     body: JSON.stringify({
@@ -163,19 +147,12 @@ async function register(){
       password: novaSenha.value
     })
   })
-
-  const data = await res.json()
-
-  if(res.ok){
-    alert("Conta criada!")
-    voltarLogin()
-  }else{
-    alert(data.error)
-  }
+  alert("Conta criada!")
+  voltarLogin()
 }
 
 async function login(){
-  const res = await fetch(API + "/login", {
+  const res = await fetch(API + "/login",{
     method:"POST",
     headers:{"Content-Type":"application/json"},
     body: JSON.stringify({
@@ -187,24 +164,27 @@ async function login(){
   const data = await res.json()
 
   if(res.ok){
-    alert("Login feito 🚀")
-
     token = data.token
 
-    document.querySelector(".container").style.display="none"
-    document.querySelector(".logo").style.display="none"
-    document.querySelector("h1").style.display="none"
-
-    document.getElementById("appBox").style.display="block"
+    authBox.style.display="none"
+    appBox.style.display="block"
 
     listar()
   }else{
-    alert(data.error)
+    alert("Erro login")
+  }
+}
+
+function esqueciSenha(){
+  const emailUser = prompt("Digite seu email:")
+
+  if(emailUser){
+    alert("Senha enviada para: " + emailUser + "\n(Depois a gente conecta email real)")
   }
 }
 
 async function criar(){
-  await fetch(API + "/processos", {
+  await fetch(API + "/processos",{
     method:"POST",
     headers:{
       "Content-Type":"application/json",
@@ -212,7 +192,8 @@ async function criar(){
     },
     body: JSON.stringify({
       titulo: titulo.value,
-      descricao: descricao.value
+      descricao: descricao.value,
+      prazo: prazo.value
     })
   })
 
@@ -220,31 +201,51 @@ async function criar(){
 }
 
 async function listar(){
-  const res = await fetch(API + "/processos", {
+  const res = await fetch(API + "/processos",{
     headers:{ "Authorization":token }
   })
 
   const dados = await res.json()
 
   lista.innerHTML=""
+  alertas.innerHTML=""
+
+  const hoje = new Date()
 
   dados.forEach(p=>{
+
+    // PROCESSOS
     lista.innerHTML += `
-      <div style="margin:10px;padding:10px;background:#fff;color:#000;border-radius:8px">
+      <div class="card">
         <b>${p.titulo}</b><br>
         ${p.descricao}<br>
+        Prazo: ${p.prazo || "sem prazo"}<br>
         <button onclick="deletar('${p.id}')">Excluir</button>
       </div>
     `
+
+    // ALERTAS
+    if(p.prazo){
+      const dataPrazo = new Date(p.prazo)
+      const diff = (dataPrazo - hoje) / (1000*60*60*24)
+
+      if(diff <= 2){
+        alertas.innerHTML += `
+          <div class="card">
+            ⚠️ ${p.titulo} vence em breve!
+          </div>
+        `
+      }
+    }
+
   })
 }
 
 async function deletar(id){
-  await fetch(API + "/processos/"+id, {
+  await fetch(API + "/processos/"+id,{
     method:"DELETE",
     headers:{ "Authorization":token }
   })
-
   listar()
 }
 
