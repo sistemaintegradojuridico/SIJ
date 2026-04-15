@@ -13,9 +13,14 @@ body{
   text-align:center;
 }
 
+/* LOGIN */
+#login{
+  margin-top:150px;
+}
+
 .container{
   width:300px;
-  margin:40px auto;
+  margin:20px auto;
 }
 
 input, select, button{
@@ -40,15 +45,32 @@ button{
   margin:10px 0;
   border-radius:8px;
 }
+
+.hidden{
+  display:none;
+}
 </style>
 
 </head>
 
 <body>
 
+<!-- LOGIN -->
+<div id="login">
+  <h2>SIJ</h2>
+  <div class="container">
+    <input id="email" placeholder="Email">
+    <input id="senha" type="password" placeholder="Senha">
+    <button onclick="entrar()">Entrar</button>
+  </div>
+</div>
+
+<!-- SISTEMA -->
+<div id="app" class="hidden">
+
 <div class="container">
 
-<button onclick="logout()">Sair</button>
+<button onclick="sair()">Sair</button>
 
 <input id="titulo" placeholder="Título">
 
@@ -61,11 +83,8 @@ button{
 </select>
 
 <input id="parte" placeholder="Nome da parte">
-
 <input id="descricao" placeholder="Descrição">
-
 <input id="prazo" type="date">
-
 <input id="arquivo" type="file">
 
 <button onclick="salvar()">Salvar</button>
@@ -77,98 +96,92 @@ button{
 <div id="lista"></div>
 
 </div>
+</div>
 
 <script>
 
-const API = "https://sij-backend.onrender.com"
-let token = localStorage.getItem("token")
-let editandoId = null
+// ===== LOGIN =====
+function entrar(){
+  if(email.value && senha.value){
+    localStorage.setItem("logado", "sim")
+    iniciar()
+  }else{
+    alert("Preenche email e senha")
+  }
+}
 
-function logout(){
-  localStorage.removeItem("token")
+function sair(){
+  localStorage.removeItem("logado")
   location.reload()
 }
 
-function hoje(){
-  return new Date().toISOString().split("T")[0]
+// ===== INICIAR =====
+function iniciar(){
+  document.getElementById("login").classList.add("hidden")
+  document.getElementById("app").classList.remove("hidden")
+  listar()
 }
 
-async function salvar(){
+// ===== BANCO LOCAL =====
+function getProcessos(){
+  return JSON.parse(localStorage.getItem("processos") || "[]")
+}
 
-  const dados = {
+function salvarProcessos(lista){
+  localStorage.setItem("processos", JSON.stringify(lista))
+}
+
+// ===== SALVAR =====
+function salvar(){
+
+  let lista = getProcessos()
+
+  const novo = {
+    id: Date.now(),
     titulo: titulo.value,
     area: area.value,
     parte: parte.value,
     descricao: descricao.value,
     prazo: prazo.value,
-    dataCriacao: hoje(),
-    arquivo: arquivo.files[0]?.name || null
+    data: new Date().toLocaleDateString(),
+    arquivo: arquivo.files[0]?.name || "nenhum"
   }
 
-  if(editandoId){
-    await fetch(API + "/processos/" + editandoId,{
-      method:"PUT",
-      headers:{
-        "Content-Type":"application/json",
-        "Authorization":token
-      },
-      body: JSON.stringify(dados)
-    })
-    editandoId = null
-  }else{
-    await fetch(API + "/processos",{
-      method:"POST",
-      headers:{
-        "Content-Type":"application/json",
-        "Authorization":token
-      },
-      body: JSON.stringify(dados)
-    })
-  }
+  lista.push(novo)
+  salvarProcessos(lista)
 
   limpar()
   listar()
 }
 
-function limpar(){
-  titulo.value=""
-  parte.value=""
-  descricao.value=""
-  prazo.value=""
-}
+// ===== LISTAR =====
+function listar(){
 
-async function listar(){
-
-  const res = await fetch(API + "/processos",{
-    headers:{ "Authorization":token }
-  })
-
-  const dados = await res.json()
+  let listaDados = getProcessos()
 
   lista.innerHTML=""
   alertas.innerHTML=""
 
-  const hojeData = new Date()
+  const hoje = new Date()
 
-  dados.forEach(p=>{
+  listaDados.forEach(p=>{
 
     lista.innerHTML += `
       <div class="card">
         <b>${p.titulo}</b><br>
         Área: ${p.area}<br>
         Parte: ${p.parte}<br>
-        Criado em: ${p.dataCriacao}<br>
+        Criado: ${p.data}<br>
         Prazo: ${p.prazo || "sem prazo"}<br>
-        Arquivo: ${p.arquivo || "nenhum"}<br><br>
+        Arquivo: ${p.arquivo}<br><br>
 
-        <button onclick="editar('${p.id}')">Editar</button>
-        <button onclick="deletar('${p.id}')">Excluir</button>
+        <button onclick="excluir(${p.id})">Excluir</button>
       </div>
     `
 
     if(p.prazo){
-      const dataPrazo = new Date(p.prazo)
-      const diff = (dataPrazo - hojeData) / (1000*60*60*24)
+      let prazoData = new Date(p.prazo)
+      let diff = (prazoData - hoje)/(1000*60*60*24)
 
       if(diff <= 3){
         alertas.innerHTML += `
@@ -182,34 +195,25 @@ async function listar(){
   })
 }
 
-function editar(id){
-
-  fetch(API + "/processos",{
-    headers:{ "Authorization":token }
-  })
-  .then(r=>r.json())
-  .then(dados=>{
-    const p = dados.find(x=>x.id == id)
-
-    titulo.value = p.titulo
-    area.value = p.area
-    parte.value = p.parte
-    descricao.value = p.descricao
-    prazo.value = p.prazo
-
-    editandoId = id
-  })
-}
-
-async function deletar(id){
-  await fetch(API + "/processos/"+id,{
-    method:"DELETE",
-    headers:{ "Authorization":token }
-  })
+// ===== EXCLUIR =====
+function excluir(id){
+  let lista = getProcessos().filter(p => p.id !== id)
+  salvarProcessos(lista)
   listar()
 }
 
-listar()
+// ===== LIMPAR =====
+function limpar(){
+  titulo.value=""
+  parte.value=""
+  descricao.value=""
+  prazo.value=""
+}
+
+// ===== AUTO LOGIN =====
+if(localStorage.getItem("logado")){
+  iniciar()
+}
 
 </script>
 
