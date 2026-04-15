@@ -12,7 +12,6 @@ body {
   display:flex;
   align-items:center;
   justify-content:center;
-
   background: linear-gradient(135deg, #2a003f, #5a0f3d, #8b1e3f);
 }
 
@@ -24,23 +23,6 @@ body::after{
   height:100%;
   background-image: radial-gradient(rgba(255,255,255,0.04) 1px, transparent 1px);
   background-size: 4px 4px;
-}
-
-/* logo */
-.logo{
-  text-align:center;
-  margin-bottom:20px;
-}
-
-.logo img{
-  width:100px;
-  margin-bottom:10px;
-}
-
-.logo h1{
-  color:#f7d774;
-  font-size:18px;
-  letter-spacing:2px;
 }
 
 /* caixa */
@@ -68,26 +50,12 @@ input{
   width:100%;
   margin-top:15px;
   padding:12px;
-
   background: linear-gradient(90deg, #ff512f, #dd2476);
   border:none;
   border-radius:10px;
-
   color:white;
   font-weight:bold;
-  font-size:16px;
-
   cursor:pointer;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  transition:0.3s;
-}
-
-.btn:hover{
-  transform: scale(1.05);
 }
 
 /* link */
@@ -98,16 +66,19 @@ input{
   font-size:14px;
 }
 
-/* app */
-#appBox{
-  display:none;
+/* topo app */
+.topo{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
   color:white;
-  text-align:center;
+  margin-bottom:10px;
 }
 
+/* lista */
 .processo{
   background: rgba(255,255,255,0.1);
-  margin:10px;
+  margin:10px 0;
   padding:10px;
   border-radius:10px;
 }
@@ -116,64 +87,70 @@ input{
 
 <body>
 
-<div>
-  <!-- LOGO -->
-  <div class="logo">
-    <img src="logo.png">
-    <h1>SISTEMA INTEGRADO JURÍDICO</h1>
-  </div>
+<div id="auth">
 
-  <!-- LOGIN -->
   <div class="container" id="loginBox">
+    <h3 style="color:#f7d774">SIJ PRO</h3>
+
     <input id="email" placeholder="Email">
     <input id="senha" type="password" placeholder="Senha">
 
     <button class="btn" onclick="login()">Entrar</button>
-
     <div class="link" onclick="mostrarCadastro()">Criar conta</div>
   </div>
 
-  <!-- CADASTRO -->
   <div class="container" id="cadastroBox" style="display:none;">
+    <h3 style="color:#f7d774">Cadastro</h3>
+
     <input id="novoEmail" placeholder="Email">
     <input id="novaSenha" type="password" placeholder="Senha">
 
     <button class="btn" onclick="register()">Cadastrar</button>
-
     <div class="link" onclick="voltarLogin()">Voltar</div>
   </div>
 
-  <!-- APP -->
-  <div id="appBox">
-    <h2>Processos</h2>
+</div>
 
-    <input id="titulo" placeholder="Título">
-    <input id="descricao" placeholder="Descrição">
-    <button class="btn" onclick="criar()">Salvar</button>
+<div id="appBox" style="display:none; width:300px;">
 
-    <div id="lista"></div>
+  <div class="topo">
+    <b>Processos</b>
+    <button onclick="logout()">Sair</button>
   </div>
+
+  <input id="titulo" placeholder="Título">
+  <input id="descricao" placeholder="Descrição">
+  <button class="btn" onclick="criar()">Salvar</button>
+
+  <div id="lista"></div>
 </div>
 
 <script>
 const API = "https://sij-backend.onrender.com"
 
-let token = null
+let token = localStorage.getItem("token")
+
+// 🔥 AUTO LOGIN
+if(token){
+  document.getElementById("auth").style.display="none"
+  document.getElementById("appBox").style.display="block"
+  listar()
+}
 
 function mostrarCadastro(){
-  document.getElementById("loginBox").style.display="none"
-  document.getElementById("cadastroBox").style.display="block"
+  loginBox.style.display="none"
+  cadastroBox.style.display="block"
 }
 
 function voltarLogin(){
-  document.getElementById("cadastroBox").style.display="none"
-  document.getElementById("loginBox").style.display="block"
+  cadastroBox.style.display="none"
+  loginBox.style.display="block"
 }
 
 // ================= REGISTER =================
 async function register(){
-  const email = document.getElementById("novoEmail").value
-  const password = document.getElementById("novaSenha").value
+  const email = novoEmail.value
+  const password = novaSenha.value
 
   const res = await fetch(API + "/register", {
     method:"POST",
@@ -185,14 +162,14 @@ async function register(){
     alert("Conta criada!")
     voltarLogin()
   } else {
-    alert("Erro ao cadastrar")
+    alert("Erro")
   }
 }
 
 // ================= LOGIN =================
 async function login(){
-  const email = document.getElementById("email").value
-  const password = document.getElementById("senha").value
+  const email = email.value
+  const password = senha.value
 
   const res = await fetch(API + "/login", {
     method:"POST",
@@ -203,17 +180,22 @@ async function login(){
   const data = await res.json()
 
   if(res.ok){
-    alert("Login feito 🚀")
-
     token = data.token
+    localStorage.setItem("token", token)
 
-    document.getElementById("loginBox").style.display="none"
+    document.getElementById("auth").style.display="none"
     document.getElementById("appBox").style.display="block"
 
     listar()
   } else {
     alert(data.error)
   }
+}
+
+// ================= LOGOUT =================
+function logout(){
+  localStorage.removeItem("token")
+  location.reload()
 }
 
 // ================= CRIAR =================
