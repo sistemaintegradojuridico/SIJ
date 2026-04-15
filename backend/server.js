@@ -1,90 +1,57 @@
-const express = require("express")
-const cors = require("cors")
-const { Pool } = require("pg")
-const jwt = require("jsonwebtoken")
-const bcrypt = require("bcryptjs")
-const nodemailer = require("nodemailer")
+import express from "express"
+import cors from "cors"
+import pkg from "pg"
+import bcrypt from "bcrypt"
+import jwt from "jsonwebtoken"
 
-let OpenAI = null
-if(process.env.OPENAI_API_KEY){
-  OpenAI = require("openai")
-}
+const { Pool } = pkg
 
 const app = express()
 app.use(cors())
 app.use(express.json())
 
+// ================= DB =================
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: { rejectUnauthorized: false }
 })
 
-const SECRET = process.env.JWT_SECRET || "123"
+// ================= CONFIG =================
+const JWT_SECRET = process.env.JWT_SECRET || "segredo"
 
-// IA segura (não quebra se não tiver chave)
-let openai = null
-if(process.env.OPENAI_API_KEY){
-  openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY
-  })
-}
-
-// ================= DB
-async function initDB() {
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS users (
-      id SERIAL PRIMARY KEY,
-      email TEXT UNIQUE NOT NULL,
-      password TEXT NOT NULL,
-      reset_token TEXT
-    );
-  `)
-
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS processos (
-      id SERIAL PRIMARY KEY,
-      titulo TEXT,
-      descricao TEXT,
-      user_id INTEGER REFERENCES users(id) ON DELETE CASCADE
-    );
-  `)
-
-  console.log("Banco pronto 🚀")
-}
-initDB()
-
-// ================= AUTH
-function auth(req,res,next){
+// ================= AUTH =================
+function auth(req, res, next){
   const token = req.headers.authorization
   if(!token) return res.status(401).json({error:"Sem token"})
+
   try{
-    const decoded = jwt.verify(token,SECRET)
-    req.userId = decoded.id
+    const decoded = jwt.verify(token, JWT_SECRET)
+    req.user = decoded
     next()
   }catch{
     res.status(401).json({error:"Token inválido"})
   }
 }
 
-// ================= TESTE
-app.get("/", (req,res)=>{
-  res.send("SIJ rodando 🚀")
-})
-
-// ================= REGISTER
+// ================= REGISTER =================
 app.post("/register", async (req,res)=>{
   const {email,password} = req.body
+
   const hash = await bcrypt.hash(password,10)
 
-  await pool.query(
-    "INSERT INTO users (email,password) VALUES ($1,$2)",
-    [email,hash]
-  )
+  try{
+    const user = await pool.query(
+      "INSERT INTO users(email,password) VALUES($1,$2) RETURNING *",
+      [email,hash]
+    )
 
-  res.json({ok:true})
+    res.json(user.rows[0])
+  }catch{
+    res.status(400).json({error:"Email já existe"})
+  }
 })
 
-// ================= LOGIN
+// ================= LOGIN =================
 app.post("/login", async (req,res)=>{
   const {email,password} = req.body
 
@@ -93,65 +60,83 @@ app.post("/login", async (req,res)=>{
     [email]
   )
 
-  if(user.rows.length===0)
-    return res.status(401).json({error:"Usuário não encontrado"})
+  if(user.rows.length === 0)
+    return res.status(400).json({error:"Usuário não encontrado"})
 
-  const valid = await bcrypt.compare(password,user.rows[0].password)
+  const valid = await bcrypt.compare(password, user.rows[0].password)
 
   if(!valid)
-    return res.status(401).json({error:"Senha inválida"})
+    return res.status(400).json({error:"Senha inválida"})
 
-  const token = jwt.sign({id:user.rows[0].id},SECRET)
+  const token = jwt.sign({id:user.rows[0].id}, JWT_SECRET)
 
   res.json({token})
 })
 
-// ================= PROCESSOS
+// ================= PROCESSOS =================
 app.post("/processos", auth, async (req,res)=>{
   const {titulo,descricao} = req.body
 
-  await pool.query(
-    "INSERT INTO processos (titulo,descricao,user_id) VALUES ($1,$2,$3)",
-    [titulo,descricao,req.userId]
+  const novo = await pool.query(
+    "INSERT INTO processos(titulo,descricao,user_id) VALUES($1,$2,$3) RETURNING *",
+    [titulo,descricao,req.user.id]
   )
 
-  res.json({ok:true})
+  res.json(novo.rows[0])
 })
 
 app.get("/processos", auth, async (req,res)=>{
-  const data = await pool.query(
-    "SELECT * FROM processos WHERE user_id=$1",
-    [req.userId]
+  const lista = await pool.query(
+    "SELECT * FROM processos WHERE user_id=$1 ORDER BY id DESC",
+    [req.user.id]
   )
-  res.json(data.rows)
+
+  res.json(lista.rows)
 })
 
 app.delete("/processos/:id", auth, async (req,res)=>{
   await pool.query(
     "DELETE FROM processos WHERE id=$1 AND user_id=$2",
-    [req.params.id,req.userId]
+    [req.params.id, req.user.id]
   )
+
   res.json({ok:true})
 })
 
-// ================= IA (SEGURA)
-app.post("/ia/peticao", auth, async (req,res)=>{
-  if(!openai){
-    return res.json({texto:"IA não configurada ainda"})
-  }
-
+// ================= IA (SAFE) =================
+app.post("/ia", auth, async (req,res)=>{
   const {tema} = req.body
 
-  const completion = await openai.chat.completions.create({
-    model: "gpt-4.1-mini",
-    messages: [
-      {role:"system", content:"Você é um advogado especialista"},
-      {role:"user", content:`Crie uma petição sobre: ${tema}`}
-    ]
-  })
+  if(!process.env.OPENAI_API_KEY){
+    return res.json({
+      texto: "IA não configurada ainda. Adicione OPENAI_API_KEY no Render."
+    })
+  }
 
-  res.json({texto: completion.choices[0].message.content})
+  try{
+    const { default: OpenAI } = await import("openai")
+
+    const openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY
+    })
+
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        { role: "user", content: `Crie uma petição jurídica sobre: ${tema}` }
+      ]
+    })
+
+    res.json({texto: response.choices[0].message.content})
+
+  }catch(err){
+    res.json({texto:"Erro na IA"})
+  }
 })
 
+// ================= START =================
 const PORT = process.env.PORT || 3000
-app.listen(PORT, ()=> console.log("Servidor rodando 🚀"))
+
+app.listen(PORT, ()=>{
+  console.log("Servidor rodando na porta", PORT)
+})
