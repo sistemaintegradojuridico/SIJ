@@ -7,7 +7,6 @@ const app = express()
 app.use(cors())
 app.use(express.json())
 
-// 🔥 conexão com banco (Render usa DATABASE_URL)
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: { rejectUnauthorized: false }
@@ -18,9 +17,7 @@ app.get("/", (req, res) => {
   res.send("SIJ backend rodando 🚀")
 })
 
-// =========================
-// REGISTER
-// =========================
+// ================== REGISTER
 app.post("/register", async (req, res) => {
   const { email, password } = req.body
 
@@ -33,16 +30,13 @@ app.post("/register", async (req, res) => {
       "INSERT INTO users (email, password) VALUES ($1, $2)",
       [email, password]
     )
-
     res.json({ ok: true })
-  } catch (err) {
+  } catch {
     res.status(400).json({ error: "Email já existe" })
   }
 })
 
-// =========================
-// LOGIN
-// =========================
+// ================== LOGIN
 app.post("/login", async (req, res) => {
   const { email, password } = req.body
 
@@ -55,15 +49,10 @@ app.post("/login", async (req, res) => {
     return res.status(401).json({ error: "Login inválido" })
   }
 
-  res.json({
-    ok: true,
-    user: result.rows[0]
-  })
+  res.json({ ok: true, user: result.rows[0] })
 })
 
-// =========================
-// CRIAR PROCESSO
-// =========================
+// ================== CRIAR
 app.post("/processos", async (req, res) => {
   const { titulo, descricao, user_id } = req.body
 
@@ -75,9 +64,7 @@ app.post("/processos", async (req, res) => {
   res.json({ ok: true })
 })
 
-// =========================
-// LISTAR
-// =========================
+// ================== LISTAR
 app.get("/processos/:user_id", async (req, res) => {
   const { user_id } = req.params
 
@@ -89,9 +76,7 @@ app.get("/processos/:user_id", async (req, res) => {
   res.json(result.rows)
 })
 
-// =========================
-// DELETAR
-// =========================
+// ================== DELETAR
 app.delete("/processos/:id", async (req, res) => {
   const { id } = req.params
 
@@ -100,6 +85,5 @@ app.delete("/processos/:id", async (req, res) => {
   res.json({ ok: true })
 })
 
-// =========================
 const PORT = process.env.PORT || 3000
 app.listen(PORT, () => console.log("Servidor rodando 🚀"))
