@@ -1,9 +1,12 @@
 const express = require("express")
 const cors = require("cors")
 const { Pool } = require("pg")
+const jwt = require("jsonwebtoken")
+const bcrypt = require("bcryptjs")
+const nodemailer = require("nodemailer")
+const OpenAI = require("openai")
 
 const app = express()
-
 app.use(cors())
 app.use(express.json())
 
@@ -12,78 +15,174 @@ const pool = new Pool({
   ssl: { rejectUnauthorized: false }
 })
 
-// TESTE
-app.get("/", (req, res) => {
-  res.send("SIJ backend rodando 🚀")
-})
+const SECRET = process.env.JWT_SECRET
 
-// ================== REGISTER
-app.post("/register", async (req, res) => {
-  const { email, password } = req.body
-
-  if (!email || !password) {
-    return res.status(400).json({ error: "Preencha tudo" })
-  }
-
-  try {
-    await pool.query(
-      "INSERT INTO users (email, password) VALUES ($1, $2)",
-      [email, password]
-    )
-    res.json({ ok: true })
-  } catch {
-    res.status(400).json({ error: "Email já existe" })
+// EMAIL
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS
   }
 })
 
-// ================== LOGIN
-app.post("/login", async (req, res) => {
-  const { email, password } = req.body
-
-  const result = await pool.query(
-    "SELECT * FROM users WHERE email=$1 AND password=$2",
-    [email, password]
-  )
-
-  if (result.rows.length === 0) {
-    return res.status(401).json({ error: "Login inválido" })
-  }
-
-  res.json({ ok: true, user: result.rows[0] })
+// IA
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY
 })
 
-// ================== CRIAR
-app.post("/processos", async (req, res) => {
-  const { titulo, descricao, user_id } = req.body
+// ================= DB INIT
+async function initDB() {
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS users (
+      id SERIAL PRIMARY KEY,
+      email TEXT UNIQUE NOT NULL,
+      password TEXT NOT NULL,
+      reset_token TEXT
+    );
+  `)
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS processos (
+      id SERIAL PRIMARY KEY,
+      titulo TEXT,
+      descricao TEXT,
+      user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+  `)
+
+  console.log("Banco pronto 🚀")
+}
+initDB()
+
+// ================= AUTH
+function auth(req, res, next){
+  const token = req.headers.authorization
+  if(!token) return res.status(401).json({error:"Sem token"})
+
+  try{
+    const decoded = jwt.verify(token, SECRET)
+    req.userId = decoded.id
+    next()
+  }catch{
+    res.status(401).json({error:"Token inválido"})
+  }
+}
+
+// ================= TESTE
+app.get("/", (req,res)=>{
+  res.send("SIJ PRO rodando 🚀")
+})
+
+// ================= REGISTER
+app.post("/register", async (req,res)=>{
+  const {email,password} = req.body
+  const hash = await bcrypt.hash(password,10)
 
   await pool.query(
-    "INSERT INTO processos (titulo, descricao, user_id) VALUES ($1,$2,$3)",
-    [titulo, descricao, user_id]
+    "INSERT INTO users (email,password) VALUES ($1,$2)",
+    [email,hash]
   )
 
-  res.json({ ok: true })
+  res.json({ok:true})
 })
 
-// ================== LISTAR
-app.get("/processos/:user_id", async (req, res) => {
-  const { user_id } = req.params
+// ================= LOGIN
+app.post("/login", async (req,res)=>{
+  const {email,password} = req.body
 
-  const result = await pool.query(
-    "SELECT * FROM processos WHERE user_id=$1 ORDER BY id DESC",
-    [user_id]
+  const user = await pool.query(
+    "SELECT * FROM users WHERE email=$1",
+    [email]
   )
 
-  res.json(result.rows)
+  if(user.rows.length===0) return res.status(401).json({error:"Usuário não encontrado"})
+
+  const valid = await bcrypt.compare(password,user.rows[0].password)
+
+  if(!valid) return res.status(401).json({error:"Senha inválida"})
+
+  const token = jwt.sign({id:user.rows[0].id},SECRET)
+
+  res.json({token})
 })
 
-// ================== DELETAR
-app.delete("/processos/:id", async (req, res) => {
-  const { id } = req.params
+// ================= RECUPERAR SENHA
+app.post("/forgot", async (req,res)=>{
+  const {email} = req.body
+  const token = Math.random().toString(36).substring(2)
 
-  await pool.query("DELETE FROM processos WHERE id=$1", [id])
+  await pool.query(
+    "UPDATE users SET reset_token=$1 WHERE email=$2",
+    [token,email]
+  )
 
-  res.json({ ok: true })
+  await transporter.sendMail({
+    from: process.env.EMAIL_USER,
+    to: email,
+    subject: "Recuperação de senha",
+    text: `Seu token: ${token}`
+  })
+
+  res.json({ok:true})
+})
+
+// ================= RESET
+app.post("/reset", async (req,res)=>{
+  const {token,newPassword} = req.body
+  const hash = await bcrypt.hash(newPassword,10)
+
+  await pool.query(
+    "UPDATE users SET password=$1, reset_token=NULL WHERE reset_token=$2",
+    [hash,token]
+  )
+
+  res.json({ok:true})
+})
+
+// ================= PROCESSOS
+app.post("/processos", auth, async (req,res)=>{
+  const {titulo,descricao} = req.body
+
+  await pool.query(
+    "INSERT INTO processos (titulo,descricao,user_id) VALUES ($1,$2,$3)",
+    [titulo,descricao,req.userId]
+  )
+
+  res.json({ok:true})
+})
+
+app.get("/processos", auth, async (req,res)=>{
+  const data = await pool.query(
+    "SELECT * FROM processos WHERE user_id=$1",
+    [req.userId]
+  )
+  res.json(data.rows)
+})
+
+app.delete("/processos/:id", auth, async (req,res)=>{
+  await pool.query(
+    "DELETE FROM processos WHERE id=$1 AND user_id=$2",
+    [req.params.id,req.userId]
+  )
+  res.json({ok:true})
+})
+
+// ================= IA PETIÇÃO
+app.post("/ia/peticao", auth, async (req,res)=>{
+  const {tema} = req.body
+
+  const completion = await openai.chat.completions.create({
+    model: "gpt-4.1-mini",
+    messages: [
+      {role:"system", content:"Você é um advogado especialista"},
+      {role:"user", content:`Crie uma petição sobre: ${tema}`}
+    ]
+  })
+
+  res.json({texto: completion.choices[0].message.content})
 })
 
 const PORT = process.env.PORT || 3000
-app.listen(PORT, () => console.log("Servidor rodando 🚀"))
+app.listen(PORT, ()=> console.log("Servidor PRO rodando 🚀"))
