@@ -6,10 +6,10 @@
 
 <style>
 
-/* ===== VARIÁVEIS ===== */
+/* ===== TEMA ===== */
 :root{
-  --roxo:#5b21b6;
-  --roxo-escuro:#3b0764;
+  --roxo:#2e1065;
+  --roxo2:#5b21b6;
   --bg:#f4f6fb;
   --card:#ffffff;
   --text:#1f2937;
@@ -21,6 +21,7 @@
   --text:#e5e7eb;
 }
 
+/* ===== BASE ===== */
 body{
   margin:0;
   font-family:Arial;
@@ -28,13 +29,13 @@ body{
   color:var(--text);
 }
 
-/* LOGIN */
+/* ===== LOGIN ===== */
 #login{
   height:100vh;
   display:flex;
   justify-content:center;
   align-items:center;
-  background:linear-gradient(135deg,#5b21b6,#9333ea,#3b0764);
+  background:linear-gradient(135deg,#5b21b6,#9333ea,#2e1065);
 }
 
 .box{
@@ -47,7 +48,7 @@ body{
   color:white;
 }
 
-input,select{
+input{
   width:100%;
   padding:12px;
   margin:6px 0;
@@ -56,37 +57,52 @@ input,select{
 }
 
 button{
-  width:100%;
-  padding:12px;
+  padding:10px;
   border:none;
   border-radius:8px;
-  background:var(--roxo-escuro);
+  background:#2e1065;
   color:white;
   cursor:pointer;
 }
 
-/* APP */
+/* ===== APP ===== */
 #app{display:none}
 
 /* SIDEBAR */
 .sidebar{
-  width:230px;
+  width:70px;
   height:100vh;
   position:fixed;
-  background:linear-gradient(#5b21b6,#3b0764);
-  padding:20px;
-  color:white;
+  background:linear-gradient(#2e1065,#5b21b6);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding-top:20px;
 }
 
-.sidebar button{
-  margin:6px 0;
-  background:rgba(255,255,255,0.1);
+.icon{
+  margin:15px 0;
+  font-size:20px;
+  cursor:pointer;
+  color:#ddd;
+}
+
+/* TOPBAR */
+.topbar{
+  margin-left:70px;
+  height:60px;
+  background:var(--card);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 20px;
+  box-shadow:0 2px 5px rgba(0,0,0,0.05);
 }
 
 /* MAIN */
 .main{
-  margin-left:230px;
-  padding:25px;
+  margin-left:70px;
+  padding:20px;
 }
 
 /* CARD */
@@ -94,8 +110,14 @@ button{
   background:var(--card);
   padding:15px;
   border-radius:10px;
-  margin-bottom:10px;
-  position:relative;
+  margin-bottom:15px;
+}
+
+/* GRID */
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+  gap:15px;
 }
 
 /* STATUS */
@@ -104,37 +126,28 @@ button{
   border-radius:20px;
   font-size:12px;
   color:white;
-  cursor:pointer;
 }
 
 .ativo{background:#22c55e}
 .vencer{background:#eab308;color:black}
 .finalizado{background:#6b7280}
-.deferido{background:#3b82f6}
-.indeferido{background:#ef4444}
 
-/* BOTÕES */
-.actions{
-  position:absolute;
-  right:10px;
-  top:10px;
+/* LISTA */
+.linha{
+  display:flex;
+  justify-content:space-between;
+  padding:10px;
+  border-bottom:1px solid #ddd;
 }
 
-.actions button{
-  width:auto;
+/* BOTÕES */
+.small{
   padding:5px 8px;
   font-size:11px;
-  margin-left:5px;
 }
 
 .edit{background:#5b21b6}
 .delete{background:#ef4444}
-.done{background:#22c55e}
-
-/* ALERTA */
-.alerta{
-  border-left:5px solid red;
-}
 
 </style>
 </head>
@@ -155,14 +168,17 @@ button{
 <div id="app">
 
 <div class="sidebar">
-  <h3>SIJ</h3>
-  <button onclick="tela('dashboard')">Dashboard</button>
-  <button onclick="tela('processos')">Processos</button>
-  <button onclick="tela('tarefas')">Tarefas</button>
-  <button onclick="tela('financeiro')">Financeiro</button>
-  <button onclick="tela('escritorio')">Escritórios</button>
-  <button onclick="toggleTema()">🌗 Tema</button>
-  <button onclick="sair()">Sair</button>
+  <div class="icon" onclick="tela('dashboard')">🏠</div>
+  <div class="icon" onclick="tela('processos')">📁</div>
+  <div class="icon" onclick="tela('tarefas')">✅</div>
+  <div class="icon" onclick="tela('agenda')">📅</div>
+  <div class="icon" onclick="tela('financeiro')">💰</div>
+  <div class="icon" onclick="toggleTema()">🌗</div>
+</div>
+
+<div class="topbar">
+  <input placeholder="Buscar..." style="width:300px">
+  <div>👤 Usuário</div>
 </div>
 
 <div class="main">
@@ -170,7 +186,12 @@ button{
 <!-- DASHBOARD -->
 <div id="dashboard">
 <h2>Dashboard</h2>
-<p id="stats"></p>
+
+<div class="grid">
+  <div class="card">Processos: <span id="totalProc"></span></div>
+  <div class="card">Tarefas: <span id="totalTarefas"></span></div>
+  <div class="card">Financeiro: R$ <span id="totalFin"></span></div>
+</div>
 </div>
 
 <!-- PROCESSOS -->
@@ -178,63 +199,44 @@ button{
 <h2>Processos</h2>
 
 <input id="titulo" placeholder="Título">
-<input id="assunto" placeholder="Assunto">
 <input id="parte" placeholder="Parte">
-
-<select id="area">
-<option>Cível</option>
-<option>Previdenciário</option>
-<option>Família</option>
-<option>Trabalhista</option>
-</select>
-
 <input type="date" id="prazo">
 
 <select id="status">
 <option value="ativo">Ativo</option>
 <option value="vencer">A vencer</option>
 <option value="finalizado">Finalizado</option>
-<option value="deferido">Deferido</option>
-<option value="indeferido">Indeferido</option>
 </select>
 
-<input type="file" id="file">
+<button onclick="addProc()">Salvar</button>
 
-<button onclick="salvarProcesso()">Salvar Processo</button>
-
-<div id="listaProcessos"></div>
+<div id="listaProc"></div>
 </div>
 
 <!-- TAREFAS -->
 <div id="tarefas" style="display:none">
-<h2>Tarefas da equipe</h2>
+<h2>Tarefas</h2>
 
-<input id="tarefaTexto" placeholder="Nova tarefa">
+<input id="tarefa">
 <button onclick="addTarefa()">Adicionar</button>
 
-<div id="listaTarefas"></div>
+<div id="listaTarefa"></div>
+</div>
+
+<!-- AGENDA -->
+<div id="agenda" style="display:none">
+<h2>Agenda</h2>
+<p>Visual calendário (base pronta)</p>
 </div>
 
 <!-- FINANCEIRO -->
 <div id="financeiro" style="display:none">
-<h2>Financeiro</h2>
+<h2>Financeiro do Escritório</h2>
 
 <input id="valor" placeholder="Valor">
-<button onclick="addFinanceiro()">Adicionar</button>
+<button onclick="addFin()">Adicionar</button>
 
-<div id="listaFinanceiro"></div>
-</div>
-
-<!-- ESCRITÓRIO -->
-<div id="escritorio" style="display:none">
-<h2>Escritório</h2>
-
-<input id="funcionario" placeholder="Nome funcionário">
-<button onclick="addFuncionario()">Adicionar funcionário (+R$10)</button>
-
-<div id="listaFuncionarios"></div>
-
-<p id="mensalidade"></p>
+<div id="listaFin"></div>
 </div>
 
 </div>
@@ -246,181 +248,116 @@ button{
 function entrar(){
   login.style.display="none"
   app.style.display="block"
-  renderAll()
-}
-
-function sair(){
-  app.style.display="none"
-  login.style.display="flex"
+  render()
 }
 
 /* TELAS */
 function tela(x){
-  dashboard.style.display="none"
-  processos.style.display="none"
-  tarefas.style.display="none"
-  financeiro.style.display="none"
-  escritorio.style.display="none"
-
+  document.querySelectorAll(".main > div").forEach(e=>e.style.display="none")
   document.getElementById(x).style.display="block"
 }
 
 /* PROCESSOS */
-function salvarProcesso(){
-  let d = JSON.parse(localStorage.getItem("proc")||"[]")
-
+function addProc(){
+  let d=JSON.parse(localStorage.proc||"[]")
   d.push({
-    id:Date.now(),
-    titulo:titulo.value,
-    assunto:assunto.value,
-    parte:parte.value,
-    area:area.value,
+    t:titulo.value,
+    p:parte.value,
     prazo:prazo.value,
-    status:status.value,
-    data:new Date().toLocaleDateString()
+    s:status.value
   })
-
-  localStorage.setItem("proc",JSON.stringify(d))
-  renderProcessos()
+  localStorage.proc=JSON.stringify(d)
+  render()
 }
 
-function renderProcessos(){
-  let d = JSON.parse(localStorage.getItem("proc")||"[]")
-  listaProcessos.innerHTML=""
+function renderProc(){
+  let d=JSON.parse(localStorage.proc||"[]")
+  listaProc.innerHTML=""
 
-  let hoje = new Date().toISOString().split("T")[0]
+  d.forEach((x,i)=>{
+    listaProc.innerHTML+=`
+    <div class="linha">
+      <div>
+        <b>${x.t}</b><br>
+        ${x.p} | ${x.prazo}
+      </div>
 
-  d.forEach(p=>{
-    let alerta = (p.prazo && p.prazo < hoje) ? "alerta" : ""
-
-    listaProcessos.innerHTML+=`
-    <div class="card ${alerta}">
-
-    <div class="actions">
-      <button class="delete" onclick="delProc(${p.id})">Excluir</button>
-    </div>
-
-    <div class="status ${p.status}" onclick="trocarStatus(${p.id})">${p.status}</div>
-
-    <h3>${p.titulo}</h3>
-    <p>${p.assunto}</p>
-    <p>${p.area}</p>
-    <p>${p.parte}</p>
-    <p>Prazo: ${p.prazo||"-"}</p>
-    <small>${p.data}</small>
-
+      <div>
+        <span class="status ${x.s}">${x.s}</span>
+        <button class="small delete" onclick="delProc(${i})">X</button>
+      </div>
     </div>`
   })
+
+  totalProc.innerText=d.length
 }
 
-function trocarStatus(id){
-  let d = JSON.parse(localStorage.getItem("proc"))
-  let ordem=["ativo","vencer","finalizado","deferido","indeferido"]
-
-  let p = d.find(x=>x.id===id)
-  let i = ordem.indexOf(p.status)
-  p.status = ordem[(i+1)%ordem.length]
-
-  localStorage.setItem("proc",JSON.stringify(d))
-  renderProcessos()
-}
-
-function delProc(id){
-  let d = JSON.parse(localStorage.getItem("proc"))
-  d = d.filter(x=>x.id!==id)
-  localStorage.setItem("proc",JSON.stringify(d))
-  renderProcessos()
+function delProc(i){
+  let d=JSON.parse(localStorage.proc)
+  d.splice(i,1)
+  localStorage.proc=JSON.stringify(d)
+  render()
 }
 
 /* TAREFAS */
 function addTarefa(){
-  let t = JSON.parse(localStorage.getItem("tarefas")||"[]")
-  t.push({txt:tarefaTexto.value})
-  localStorage.setItem("tarefas",JSON.stringify(t))
-  renderTarefas()
+  let t=JSON.parse(localStorage.t||"[]")
+  t.push(tarefa.value)
+  localStorage.t=JSON.stringify(t)
+  render()
 }
 
-function renderTarefas(){
-  let t = JSON.parse(localStorage.getItem("tarefas")||"[]")
-  listaTarefas.innerHTML=""
+function renderTarefa(){
+  let t=JSON.parse(localStorage.t||"[]")
+  listaTarefa.innerHTML=""
 
   t.forEach((x,i)=>{
-    listaTarefas.innerHTML+=`
-    <div class="card">
-      ${x.txt}
-      <button class="done" onclick="done(${i})">OK</button>
+    listaTarefa.innerHTML+=`
+    <div class="linha">
+      ${x}
+      <button class="small delete" onclick="delT(${i})">X</button>
     </div>`
   })
+
+  totalTarefas.innerText=t.length
 }
 
-function done(i){
-  let t = JSON.parse(localStorage.getItem("tarefas"))
+function delT(i){
+  let t=JSON.parse(localStorage.t)
   t.splice(i,1)
-  localStorage.setItem("tarefas",JSON.stringify(t))
-  renderTarefas()
+  localStorage.t=JSON.stringify(t)
+  render()
 }
 
 /* FINANCEIRO */
-function addFinanceiro(){
-  let f = JSON.parse(localStorage.getItem("fin")||"[]")
-  f.push(valor.value)
-  localStorage.setItem("fin",JSON.stringify(f))
-  renderFinanceiro()
+function addFin(){
+  let f=JSON.parse(localStorage.f||"[]")
+  f.push(Number(valor.value))
+  localStorage.f=JSON.stringify(f)
+  render()
 }
 
-function renderFinanceiro(){
-  let f = JSON.parse(localStorage.getItem("fin")||"[]")
-  listaFinanceiro.innerHTML=""
-
+function renderFin(){
+  let f=JSON.parse(localStorage.f||"[]")
+  listaFin.innerHTML=""
   let total=0
 
   f.forEach(v=>{
-    total+=Number(v)
-    listaFinanceiro.innerHTML+=`<div class="card">R$ ${v}</div>`
+    total+=v
+    listaFin.innerHTML+=`<div class="card">R$ ${v}</div>`
   })
 
-  listaFinanceiro.innerHTML+=`<h3>Total: R$ ${total}</h3>`
-}
-
-/* FUNCIONÁRIOS */
-function addFuncionario(){
-  let f = JSON.parse(localStorage.getItem("func")||"[]")
-  f.push(funcionario.value)
-  localStorage.setItem("func",JSON.stringify(f))
-  renderFunc()
-}
-
-function renderFunc(){
-  let f = JSON.parse(localStorage.getItem("func")||"[]")
-  listaFuncionarios.innerHTML=""
-
-  f.forEach(x=>{
-    listaFuncionarios.innerHTML+=`<div class="card">${x}</div>`
-  })
-
-  let mensal = 39 + (f.length*10)
-  mensalidade.innerHTML = "Mensalidade: R$ "+mensal
-}
-
-/* DASHBOARD */
-function renderDashboard(){
-  let d = JSON.parse(localStorage.getItem("proc")||"[]")
-
-  let def = d.filter(x=>x.status==="deferido").length
-  let ind = d.filter(x=>x.status==="indeferido").length
-
-  stats.innerHTML = `Deferidos: ${def} | Indeferidos: ${ind}`
+  totalFin.innerText=total
 }
 
 /* GERAL */
-function renderAll(){
-  renderProcessos()
-  renderTarefas()
-  renderFinanceiro()
-  renderFunc()
-  renderDashboard()
+function render(){
+  renderProc()
+  renderTarefa()
+  renderFin()
 }
 
+/* TEMA */
 function toggleTema(){
   document.body.classList.toggle("dark")
 }
