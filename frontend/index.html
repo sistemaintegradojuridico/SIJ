@@ -9,8 +9,8 @@
 <style>
 body{
   margin:0;
-  font-family:Arial;
-  background:#f4f6fb;
+  font-family:'Segoe UI',sans-serif;
+  background:#f5f6fa;
 }
 
 /* SIDEBAR */
@@ -18,7 +18,7 @@ body{
   width:70px;
   height:100vh;
   position:fixed;
-  background:linear-gradient(#2e1065,#5b21b6);
+  background:linear-gradient(180deg,#2e1065,#4c1d95);
   display:flex;
   flex-direction:column;
   align-items:center;
@@ -26,15 +26,17 @@ body{
 }
 
 .sidebar i{
-  color:#ccc;
+  color:#cbd5e1;
   font-size:22px;
-  margin:20px 0;
+  margin:18px 0;
   cursor:pointer;
 }
 
-.sidebar i:hover{color:white}
+.sidebar i:hover{
+  color:white;
+}
 
-/* TOPBAR */
+/* TOP */
 .top{
   margin-left:70px;
   height:60px;
@@ -42,8 +44,12 @@ body{
   display:flex;
   align-items:center;
   justify-content:space-between;
-  padding:0 20px;
-  box-shadow:0 2px 10px rgba(0,0,0,0.1);
+  padding:0 25px;
+  border-bottom:1px solid #eee;
+}
+
+.logo{
+  font-weight:600;
 }
 
 .user{
@@ -62,45 +68,91 @@ body{
 /* MAIN */
 .main{
   margin-left:70px;
-  padding:20px;
+  padding:25px;
 }
 
-/* CARDS */
+/* DASH */
 .cards{
   display:grid;
   grid-template-columns:repeat(4,1fr);
   gap:15px;
+  margin-top:15px;
 }
 
 .card{
   background:white;
-  padding:20px;
-  border-radius:12px;
+  padding:18px;
+  border-radius:10px;
+  border:1px solid #eee;
+}
+
+/* FORM */
+.form{
+  display:flex;
+  gap:10px;
+  margin-top:15px;
+}
+
+.form input{
+  padding:8px;
+  border:1px solid #ccc;
+  border-radius:5px;
+}
+
+.form button{
+  background:#4c1d95;
+  color:white;
+  border:none;
+  padding:8px 15px;
+  border-radius:5px;
+  cursor:pointer;
 }
 
 /* LISTA */
+.lista{
+  margin-top:20px;
+}
+
 .item{
   background:white;
   padding:15px;
-  margin-top:10px;
-  border-radius:10px;
+  border-radius:8px;
+  margin-bottom:10px;
+  border:1px solid #eee;
 }
 
+/* PERFIL */
+.perfil input{
+  display:block;
+  margin:10px 0;
+  padding:8px;
+  width:250px;
+}
+
+.perfil button{
+  background:#4c1d95;
+  color:white;
+  border:none;
+  padding:8px 15px;
+  border-radius:5px;
+  cursor:pointer;
+}
 </style>
 </head>
 
 <body>
 
 <div class="sidebar">
-  <i class="ri-home-line" onclick="show('dash')"></i>
-  <i class="ri-file-list-3-line" onclick="show('processos')"></i>
-  <i class="ri-calendar-line" onclick="show('agenda')"></i>
-  <i class="ri-user-line" onclick="show('perfil')"></i>
+  <i class="ri-home-line" onclick="trocar('dash')"></i>
+  <i class="ri-file-list-3-line" onclick="trocar('processos')"></i>
+  <i class="ri-calendar-line" onclick="trocar('agenda')"></i>
+  <i class="ri-user-line" onclick="trocar('perfil')"></i>
 </div>
 
 <div class="top">
-  <h3>SIJ PRO</h3>
-  <div class="user" onclick="show('perfil')">
+  <div class="logo">SIJ PRO</div>
+
+  <div class="user" onclick="trocar('perfil')">
     <img id="foto" src="https://i.imgur.com/6VBx3io.png">
     <span id="nome">Usuário</span>
   </div>
@@ -108,7 +160,6 @@ body{
 
 <div class="main">
 
-<!-- DASHBOARD -->
 <div id="dash">
   <h2>Dashboard</h2>
 
@@ -120,25 +171,24 @@ body{
   </div>
 </div>
 
-<!-- PROCESSOS -->
 <div id="processos" style="display:none">
   <h2>Processos</h2>
 
-  <input id="titulo" placeholder="Título">
-  <input id="parte" placeholder="Parte">
-  <button onclick="add()">Adicionar</button>
+  <div class="form">
+    <input id="titulo" placeholder="Título">
+    <input id="parte" placeholder="Parte">
+    <button onclick="add()">Adicionar</button>
+  </div>
 
-  <div id="lista"></div>
+  <div id="lista" class="lista"></div>
 </div>
 
-<!-- AGENDA -->
 <div id="agenda" style="display:none">
   <h2>Agenda</h2>
-  <p>Calendário estilo ADVBOX (fase 2)</p>
+  <p>Calendário entra depois</p>
 </div>
 
-<!-- PERFIL -->
-<div id="perfil" style="display:none">
+<div id="perfil" style="display:none" class="perfil">
   <h2>Perfil</h2>
 
   <input id="nomeInput" placeholder="Nome">
@@ -150,10 +200,9 @@ body{
 </div>
 
 <script>
-
-function show(id){
-  ["dash","processos","agenda","perfil"].forEach(x=>{
-    document.getElementById(x).style.display="none"
+function trocar(id){
+  ["dash","processos","agenda","perfil"].forEach(p=>{
+    document.getElementById(p).style.display="none"
   })
   document.getElementById(id).style.display="block"
 }
@@ -193,7 +242,6 @@ window.onload = ()=>{
     foto.src = localStorage.getItem("foto")
   }
 }
-
 </script>
 
 </body>
