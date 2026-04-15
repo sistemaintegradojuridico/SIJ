@@ -10,16 +10,17 @@ body{
   font-family:Arial;
   background: linear-gradient(135deg,#2b0a2e,#5a0f3d,#7b1e4f);
   color:white;
-  text-align:center;
 }
 
 /* LOGIN */
-#login{
-  margin-top:150px;
+.center{
+  width:320px;
+  margin:120px auto;
+  text-align:center;
 }
 
 .container{
-  width:300px;
+  width:350px;
   margin:20px auto;
 }
 
@@ -28,7 +29,7 @@ input, select, button{
   padding:12px;
   margin:6px 0;
   border:none;
-  border-radius:8px;
+  border-radius:10px;
 }
 
 button{
@@ -38,17 +39,40 @@ button{
   cursor:pointer;
 }
 
+/* CARD */
 .card{
+  width:90%;
   background:white;
   color:black;
-  padding:10px;
-  margin:10px 0;
-  border-radius:8px;
+  padding:15px;
+  margin:10px auto;
+  border-radius:12px;
 }
 
-.hidden{
-  display:none;
+/* STATUS */
+.status{
+  padding:4px 10px;
+  border-radius:20px;
+  font-size:12px;
+  display:inline-block;
+  margin-bottom:8px;
+  cursor:pointer;
 }
+
+.ativo{background:green;color:white;}
+.vencer{background:orange;color:white;}
+.finalizado{background:gray;color:white;}
+.deferido{background:blue;color:white;}
+.indeferido{background:red;color:white;}
+
+.small{
+  font-size:11px;
+  color:gray;
+}
+
+.hidden{display:none;}
+
+h3{text-align:center;}
 </style>
 
 </head>
@@ -56,16 +80,14 @@ button{
 <body>
 
 <!-- LOGIN -->
-<div id="login">
-  <h2>SIJ</h2>
-  <div class="container">
-    <input id="email" placeholder="Email">
-    <input id="senha" type="password" placeholder="Senha">
-    <button onclick="entrar()">Entrar</button>
-  </div>
+<div id="login" class="center">
+  <h2>SIJ PRO</h2>
+  <input id="email" placeholder="Email">
+  <input id="senha" type="password" placeholder="Senha">
+  <button onclick="entrar()">Entrar</button>
 </div>
 
-<!-- SISTEMA -->
+<!-- APP -->
 <div id="app" class="hidden">
 
 <div class="container">
@@ -89,99 +111,175 @@ button{
 
 <button onclick="salvar()">Salvar</button>
 
+</div>
+
 <h3>Prazos próximos</h3>
 <div id="alertas"></div>
 
 <h3>Processos</h3>
 <div id="lista"></div>
 
-</div>
+<h3>Estatística do mês</h3>
+<div id="stats"></div>
+
 </div>
 
 <script>
 
-// ===== LOGIN =====
+let editando = null
+
+// LOGIN
 function entrar(){
   if(email.value && senha.value){
-    localStorage.setItem("logado", "sim")
+    localStorage.setItem("logado","sim")
     iniciar()
   }else{
-    alert("Preenche email e senha")
+    alert("Preencha os dados")
   }
 }
 
 function sair(){
-  localStorage.removeItem("logado")
+  localStorage.clear()
   location.reload()
 }
 
-// ===== INICIAR =====
 function iniciar(){
-  document.getElementById("login").classList.add("hidden")
-  document.getElementById("app").classList.remove("hidden")
+  login.classList.add("hidden")
+  app.classList.remove("hidden")
   listar()
 }
 
-// ===== BANCO LOCAL =====
-function getProcessos(){
-  return JSON.parse(localStorage.getItem("processos") || "[]")
+// BANCO
+function getDados(){
+  return JSON.parse(localStorage.getItem("dados") || "[]")
 }
 
-function salvarProcessos(lista){
-  localStorage.setItem("processos", JSON.stringify(lista))
+function setDados(d){
+  localStorage.setItem("dados", JSON.stringify(d))
 }
 
-// ===== SALVAR =====
+// DATA HOJE
+function hoje(){
+  return new Date().toLocaleDateString()
+}
+
+// SALVAR
 function salvar(){
 
-  let lista = getProcessos()
+  let lista = getDados()
 
-  const novo = {
-    id: Date.now(),
-    titulo: titulo.value,
-    area: area.value,
-    parte: parte.value,
-    descricao: descricao.value,
-    prazo: prazo.value,
-    data: new Date().toLocaleDateString(),
-    arquivo: arquivo.files[0]?.name || "nenhum"
+  if(editando){
+    let p = lista.find(x=>x.id===editando)
+
+    p.titulo = titulo.value
+    p.area = area.value
+    p.parte = parte.value
+    p.descricao = descricao.value
+    p.prazo = prazo.value
+    p.arquivo = arquivo.files[0]?.name || p.arquivo
+
+    editando = null
+
+  }else{
+    lista.push({
+      id: Date.now(),
+      titulo: titulo.value,
+      area: area.value,
+      parte: parte.value,
+      descricao: descricao.value,
+      prazo: prazo.value,
+      data: hoje(),
+      arquivo: arquivo.files[0]?.name || "nenhum",
+      status:"ativo"
+    })
   }
 
-  lista.push(novo)
-  salvarProcessos(lista)
-
+  setDados(lista)
   limpar()
   listar()
 }
 
-// ===== LISTAR =====
+// LIMPAR
+function limpar(){
+  titulo.value=""
+  parte.value=""
+  descricao.value=""
+  prazo.value=""
+}
+
+// STATUS
+function trocarStatus(id){
+  let lista = getDados()
+  let p = lista.find(x=>x.id===id)
+
+  const ordem = ["ativo","vencer","finalizado","deferido","indeferido"]
+  let i = ordem.indexOf(p.status)
+  p.status = ordem[(i+1)%ordem.length]
+
+  setDados(lista)
+  listar()
+}
+
+// EDITAR
+function editar(id){
+  let lista = getDados()
+  let p = lista.find(x=>x.id===id)
+
+  titulo.value = p.titulo
+  area.value = p.area
+  parte.value = p.parte
+  descricao.value = p.descricao
+  prazo.value = p.prazo
+
+  editando = id
+}
+
+// EXCLUIR
+function excluir(id){
+  let lista = getDados().filter(p=>p.id!==id)
+  setDados(lista)
+  listar()
+}
+
+// LISTAR
 function listar(){
 
-  let listaDados = getProcessos()
-
+  let dados = getDados()
   lista.innerHTML=""
   alertas.innerHTML=""
 
-  const hoje = new Date()
+  let hojeData = new Date()
+  let deferidos = 0
 
-  listaDados.forEach(p=>{
+  dados.forEach(p=>{
+
+    if(p.status === "deferido") deferidos++
 
     lista.innerHTML += `
       <div class="card">
+
+        <div class="status ${p.status}" onclick="trocarStatus(${p.id})">
+          ${p.status}
+        </div>
+
         <b>${p.titulo}</b><br>
         Área: ${p.area}<br>
         Parte: ${p.parte}<br>
-        Criado: ${p.data}<br>
         Prazo: ${p.prazo || "sem prazo"}<br>
-        Arquivo: ${p.arquivo}<br><br>
+        Arquivo: ${p.arquivo}<br>
 
+        <div class="small">Criado em ${p.data}</div>
+
+        <br>
+        <button onclick="editar(${p.id})">Editar</button>
         <button onclick="excluir(${p.id})">Excluir</button>
+
       </div>
     `
 
     if(p.prazo){
       let prazoData = new Date(p.prazo)
-      let diff = (prazoData - hoje)/(1000*60*60*24)
+      let diff = (prazoData - hojeData)/(1000*60*60*24)
 
       if(diff <= 3){
         alertas.innerHTML += `
@@ -193,24 +291,15 @@ function listar(){
     }
 
   })
+
+  stats.innerHTML = `
+    <div class="card">
+      Deferidos no mês: ${deferidos}
+    </div>
+  `
 }
 
-// ===== EXCLUIR =====
-function excluir(id){
-  let lista = getProcessos().filter(p => p.id !== id)
-  salvarProcessos(lista)
-  listar()
-}
-
-// ===== LIMPAR =====
-function limpar(){
-  titulo.value=""
-  parte.value=""
-  descricao.value=""
-  prazo.value=""
-}
-
-// ===== AUTO LOGIN =====
+// AUTO LOGIN
 if(localStorage.getItem("logado")){
   iniciar()
 }
