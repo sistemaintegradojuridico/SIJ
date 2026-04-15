@@ -4,15 +4,17 @@
 <meta charset="UTF-8">
 <title>SIJ PRO</title>
 
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+
 <style>
 
-/* ===== TEMA ===== */
 :root{
   --roxo:#2e1065;
   --roxo2:#5b21b6;
   --bg:#f4f6fb;
   --card:#ffffff;
   --text:#1f2937;
+  --icon:#cbd5e1;
 }
 
 .dark{
@@ -21,7 +23,6 @@
   --text:#e5e7eb;
 }
 
-/* ===== BASE ===== */
 body{
   margin:0;
   font-family:Arial;
@@ -29,7 +30,7 @@ body{
   color:var(--text);
 }
 
-/* ===== LOGIN ===== */
+/* LOGIN */
 #login{
   height:100vh;
   display:flex;
@@ -65,7 +66,7 @@ button{
   cursor:pointer;
 }
 
-/* ===== APP ===== */
+/* APP */
 #app{display:none}
 
 /* SIDEBAR */
@@ -81,10 +82,10 @@ button{
 }
 
 .icon{
-  margin:15px 0;
-  font-size:20px;
+  margin:18px 0;
+  font-size:18px;
   cursor:pointer;
-  color:#ddd;
+  color:var(--icon);
 }
 
 /* TOPBAR */
@@ -96,7 +97,25 @@ button{
   align-items:center;
   justify-content:space-between;
   padding:0 20px;
-  box-shadow:0 2px 5px rgba(0,0,0,0.05);
+}
+
+.top-right{
+  display:flex;
+  align-items:center;
+  gap:15px;
+}
+
+.user-box{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.user-box img{
+  width:35px;
+  height:35px;
+  border-radius:50%;
+  object-fit:cover;
 }
 
 /* MAIN */
@@ -105,7 +124,6 @@ button{
   padding:20px;
 }
 
-/* CARD */
 .card{
   background:var(--card);
   padding:15px;
@@ -113,14 +131,13 @@ button{
   margin-bottom:15px;
 }
 
-/* GRID */
-.grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-  gap:15px;
+.linha{
+  display:flex;
+  justify-content:space-between;
+  padding:12px;
+  border-bottom:1px solid #ddd;
 }
 
-/* STATUS */
 .status{
   padding:4px 10px;
   border-radius:20px;
@@ -132,21 +149,11 @@ button{
 .vencer{background:#eab308;color:black}
 .finalizado{background:#6b7280}
 
-/* LISTA */
-.linha{
-  display:flex;
-  justify-content:space-between;
-  padding:10px;
-  border-bottom:1px solid #ddd;
-}
-
-/* BOTÕES */
 .small{
   padding:5px 8px;
   font-size:11px;
 }
 
-.edit{background:#5b21b6}
 .delete{background:#ef4444}
 
 </style>
@@ -158,8 +165,11 @@ button{
 <div id="login">
   <div class="box">
     <h2>SIJ PRO</h2>
-    <input placeholder="Email">
-    <input type="password" placeholder="Senha">
+    <input id="email" placeholder="Email">
+    <input id="senha" type="password" placeholder="Senha">
+
+    <input type="file" id="foto">
+
     <button onclick="entrar()">Entrar</button>
   </div>
 </div>
@@ -168,33 +178,33 @@ button{
 <div id="app">
 
 <div class="sidebar">
-  <div class="icon" onclick="tela('dashboard')">🏠</div>
-  <div class="icon" onclick="tela('processos')">📁</div>
-  <div class="icon" onclick="tela('tarefas')">✅</div>
-  <div class="icon" onclick="tela('agenda')">📅</div>
-  <div class="icon" onclick="tela('financeiro')">💰</div>
-  <div class="icon" onclick="toggleTema()">🌗</div>
+  <i class="fa-solid fa-house icon" onclick="tela('dashboard')"></i>
+  <i class="fa-solid fa-folder icon" onclick="tela('processos')"></i>
 </div>
 
 <div class="topbar">
+
   <input placeholder="Buscar..." style="width:300px">
-  <div>👤 Usuário</div>
+
+  <div class="top-right">
+    <i class="fa-solid fa-moon" onclick="toggleTema()"></i>
+
+    <div class="user-box">
+      <img id="userFoto">
+      <span id="userEmail"></span>
+    </div>
+
+    <button onclick="sair()">Sair</button>
+  </div>
+
 </div>
 
 <div class="main">
 
-<!-- DASHBOARD -->
 <div id="dashboard">
 <h2>Dashboard</h2>
-
-<div class="grid">
-  <div class="card">Processos: <span id="totalProc"></span></div>
-  <div class="card">Tarefas: <span id="totalTarefas"></span></div>
-  <div class="card">Financeiro: R$ <span id="totalFin"></span></div>
-</div>
 </div>
 
-<!-- PROCESSOS -->
 <div id="processos" style="display:none">
 <h2>Processos</h2>
 
@@ -211,32 +221,7 @@ button{
 <button onclick="addProc()">Salvar</button>
 
 <div id="listaProc"></div>
-</div>
 
-<!-- TAREFAS -->
-<div id="tarefas" style="display:none">
-<h2>Tarefas</h2>
-
-<input id="tarefa">
-<button onclick="addTarefa()">Adicionar</button>
-
-<div id="listaTarefa"></div>
-</div>
-
-<!-- AGENDA -->
-<div id="agenda" style="display:none">
-<h2>Agenda</h2>
-<p>Visual calendário (base pronta)</p>
-</div>
-
-<!-- FINANCEIRO -->
-<div id="financeiro" style="display:none">
-<h2>Financeiro do Escritório</h2>
-
-<input id="valor" placeholder="Valor">
-<button onclick="addFin()">Adicionar</button>
-
-<div id="listaFin"></div>
 </div>
 
 </div>
@@ -246,9 +231,57 @@ button{
 
 /* LOGIN */
 function entrar(){
+
+  let file = foto.files[0]
+
+  if(file){
+    let reader = new FileReader()
+    reader.onload = function(e){
+
+      let user = {
+        email:email.value,
+        foto:e.target.result
+      }
+
+      localStorage.user = JSON.stringify(user)
+      iniciar()
+    }
+    reader.readAsDataURL(file)
+
+  }else{
+
+    let user = {
+      email:email.value,
+      foto:"https://i.imgur.com/6VBx3io.png"
+    }
+
+    localStorage.user = JSON.stringify(user)
+    iniciar()
+  }
+}
+
+/* INICIAR */
+function iniciar(){
   login.style.display="none"
   app.style.display="block"
+
+  let user = JSON.parse(localStorage.user)
+
+  userEmail.innerText = user.email
+  userFoto.src = user.foto
+
   render()
+}
+
+/* AUTO LOGIN */
+if(localStorage.user){
+  iniciar()
+}
+
+/* SAIR */
+function sair(){
+  localStorage.removeItem("user")
+  location.reload()
 }
 
 /* TELAS */
@@ -284,12 +317,10 @@ function renderProc(){
 
       <div>
         <span class="status ${x.s}">${x.s}</span>
-        <button class="small delete" onclick="delProc(${i})">X</button>
+        <button class="small delete" onclick="delProc(${i})">Excluir</button>
       </div>
     </div>`
   })
-
-  totalProc.innerText=d.length
 }
 
 function delProc(i){
@@ -299,62 +330,8 @@ function delProc(i){
   render()
 }
 
-/* TAREFAS */
-function addTarefa(){
-  let t=JSON.parse(localStorage.t||"[]")
-  t.push(tarefa.value)
-  localStorage.t=JSON.stringify(t)
-  render()
-}
-
-function renderTarefa(){
-  let t=JSON.parse(localStorage.t||"[]")
-  listaTarefa.innerHTML=""
-
-  t.forEach((x,i)=>{
-    listaTarefa.innerHTML+=`
-    <div class="linha">
-      ${x}
-      <button class="small delete" onclick="delT(${i})">X</button>
-    </div>`
-  })
-
-  totalTarefas.innerText=t.length
-}
-
-function delT(i){
-  let t=JSON.parse(localStorage.t)
-  t.splice(i,1)
-  localStorage.t=JSON.stringify(t)
-  render()
-}
-
-/* FINANCEIRO */
-function addFin(){
-  let f=JSON.parse(localStorage.f||"[]")
-  f.push(Number(valor.value))
-  localStorage.f=JSON.stringify(f)
-  render()
-}
-
-function renderFin(){
-  let f=JSON.parse(localStorage.f||"[]")
-  listaFin.innerHTML=""
-  let total=0
-
-  f.forEach(v=>{
-    total+=v
-    listaFin.innerHTML+=`<div class="card">R$ ${v}</div>`
-  })
-
-  totalFin.innerText=total
-}
-
-/* GERAL */
 function render(){
   renderProc()
-  renderTarefa()
-  renderFin()
 }
 
 /* TEMA */
