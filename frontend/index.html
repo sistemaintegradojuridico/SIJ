@@ -6,8 +6,8 @@
 
 <style>
 :root{
-  --roxo:#4b006e;
-  --roxo-escuro:#2e0045;
+  --roxo:#5b21b6;
+  --roxo-escuro:#3b0764;
   --bg:#f5f6fa;
   --card:#ffffff;
   --text:#222;
@@ -32,14 +32,14 @@ body{
   display:flex;
   justify-content:center;
   align-items:center;
-  background:linear-gradient(135deg,#4b006e,#7b1fa2,#2e0045);
+  background:linear-gradient(135deg,#5b21b6,#9333ea,#3b0764);
 }
 
-.login-box{
-  background:rgba(255,255,255,0.1);
+.box{
+  width:320px;
   padding:30px;
   border-radius:15px;
-  width:320px;
+  background:rgba(255,255,255,0.1);
   backdrop-filter:blur(10px);
   text-align:center;
   color:white;
@@ -48,13 +48,12 @@ body{
 input, select{
   width:100%;
   padding:12px;
-  margin:8px 0;
+  margin:6px 0;
   border-radius:8px;
   border:none;
-  outline:none;
 }
 
-.btn{
+button{
   width:100%;
   padding:12px;
   border:none;
@@ -62,111 +61,80 @@ input, select{
   background:var(--roxo-escuro);
   color:white;
   cursor:pointer;
-  transition:0.2s;
-}
-
-.btn:hover{
-  opacity:0.9;
 }
 
 /* APP */
-#app{display:none;}
+#app{display:none}
 
 /* SIDEBAR */
 .sidebar{
-  width:240px;
+  width:230px;
   height:100vh;
-  background:linear-gradient(180deg,#4b006e,#2e0045);
-  color:white;
   position:fixed;
+  background:linear-gradient(#5b21b6,#3b0764);
   padding:20px;
-  box-sizing:border-box;
-}
-
-.sidebar h2{
-  margin-bottom:25px;
+  color:white;
 }
 
 .sidebar button{
-  width:100%;
-  padding:12px;
-  margin-bottom:10px;
-  border:none;
-  border-radius:8px;
+  margin:6px 0;
   background:rgba(255,255,255,0.1);
-  color:white;
-  cursor:pointer;
-}
-
-.sidebar button:hover{
-  background:rgba(255,255,255,0.2);
 }
 
 /* MAIN */
 .main{
-  margin-left:240px;
-  padding:30px;
-  min-height:100vh;
-}
-
-/* HEADER */
-.header{
-  display:flex;
-  justify-content:space-between;
-  margin-bottom:20px;
+  margin-left:230px;
+  padding:25px;
 }
 
 /* CARD */
 .card{
   background:var(--card);
-  padding:20px;
-  border-radius:12px;
-  margin-bottom:15px;
-  box-shadow:0 5px 15px rgba(0,0,0,0.05);
+  padding:15px;
+  border-radius:10px;
+  margin-bottom:10px;
   position:relative;
 }
 
-/* STATUS */
+.dark .card{
+  background:#2a2a3d;
+  color:white;
+}
+
 .status{
-  display:inline-block;
-  padding:5px 12px;
+  padding:4px 10px;
   border-radius:20px;
   font-size:12px;
   color:white;
-  margin-bottom:10px;
+  cursor:pointer;
 }
 
-.ativo{background:#28a745;}
-.vencer{background:#ffc107;color:black;}
-.finalizado{background:#6c757d;}
-.deferido{background:#007bff;}
-.indeferido{background:#dc3545;}
+.ativo{background:#22c55e}
+.vencer{background:#eab308;color:black}
+.finalizado{background:#6b7280}
+.deferido{background:#3b82f6}
+.indeferido{background:#ef4444}
 
-/* ACTIONS */
+/* SMALL BUTTONS */
 .actions{
   position:absolute;
-  top:15px;
-  right:15px;
+  right:10px;
+  top:10px;
 }
 
 .actions button{
-  border:none;
-  padding:6px 10px;
-  border-radius:6px;
+  width:auto;
+  padding:5px 8px;
+  font-size:11px;
   margin-left:5px;
-  cursor:pointer;
-  font-size:12px;
 }
 
-.edit{background:var(--roxo);color:white;}
-.delete{background:#dc3545;color:white;}
+.edit{background:#5b21b6}
+.delete{background:#ef4444}
 
-/* FORM */
-.form{
-  max-width:400px;
-  background:var(--card);
-  padding:20px;
-  border-radius:12px;
+/* ALERTA */
+.alerta{
+  border-left:5px solid #ef4444;
 }
 
 </style>
@@ -176,18 +144,11 @@ input, select{
 
 <!-- LOGIN -->
 <div id="login">
-  <div class="login-box">
+  <div class="box">
     <h2>SIJ PRO</h2>
-
     <input id="email" placeholder="Email">
     <input id="senha" type="password" placeholder="Senha">
-
-    <button class="btn" onclick="entrar()">Entrar</button>
-
-    <div style="font-size:13px;margin-top:10px">
-      Criar conta<br>
-      Esqueci minha senha
-    </div>
+    <button onclick="entrar()">Entrar</button>
   </div>
 </div>
 
@@ -195,33 +156,30 @@ input, select{
 <div id="app">
 
 <div class="sidebar">
-  <h2>SIJ</h2>
-
-  <button onclick="mostrar('lista')">Processos</button>
-  <button onclick="mostrar('novo')">Novo</button>
+  <h3>SIJ</h3>
+  <button onclick="tela('processos')">Processos</button>
   <button onclick="toggleTema()">🌗 Tema</button>
   <button onclick="sair()">Sair</button>
 </div>
 
 <div class="main">
 
-<div class="header">
-  <h2>Processos</h2>
-</div>
+<div id="processos">
+<h2>Processos</h2>
 
-<!-- FORM -->
-<div id="novo" class="form" style="display:none">
 <input id="titulo" placeholder="Título">
+<input id="parte" placeholder="Parte">
+
 <select id="area">
 <option>Cível</option>
 <option>Previdenciário</option>
 <option>Família</option>
 <option>Trabalhista</option>
 </select>
-<input id="parte" placeholder="Parte">
-<input id="prazo" type="date">
 
-<select id="statusSelect">
+<input type="date" id="prazo">
+
+<select id="status">
 <option value="ativo">Ativo</option>
 <option value="vencer">A vencer</option>
 <option value="finalizado">Finalizado</option>
@@ -229,11 +187,12 @@ input, select{
 <option value="indeferido">Indeferido</option>
 </select>
 
-<button class="btn" onclick="salvar()">Salvar</button>
-</div>
+<input type="file" id="file">
 
-<!-- LISTA -->
-<div id="lista"></div>
+<button onclick="salvarProcesso()">Salvar</button>
+
+<div id="listaProcessos"></div>
+</div>
 
 </div>
 </div>
@@ -245,7 +204,7 @@ let editando=null
 function entrar(){
   login.style.display="none"
   app.style.display="block"
-  listar()
+  renderProcessos()
 }
 
 function sair(){
@@ -253,84 +212,101 @@ function sair(){
   login.style.display="flex"
 }
 
-function mostrar(t){
-  novo.style.display="none"
-  if(t==="novo") novo.style.display="block"
-}
+function salvarProcesso(){
+  let dados = JSON.parse(localStorage.getItem("proc")||"[]")
 
-function salvar(){
-  let dados = JSON.parse(localStorage.getItem("dados")||"[]")
+  let f = file.files[0]
+  let url = f ? URL.createObjectURL(f):null
 
   if(editando){
     let p = dados.find(x=>x.id===editando)
     p.titulo=titulo.value
-    p.area=area.value
     p.parte=parte.value
+    p.area=area.value
     p.prazo=prazo.value
-    p.status=statusSelect.value
+    p.status=status.value
+    if(url) p.file=url
+    editando=null
   }else{
     dados.push({
       id:Date.now(),
       titulo:titulo.value,
-      area:area.value,
       parte:parte.value,
+      area:area.value,
       prazo:prazo.value,
-      status:statusSelect.value,
+      status:status.value,
+      file:url,
       data:new Date().toLocaleDateString()
     })
   }
 
-  localStorage.setItem("dados",JSON.stringify(dados))
-  listar()
-  novo.style.display="none"
-  editando=null
+  localStorage.setItem("proc",JSON.stringify(dados))
+  renderProcessos()
 }
 
-function listar(){
-  let dados = JSON.parse(localStorage.getItem("dados")||"[]")
-  lista.innerHTML=""
+function renderProcessos(){
+  let dados = JSON.parse(localStorage.getItem("proc")||"[]")
+  listaProcessos.innerHTML=""
+
+  let hoje = new Date().toISOString().split("T")[0]
 
   dados.forEach(p=>{
-    lista.innerHTML+=`
-    <div class="card">
 
-      <div class="actions">
-        <button class="edit" onclick="editar(${p.id})">Editar</button>
-        <button class="delete" onclick="excluir(${p.id})">Excluir</button>
-      </div>
+    let alerta = (p.prazo && p.prazo < hoje) ? "alerta" : ""
 
-      <div class="status ${p.status}">${p.status}</div>
+    listaProcessos.innerHTML+=`
+    <div class="card ${alerta}">
 
-      <h3>${p.titulo}</h3>
+    <div class="actions">
+      <button class="edit" onclick="editar(${p.id})">Editar</button>
+      <button class="delete" onclick="del(${p.id})">Excluir</button>
+    </div>
 
-      <p><b>Área:</b> ${p.area}</p>
-      <p><b>Parte:</b> ${p.parte}</p>
-      <p><b>Prazo:</b> ${p.prazo || "—"}</p>
-      <small>Criado: ${p.data}</small>
+    <div class="status ${p.status}" onclick="trocarStatus(${p.id})">${p.status}</div>
+
+    <h3>${p.titulo}</h3>
+    <p>${p.area}</p>
+    <p>${p.parte}</p>
+    <p>Prazo: ${p.prazo||"-"}</p>
+
+    ${p.file ? `<a href="${p.file}" target="_blank">📎 Anexo</a>`:""}
+
+    <br><small>${p.data}</small>
 
     </div>`
   })
 }
 
+function trocarStatus(id){
+  let dados = JSON.parse(localStorage.getItem("proc"))
+  let ordem=["ativo","vencer","finalizado","deferido","indeferido"]
+
+  let p = dados.find(x=>x.id===id)
+  let i = ordem.indexOf(p.status)
+  p.status = ordem[(i+1)%ordem.length]
+
+  localStorage.setItem("proc",JSON.stringify(dados))
+  renderProcessos()
+}
+
 function editar(id){
-  let dados = JSON.parse(localStorage.getItem("dados"))
+  let dados = JSON.parse(localStorage.getItem("proc"))
   let p = dados.find(x=>x.id===id)
 
   titulo.value=p.titulo
-  area.value=p.area
   parte.value=p.parte
+  area.value=p.area
   prazo.value=p.prazo
-  statusSelect.value=p.status
+  status.value=p.status
 
   editando=id
-  mostrar("novo")
 }
 
-function excluir(id){
-  let dados = JSON.parse(localStorage.getItem("dados"))
-  dados = dados.filter(p=>p.id!==id)
-  localStorage.setItem("dados",JSON.stringify(dados))
-  listar()
+function del(id){
+  let d = JSON.parse(localStorage.getItem("proc"))
+  d = d.filter(x=>x.id!==id)
+  localStorage.setItem("proc",JSON.stringify(d))
+  renderProcessos()
 }
 
 function toggleTema(){
