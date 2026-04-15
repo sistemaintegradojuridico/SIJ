@@ -5,144 +5,172 @@
 <title>SIJ PRO</title>
 
 <style>
-body{
+body {
   margin:0;
+  font-family: Arial;
   height:100vh;
   display:flex;
-  flex-direction:column;
   align-items:center;
   justify-content:center;
-  background: radial-gradient(circle at top, #7a1f3d, #2a0015);
-  font-family: Arial;
+
+  background: linear-gradient(135deg, #2a003f, #5a0f3d, #8b1e3f);
 }
 
-/* TEXTURA */
+/* textura */
 body::after{
   content:"";
   position:absolute;
   width:100%;
   height:100%;
-  background-image:url("https://www.transparenttextures.com/patterns/asfalt-dark.png");
-  opacity:0.25;
-  pointer-events:none;
+  background-image: radial-gradient(rgba(255,255,255,0.04) 1px, transparent 1px);
+  background-size: 4px 4px;
 }
 
-/* LOGO */
+/* logo */
 .logo{
   text-align:center;
-  margin-bottom:25px;
-  z-index:1;
+  margin-bottom:20px;
 }
 
 .logo img{
-  width:140px;
-  filter: drop-shadow(0 0 20px rgba(255,255,255,0.3));
+  width:100px;
+  margin-bottom:10px;
 }
 
 .logo h1{
-  color:#f5d58c;
-  font-size:20px;
-  letter-spacing:3px;
-  margin-top:10px;
+  color:#f7d774;
+  font-size:18px;
+  letter-spacing:2px;
 }
 
-/* CAIXA */
+/* caixa */
 .container{
+  backdrop-filter: blur(20px);
   background: rgba(255,255,255,0.08);
   padding:30px;
-  border-radius:15px;
-  backdrop-filter: blur(12px);
-  box-shadow:0 10px 40px rgba(0,0,0,0.5);
+  border-radius:20px;
   width:280px;
+  text-align:center;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+}
+
+/* inputs */
+input{
+  width:100%;
+  margin:8px 0;
+  padding:10px;
+  border-radius:8px;
+  border:none;
+}
+
+/* botão */
+.btn{
+  width:100%;
+  margin-top:15px;
+  padding:12px;
+
+  background: linear-gradient(90deg, #ff512f, #dd2476);
+  border:none;
+  border-radius:10px;
+
+  color:white;
+  font-weight:bold;
+  font-size:16px;
+
+  cursor:pointer;
 
   display:flex;
-  flex-direction:column;
   align-items:center;
-  z-index:1;
+  justify-content:center;
+
+  transition:0.3s;
 }
 
-/* INPUTS */
-input{
-  width:90%;
-  padding:12px;
-  margin:8px 0;
-  border:none;
-  border-radius:8px;
-  outline:none;
-  text-align:center;
+.btn:hover{
+  transform: scale(1.05);
 }
 
-/* BOTÃO */
-button{
-  width:95%;
-  padding:12px;
-  border:none;
-  border-radius:8px;
-  background: linear-gradient(90deg,#ff416c,#ff4b2b);
-  color:white;
-  cursor:pointer;
-  margin-top:10px;
-  font-weight:bold;
-}
-
-/* LINK */
+/* link */
 .link{
-  text-align:center;
-  margin-top:12px;
-  color:#eee;
+  margin-top:10px;
+  color:white;
   cursor:pointer;
   font-size:14px;
 }
 
-/* ESCONDER */
-.hidden{
+/* app */
+#appBox{
   display:none;
+  color:white;
+  text-align:center;
+}
+
+.processo{
+  background: rgba(255,255,255,0.1);
+  margin:10px;
+  padding:10px;
+  border-radius:10px;
 }
 </style>
 </head>
 
 <body>
 
-<!-- LOGO -->
-<div class="logo">
-  <img src="logo.png">
-  <h1>SISTEMA INTEGRADO JURÍDICO</h1>
-</div>
-
-<!-- CAIXA -->
-<div class="container">
+<div>
+  <!-- LOGO -->
+  <div class="logo">
+    <img src="logo.png">
+    <h1>SISTEMA INTEGRADO JURÍDICO</h1>
+  </div>
 
   <!-- LOGIN -->
-  <div id="loginBox" style="display:nome;">
+  <div class="container" id="loginBox">
     <input id="email" placeholder="Email">
     <input id="senha" type="password" placeholder="Senha">
-    <button onclick="login()">Entrar</button>
+
+    <button class="btn" onclick="login()">Entrar</button>
+
     <div class="link" onclick="mostrarCadastro()">Criar conta</div>
   </div>
 
   <!-- CADASTRO -->
-  <div id="cadastroBox" class="hidden">
+  <div class="container" id="cadastroBox" style="display:none;">
     <input id="novoEmail" placeholder="Email">
     <input id="novaSenha" type="password" placeholder="Senha">
-    <button onclick="register()">Cadastrar</button>
+
+    <button class="btn" onclick="register()">Cadastrar</button>
+
     <div class="link" onclick="voltarLogin()">Voltar</div>
   </div>
 
+  <!-- APP -->
+  <div id="appBox">
+    <h2>Processos</h2>
+
+    <input id="titulo" placeholder="Título">
+    <input id="descricao" placeholder="Descrição">
+    <button class="btn" onclick="criar()">Salvar</button>
+
+    <div id="lista"></div>
+  </div>
 </div>
 
 <script>
-const API = "https://sij-backend.onrender.com" // tua API
+const API = "https://sij-backend.onrender.com"
+
+let token = null
 
 function mostrarCadastro(){
-  document.getElementById("loginBox").classList.add("hidden")
-  document.getElementById("cadastroBox").classList.remove("hidden")
+  document.getElementById("loginBox").style.display="none"
+  document.getElementById("cadastroBox").style.display="block"
 }
 
 function voltarLogin(){
-  document.getElementById("cadastroBox").classList.add("hidden")
-  document.getElementById("loginBox").classList.remove("hidden")
+  document.getElementById("cadastroBox").style.display="none"
+  document.getElementById("loginBox").style.display="block"
 }
 
+// ================= REGISTER =================
 async function register(){
   const email = document.getElementById("novoEmail").value
   const password = document.getElementById("novaSenha").value
@@ -153,16 +181,15 @@ async function register(){
     body: JSON.stringify({ email, password })
   })
 
-  const data = await res.json()
-
   if(res.ok){
     alert("Conta criada!")
     voltarLogin()
-  }else{
-    alert(data.error)
+  } else {
+    alert("Erro ao cadastrar")
   }
 }
 
+// ================= LOGIN =================
 async function login(){
   const email = document.getElementById("email").value
   const password = document.getElementById("senha").value
@@ -177,9 +204,65 @@ async function login(){
 
   if(res.ok){
     alert("Login feito 🚀")
-  }else{
-    alert(data.error || "Erro no login")
+
+    token = data.token
+
+    document.getElementById("loginBox").style.display="none"
+    document.getElementById("appBox").style.display="block"
+
+    listar()
+  } else {
+    alert(data.error)
   }
+}
+
+// ================= CRIAR =================
+async function criar(){
+  const titulo = document.getElementById("titulo").value
+  const descricao = document.getElementById("descricao").value
+
+  await fetch(API + "/processos", {
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json",
+      "Authorization": token
+    },
+    body: JSON.stringify({ titulo, descricao })
+  })
+
+  listar()
+}
+
+// ================= LISTAR =================
+async function listar(){
+  const res = await fetch(API + "/processos", {
+    headers:{ "Authorization": token }
+  })
+
+  const data = await res.json()
+
+  const lista = document.getElementById("lista")
+  lista.innerHTML=""
+
+  data.forEach(p=>{
+    lista.innerHTML += `
+      <div class="processo">
+        <b>${p.titulo}</b><br>
+        ${p.descricao}<br>
+        <button onclick="deletar(${p.id})">X</button>
+      </div>
+    `
+  })
+}
+
+// ================= DELETE =================
+async function deletar(id){
+  await fetch(API + "/processos/" + id, {
+    method:"DELETE",
+    headers:{ "Authorization": token }
+  })
+
+  listar()
 }
 </script>
 
