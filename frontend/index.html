@@ -4,22 +4,21 @@
 <meta charset="UTF-8">
 <title>SIJ PRO</title>
 
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
-
 <style>
 
+/* VARIÁVEIS */
 :root{
-  --roxo:#2e1065;
-  --bg:#f4f6fb;
+  --roxo:#5b21b6;
+  --roxo-escuro:#2e1065;
+  --bg:#f5f6fa;
   --card:#ffffff;
-  --text:#1f2937;
-  --icon:#cbd5e1;
+  --text:#222;
 }
 
 .dark{
-  --bg:#0f172a;
-  --card:#1e293b;
-  --text:#e5e7eb;
+  --bg:#1e1e2f;
+  --card:#2a2a3d;
+  --text:#eee;
 }
 
 body{
@@ -39,30 +38,31 @@ body{
 }
 
 .box{
-  width:320px;
-  padding:30px;
-  border-radius:15px;
-  background:rgba(255,255,255,0.1);
-  backdrop-filter:blur(10px);
+  width:340px;
+  padding:35px;
+  border-radius:16px;
+  background:rgba(255,255,255,0.12);
+  backdrop-filter:blur(12px);
   text-align:center;
   color:white;
 }
 
-input{
+.box input{
   width:100%;
-  padding:12px;
+  padding:14px;
   margin:8px 0;
-  border-radius:8px;
+  border-radius:10px;
   border:none;
 }
 
-button{
+.box button{
   width:100%;
-  padding:12px;
+  padding:14px;
   border:none;
-  border-radius:8px;
+  border-radius:10px;
   background:#2e1065;
   color:white;
+  font-weight:bold;
   cursor:pointer;
 }
 
@@ -74,35 +74,34 @@ button{
   width:70px;
   height:100vh;
   position:fixed;
-  background:linear-gradient(#2e1065,#5b21b6);
+  background:linear-gradient(#5b21b6,#2e1065);
   display:flex;
   flex-direction:column;
   align-items:center;
   padding-top:20px;
 }
 
-.icon{
-  margin:18px 0;
-  font-size:18px;
+.sidebar div{
+  margin:20px 0;
   cursor:pointer;
-  color:var(--icon);
+  color:#ccc;
+  font-size:20px;
+}
+
+.sidebar div:hover{
+  color:white;
 }
 
 /* TOPBAR */
 .topbar{
-  margin-left:70px;
   height:60px;
   background:var(--card);
   display:flex;
   align-items:center;
   justify-content:space-between;
   padding:0 20px;
-}
-
-.top-right{
-  display:flex;
-  align-items:center;
-  gap:15px;
+  margin-left:70px;
+  box-shadow:0 2px 10px rgba(0,0,0,0.1);
 }
 
 .user{
@@ -116,24 +115,6 @@ button{
   width:35px;
   height:35px;
   border-radius:50%;
-  object-fit:cover;
-}
-
-/* DROPDOWN */
-.dropdown{
-  position:absolute;
-  right:20px;
-  top:60px;
-  background:var(--card);
-  border-radius:10px;
-  padding:10px;
-  display:none;
-  box-shadow:0 5px 15px rgba(0,0,0,0.1);
-}
-
-.dropdown button{
-  width:100%;
-  margin-top:5px;
 }
 
 /* MAIN */
@@ -142,33 +123,72 @@ button{
   padding:20px;
 }
 
+/* CARD */
 .card{
   background:var(--card);
   padding:15px;
   border-radius:10px;
   margin-bottom:10px;
+  position:relative;
 }
 
-/* LISTA */
-.linha{
-  display:flex;
-  justify-content:space-between;
-  padding:12px;
-  border-bottom:1px solid #ddd;
-}
-
+/* STATUS */
 .status{
   padding:4px 10px;
   border-radius:20px;
   font-size:12px;
   color:white;
+  display:inline-block;
 }
 
 .ativo{background:#22c55e}
 .vencer{background:#eab308;color:black}
 .finalizado{background:#6b7280}
+.deferido{background:#3b82f6}
+.indeferido{background:#ef4444}
 
-.delete{background:#ef4444;padding:5px 8px;font-size:11px}
+/* BOTÕES */
+.actions{
+  position:absolute;
+  right:10px;
+  top:10px;
+}
+
+.actions button{
+  font-size:11px;
+  margin-left:5px;
+  border:none;
+  padding:5px 8px;
+  border-radius:6px;
+  cursor:pointer;
+}
+
+.edit{background:#5b21b6;color:white}
+.delete{background:#ef4444;color:white}
+
+/* INPUTS */
+input,select{
+  width:100%;
+  padding:12px;
+  margin:5px 0;
+  border-radius:8px;
+  border:1px solid #ccc;
+}
+
+button{
+  width:100%;
+  padding:12px;
+  border:none;
+  border-radius:8px;
+  background:var(--roxo-escuro);
+  color:white;
+  cursor:pointer;
+}
+
+/* PERFIL */
+#perfil{
+  display:none;
+}
 
 </style>
 </head>
@@ -181,7 +201,6 @@ button{
     <h2>SIJ PRO</h2>
     <input id="email" placeholder="Email">
     <input id="senha" type="password" placeholder="Senha">
-    <input type="file" id="foto">
     <button onclick="entrar()">Entrar</button>
   </div>
 </div>
@@ -190,71 +209,59 @@ button{
 <div id="app">
 
 <div class="sidebar">
-  <i class="fa-solid fa-house icon" onclick="tela('dashboard')"></i>
-  <i class="fa-solid fa-folder icon" onclick="tela('processos')"></i>
+  <div onclick="tela('processos')">⬛</div>
+  <div onclick="tela('perfil')">⬤</div>
 </div>
 
 <div class="topbar">
-
-  <input placeholder="Buscar..." style="width:300px">
-
-  <div class="top-right">
-
-    <i class="fa-solid fa-moon" onclick="toggleTema()"></i>
-
-    <div class="user" onclick="toggleMenu()">
-      <img id="userFoto">
-      <span id="userEmail"></span>
-    </div>
-
+  <h3>SIJ</h3>
+  <div class="user" onclick="tela('perfil')">
+    <img id="fotoUser" src="https://i.imgur.com/6VBx3io.png">
+    <span id="nomeUser">Usuário</span>
   </div>
-
-</div>
-
-<div class="dropdown" id="menuUser">
-  <button onclick="tela('perfil')">Perfil</button>
-  <button onclick="sair()">Sair</button>
 </div>
 
 <div class="main">
 
-<!-- DASHBOARD -->
-<div id="dashboard">
-<h2>Dashboard</h2>
-</div>
-
 <!-- PROCESSOS -->
-<div id="processos" style="display:none">
+<div id="processos">
 <h2>Processos</h2>
 
 <input id="titulo" placeholder="Título">
 <input id="parte" placeholder="Parte">
+
+<select id="area">
+<option>Cível</option>
+<option>Previdenciário</option>
+<option>Família</option>
+<option>Trabalhista</option>
+</select>
+
 <input type="date" id="prazo">
 
 <select id="status">
 <option value="ativo">Ativo</option>
 <option value="vencer">A vencer</option>
 <option value="finalizado">Finalizado</option>
+<option value="deferido">Deferido</option>
+<option value="indeferido">Indeferido</option>
 </select>
 
-<button onclick="addProc()">Salvar</button>
+<input type="file" id="file">
 
-<div id="listaProc"></div>
+<button onclick="salvar()">Salvar Processo</button>
 
+<div id="lista"></div>
 </div>
 
 <!-- PERFIL -->
-<div id="perfil" style="display:none">
-<h2>Meu Perfil</h2>
+<div id="perfil">
+<h2>Perfil</h2>
 
-<div class="card">
-  <img id="perfilFoto" width="80"><br><br>
+<input id="nomePerfil" placeholder="Nome">
+<input type="file" id="fotoPerfil">
 
-  <input id="novoEmail" placeholder="Novo email">
-  <input type="file" id="novaFoto">
-
-  <button onclick="salvarPerfil()">Salvar Alterações</button>
-</div>
+<button onclick="salvarPerfil()">Salvar Perfil</button>
 
 </div>
 
@@ -263,146 +270,91 @@ button{
 
 <script>
 
-/* LOGIN */
 function entrar(){
-
-  let file = foto.files[0]
-
-  if(file){
-    let reader = new FileReader()
-    reader.onload = function(e){
-
-      let user = {
-        email:email.value,
-        foto:e.target.result
-      }
-
-      localStorage.user = JSON.stringify(user)
-      iniciar()
-    }
-    reader.readAsDataURL(file)
-
-  }else{
-    localStorage.user = JSON.stringify({
-      email:email.value,
-      foto:"https://i.imgur.com/6VBx3io.png"
-    })
-    iniciar()
-  }
-}
-
-/* INICIAR */
-function iniciar(){
   login.style.display="none"
   app.style.display="block"
-
-  let u = JSON.parse(localStorage.user)
-
-  userEmail.innerText = u.email
-  userFoto.src = u.foto
-  perfilFoto.src = u.foto
-
   render()
 }
 
-if(localStorage.user){
-  iniciar()
-}
-
-/* MENU */
-function toggleMenu(){
-  menuUser.style.display =
-  menuUser.style.display === "block" ? "none" : "block"
-}
-
-/* SAIR */
-function sair(){
-  localStorage.removeItem("user")
-  location.reload()
-}
-
-/* TELAS */
 function tela(x){
-  document.querySelectorAll(".main > div").forEach(e=>e.style.display="none")
+  processos.style.display="none"
+  perfil.style.display="none"
   document.getElementById(x).style.display="block"
-  menuUser.style.display="none"
 }
 
-/* PERFIL */
-function salvarPerfil(){
+function salvar(){
+  let dados = JSON.parse(localStorage.getItem("proc")||"[]")
 
-  let u = JSON.parse(localStorage.user)
+  let f = file.files[0]
+  let url = f ? URL.createObjectURL(f):null
 
-  if(novoEmail.value){
-    u.email = novoEmail.value
-  }
-
-  let file = novaFoto.files[0]
-
-  if(file){
-    let reader = new FileReader()
-    reader.onload = function(e){
-      u.foto = e.target.result
-      salvarUser(u)
-    }
-    reader.readAsDataURL(file)
-  }else{
-    salvarUser(u)
-  }
-}
-
-function salvarUser(u){
-  localStorage.user = JSON.stringify(u)
-  iniciar()
-}
-
-/* PROCESSOS */
-function addProc(){
-  let d=JSON.parse(localStorage.proc||"[]")
-  d.push({
-    t:titulo.value,
-    p:parte.value,
+  dados.push({
+    id:Date.now(),
+    titulo:titulo.value,
+    parte:parte.value,
+    area:area.value,
     prazo:prazo.value,
-    s:status.value
+    status:status.value,
+    file:url
   })
-  localStorage.proc=JSON.stringify(d)
-  render()
-}
 
-function renderProc(){
-  let d=JSON.parse(localStorage.proc||"[]")
-  listaProc.innerHTML=""
-
-  d.forEach((x,i)=>{
-    listaProc.innerHTML+=`
-    <div class="linha">
-      <div>
-        <b>${x.t}</b><br>
-        ${x.p} | ${x.prazo}
-      </div>
-
-      <div>
-        <span class="status ${x.s}">${x.s}</span>
-        <button class="delete" onclick="delProc(${i})">Excluir</button>
-      </div>
-    </div>`
-  })
-}
-
-function delProc(i){
-  let d=JSON.parse(localStorage.proc)
-  d.splice(i,1)
-  localStorage.proc=JSON.stringify(d)
+  localStorage.setItem("proc",JSON.stringify(dados))
   render()
 }
 
 function render(){
-  renderProc()
+  let dados = JSON.parse(localStorage.getItem("proc")||"[]")
+  lista.innerHTML=""
+
+  dados.forEach(p=>{
+    lista.innerHTML+=`
+    <div class="card">
+      <div class="actions">
+        <button class="delete" onclick="del(${p.id})">Excluir</button>
+      </div>
+
+      <div class="status ${p.status}">${p.status}</div>
+
+      <h3>${p.titulo}</h3>
+      <p><b>Área:</b> ${p.area}</p>
+      <p><b>Parte:</b> ${p.parte}</p>
+      <p><b>Prazo:</b> ${p.prazo||"-"}</p>
+
+      ${p.file ? `<a href="${p.file}" target="_blank">📎 Ver anexo</a>`:""}
+    </div>`
+  })
 }
 
-/* TEMA */
-function toggleTema(){
-  document.body.classList.toggle("dark")
+function del(id){
+  let d = JSON.parse(localStorage.getItem("proc"))
+  d = d.filter(x=>x.id!==id)
+  localStorage.setItem("proc",JSON.stringify(d))
+  render()
+}
+
+/* PERFIL */
+function salvarPerfil(){
+  let nome = nomePerfil.value
+  let foto = fotoPerfil.files[0]
+
+  if(nome){
+    localStorage.setItem("nome",nome)
+    nomeUser.innerText=nome
+  }
+
+  if(foto){
+    let url = URL.createObjectURL(foto)
+    localStorage.setItem("foto",url)
+    fotoUser.src=url
+  }
+}
+
+window.onload=()=>{
+  let nome = localStorage.getItem("nome")
+  let foto = localStorage.getItem("foto")
+
+  if(nome) nomeUser.innerText=nome
+  if(foto) fotoUser.src=foto
 }
 
 </script>
