@@ -4,103 +4,45 @@
 <meta charset="UTF-8">
 <title>SIJ PRO</title>
 
+<link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
+
 <style>
-
-/* VARIÁVEIS */
-:root{
-  --roxo:#5b21b6;
-  --roxo-escuro:#2e1065;
-  --bg:#f5f6fa;
-  --card:#ffffff;
-  --text:#222;
-}
-
-.dark{
-  --bg:#1e1e2f;
-  --card:#2a2a3d;
-  --text:#eee;
-}
-
 body{
   margin:0;
   font-family:Arial;
-  background:var(--bg);
-  color:var(--text);
+  background:#f4f6fb;
 }
-
-/* LOGIN */
-#login{
-  height:100vh;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  background:linear-gradient(135deg,#5b21b6,#9333ea,#2e1065);
-}
-
-.box{
-  width:340px;
-  padding:35px;
-  border-radius:16px;
-  background:rgba(255,255,255,0.12);
-  backdrop-filter:blur(12px);
-  text-align:center;
-  color:white;
-}
-
-.box input{
-  width:100%;
-  padding:14px;
-  margin:8px 0;
-  border-radius:10px;
-  border:none;
-}
-
-.box button{
-  width:100%;
-  padding:14px;
-  border:none;
-  border-radius:10px;
-  background:#2e1065;
-  color:white;
-  font-weight:bold;
-  cursor:pointer;
-}
-
-/* APP */
-#app{display:none}
 
 /* SIDEBAR */
 .sidebar{
   width:70px;
   height:100vh;
   position:fixed;
-  background:linear-gradient(#5b21b6,#2e1065);
+  background:linear-gradient(#2e1065,#5b21b6);
   display:flex;
   flex-direction:column;
   align-items:center;
   padding-top:20px;
 }
 
-.sidebar div{
+.sidebar i{
+  color:#ccc;
+  font-size:22px;
   margin:20px 0;
   cursor:pointer;
-  color:#ccc;
-  font-size:20px;
 }
 
-.sidebar div:hover{
-  color:white;
-}
+.sidebar i:hover{color:white}
 
 /* TOPBAR */
-.topbar{
+.top{
+  margin-left:70px;
   height:60px;
-  background:var(--card);
+  background:white;
   display:flex;
   align-items:center;
   justify-content:space-between;
   padding:0 20px;
-  margin-left:70px;
   box-shadow:0 2px 10px rgba(0,0,0,0.1);
 }
 
@@ -123,71 +65,25 @@ body{
   padding:20px;
 }
 
-/* CARD */
+/* CARDS */
+.cards{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:15px;
+}
+
 .card{
-  background:var(--card);
+  background:white;
+  padding:20px;
+  border-radius:12px;
+}
+
+/* LISTA */
+.item{
+  background:white;
   padding:15px;
+  margin-top:10px;
   border-radius:10px;
-  margin-bottom:10px;
-  position:relative;
-}
-
-/* STATUS */
-.status{
-  padding:4px 10px;
-  border-radius:20px;
-  font-size:12px;
-  color:white;
-  display:inline-block;
-}
-
-.ativo{background:#22c55e}
-.vencer{background:#eab308;color:black}
-.finalizado{background:#6b7280}
-.deferido{background:#3b82f6}
-.indeferido{background:#ef4444}
-
-/* BOTÕES */
-.actions{
-  position:absolute;
-  right:10px;
-  top:10px;
-}
-
-.actions button{
-  font-size:11px;
-  margin-left:5px;
-  border:none;
-  padding:5px 8px;
-  border-radius:6px;
-  cursor:pointer;
-}
-
-.edit{background:#5b21b6;color:white}
-.delete{background:#ef4444;color:white}
-
-/* INPUTS */
-input,select{
-  width:100%;
-  padding:12px;
-  margin:5px 0;
-  border-radius:8px;
-  border:1px solid #ccc;
-}
-
-button{
-  width:100%;
-  padding:12px;
-  border:none;
-  border-radius:8px;
-  background:var(--roxo-escuro);
-  color:white;
-  cursor:pointer;
-}
-
-/* PERFIL */
-#perfil{
-  display:none;
 }
 
 </style>
@@ -195,166 +91,107 @@ button{
 
 <body>
 
-<!-- LOGIN -->
-<div id="login">
-  <div class="box">
-    <h2>SIJ PRO</h2>
-    <input id="email" placeholder="Email">
-    <input id="senha" type="password" placeholder="Senha">
-    <button onclick="entrar()">Entrar</button>
-  </div>
-</div>
-
-<!-- APP -->
-<div id="app">
-
 <div class="sidebar">
-  <div onclick="tela('processos')">⬛</div>
-  <div onclick="tela('perfil')">⬤</div>
+  <i class="ri-home-line" onclick="show('dash')"></i>
+  <i class="ri-file-list-3-line" onclick="show('processos')"></i>
+  <i class="ri-calendar-line" onclick="show('agenda')"></i>
+  <i class="ri-user-line" onclick="show('perfil')"></i>
 </div>
 
-<div class="topbar">
-  <h3>SIJ</h3>
-  <div class="user" onclick="tela('perfil')">
-    <img id="fotoUser" src="https://i.imgur.com/6VBx3io.png">
-    <span id="nomeUser">Usuário</span>
+<div class="top">
+  <h3>SIJ PRO</h3>
+  <div class="user" onclick="show('perfil')">
+    <img id="foto" src="https://i.imgur.com/6VBx3io.png">
+    <span id="nome">Usuário</span>
   </div>
 </div>
 
 <div class="main">
 
+<!-- DASHBOARD -->
+<div id="dash">
+  <h2>Dashboard</h2>
+
+  <div class="cards">
+    <div class="card">Processos: 12</div>
+    <div class="card">Tarefas: 5</div>
+    <div class="card">Prazos: 3</div>
+    <div class="card">Financeiro: R$ 2.500</div>
+  </div>
+</div>
+
 <!-- PROCESSOS -->
-<div id="processos">
-<h2>Processos</h2>
+<div id="processos" style="display:none">
+  <h2>Processos</h2>
 
-<input id="titulo" placeholder="Título">
-<input id="parte" placeholder="Parte">
+  <input id="titulo" placeholder="Título">
+  <input id="parte" placeholder="Parte">
+  <button onclick="add()">Adicionar</button>
 
-<select id="area">
-<option>Cível</option>
-<option>Previdenciário</option>
-<option>Família</option>
-<option>Trabalhista</option>
-</select>
+  <div id="lista"></div>
+</div>
 
-<input type="date" id="prazo">
-
-<select id="status">
-<option value="ativo">Ativo</option>
-<option value="vencer">A vencer</option>
-<option value="finalizado">Finalizado</option>
-<option value="deferido">Deferido</option>
-<option value="indeferido">Indeferido</option>
-</select>
-
-<input type="file" id="file">
-
-<button onclick="salvar()">Salvar Processo</button>
-
-<div id="lista"></div>
+<!-- AGENDA -->
+<div id="agenda" style="display:none">
+  <h2>Agenda</h2>
+  <p>Calendário estilo ADVBOX (fase 2)</p>
 </div>
 
 <!-- PERFIL -->
-<div id="perfil">
-<h2>Perfil</h2>
+<div id="perfil" style="display:none">
+  <h2>Perfil</h2>
 
-<input id="nomePerfil" placeholder="Nome">
-<input type="file" id="fotoPerfil">
+  <input id="nomeInput" placeholder="Nome">
+  <input type="file" id="fotoInput">
 
-<button onclick="salvarPerfil()">Salvar Perfil</button>
-
+  <button onclick="salvarPerfil()">Salvar</button>
 </div>
 
-</div>
 </div>
 
 <script>
 
-function entrar(){
-  login.style.display="none"
-  app.style.display="block"
-  render()
-}
-
-function tela(x){
-  processos.style.display="none"
-  perfil.style.display="none"
-  document.getElementById(x).style.display="block"
-}
-
-function salvar(){
-  let dados = JSON.parse(localStorage.getItem("proc")||"[]")
-
-  let f = file.files[0]
-  let url = f ? URL.createObjectURL(f):null
-
-  dados.push({
-    id:Date.now(),
-    titulo:titulo.value,
-    parte:parte.value,
-    area:area.value,
-    prazo:prazo.value,
-    status:status.value,
-    file:url
+function show(id){
+  ["dash","processos","agenda","perfil"].forEach(x=>{
+    document.getElementById(x).style.display="none"
   })
-
-  localStorage.setItem("proc",JSON.stringify(dados))
-  render()
+  document.getElementById(id).style.display="block"
 }
 
-function render(){
-  let dados = JSON.parse(localStorage.getItem("proc")||"[]")
-  lista.innerHTML=""
+function add(){
+  let lista = document.getElementById("lista")
 
-  dados.forEach(p=>{
-    lista.innerHTML+=`
-    <div class="card">
-      <div class="actions">
-        <button class="delete" onclick="del(${p.id})">Excluir</button>
-      </div>
-
-      <div class="status ${p.status}">${p.status}</div>
-
-      <h3>${p.titulo}</h3>
-      <p><b>Área:</b> ${p.area}</p>
-      <p><b>Parte:</b> ${p.parte}</p>
-      <p><b>Prazo:</b> ${p.prazo||"-"}</p>
-
-      ${p.file ? `<a href="${p.file}" target="_blank">📎 Ver anexo</a>`:""}
-    </div>`
-  })
+  lista.innerHTML += `
+    <div class="item">
+      <b>${titulo.value}</b><br>
+      ${parte.value}
+    </div>
+  `
 }
 
-function del(id){
-  let d = JSON.parse(localStorage.getItem("proc"))
-  d = d.filter(x=>x.id!==id)
-  localStorage.setItem("proc",JSON.stringify(d))
-  render()
-}
-
-/* PERFIL */
 function salvarPerfil(){
-  let nome = nomePerfil.value
-  let foto = fotoPerfil.files[0]
+  let nomeVal = nomeInput.value
+  let fotoFile = fotoInput.files[0]
 
-  if(nome){
-    localStorage.setItem("nome",nome)
-    nomeUser.innerText=nome
+  if(nomeVal){
+    localStorage.setItem("nome",nomeVal)
+    nome.innerText = nomeVal
   }
 
-  if(foto){
-    let url = URL.createObjectURL(foto)
+  if(fotoFile){
+    let url = URL.createObjectURL(fotoFile)
     localStorage.setItem("foto",url)
-    fotoUser.src=url
+    foto.src = url
   }
 }
 
-window.onload=()=>{
-  let nome = localStorage.getItem("nome")
-  let foto = localStorage.getItem("foto")
-
-  if(nome) nomeUser.innerText=nome
-  if(foto) fotoUser.src=foto
+window.onload = ()=>{
+  if(localStorage.getItem("nome")){
+    nome.innerText = localStorage.getItem("nome")
+  }
+  if(localStorage.getItem("foto")){
+    foto.src = localStorage.getItem("foto")
+  }
 }
 
 </script>
