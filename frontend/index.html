@@ -5,20 +5,25 @@
 <title>SIJ PRO</title>
 
 <style>
+:root{
+  --roxo:#4b006e;
+  --roxo-escuro:#2e0045;
+  --bg:#f5f6fa;
+  --card:#ffffff;
+  --text:#222;
+}
+
+.dark{
+  --bg:#1e1e2f;
+  --card:#2a2a3d;
+  --text:#eee;
+}
+
 body{
   margin:0;
   font-family:Arial;
-}
-
-/* TEMAS */
-.dark{
-  background:#2b0d2b;
-  color:white;
-}
-
-.light{
-  background:#f4f6f9;
-  color:black;
+  background:var(--bg);
+  color:var(--text);
 }
 
 /* LOGIN */
@@ -27,14 +32,15 @@ body{
   display:flex;
   justify-content:center;
   align-items:center;
-  background:linear-gradient(135deg,#5a0f3b,#7b1e57,#3d0c2e);
+  background:linear-gradient(135deg,#4b006e,#7b1fa2,#2e0045);
 }
 
 .login-box{
-  background:rgba(255,255,255,0.08);
+  background:rgba(255,255,255,0.1);
   padding:30px;
   border-radius:15px;
-  width:300px;
+  width:320px;
+  backdrop-filter:blur(10px);
   text-align:center;
   color:white;
 }
@@ -45,69 +51,89 @@ input, select{
   margin:8px 0;
   border-radius:8px;
   border:none;
-  box-sizing:border-box;
+  outline:none;
 }
 
-/* BOTÃO ROXO */
 .btn{
   width:100%;
   padding:12px;
   border:none;
   border-radius:8px;
-  background:#4b006e;
+  background:var(--roxo-escuro);
   color:white;
   cursor:pointer;
+  transition:0.2s;
+}
+
+.btn:hover{
+  opacity:0.9;
 }
 
 /* APP */
 #app{display:none;}
 
+/* SIDEBAR */
 .sidebar{
-  width:220px;
+  width:240px;
   height:100vh;
-  background:#4b006e;
+  background:linear-gradient(180deg,#4b006e,#2e0045);
   color:white;
-  padding:20px;
   position:fixed;
+  padding:20px;
+  box-sizing:border-box;
+}
+
+.sidebar h2{
+  margin-bottom:25px;
 }
 
 .sidebar button{
   width:100%;
-  margin:8px 0;
-  background:rgba(255,255,255,0.1);
+  padding:12px;
+  margin-bottom:10px;
   border:none;
-  padding:10px;
   border-radius:8px;
+  background:rgba(255,255,255,0.1);
   color:white;
   cursor:pointer;
 }
 
-.main{
-  margin-left:220px;
-  padding:20px;
+.sidebar button:hover{
+  background:rgba(255,255,255,0.2);
 }
 
-/* FORM */
-.form{
-  max-width:400px;
+/* MAIN */
+.main{
+  margin-left:240px;
+  padding:30px;
+  min-height:100vh;
+}
+
+/* HEADER */
+.header{
+  display:flex;
+  justify-content:space-between;
+  margin-bottom:20px;
 }
 
 /* CARD */
 .card{
-  background:white;
-  padding:15px;
-  border-radius:10px;
+  background:var(--card);
+  padding:20px;
+  border-radius:12px;
   margin-bottom:15px;
+  box-shadow:0 5px 15px rgba(0,0,0,0.05);
   position:relative;
-  box-shadow:0 2px 8px rgba(0,0,0,0.1);
 }
 
 /* STATUS */
 .status{
-  padding:4px 10px;
+  display:inline-block;
+  padding:5px 12px;
   border-radius:20px;
   font-size:12px;
   color:white;
+  margin-bottom:10px;
 }
 
 .ativo{background:#28a745;}
@@ -116,29 +142,37 @@ input, select{
 .deferido{background:#007bff;}
 .indeferido{background:#dc3545;}
 
-/* BOTÕES CARD */
+/* ACTIONS */
 .actions{
   position:absolute;
-  top:10px;
-  right:10px;
+  top:15px;
+  right:15px;
 }
 
 .actions button{
-  margin-left:5px;
-  padding:5px 8px;
-  font-size:12px;
   border:none;
-  border-radius:5px;
+  padding:6px 10px;
+  border-radius:6px;
+  margin-left:5px;
   cursor:pointer;
+  font-size:12px;
 }
 
-.edit{background:#4b006e;color:white;}
+.edit{background:var(--roxo);color:white;}
 .delete{background:#dc3545;color:white;}
+
+/* FORM */
+.form{
+  max-width:400px;
+  background:var(--card);
+  padding:20px;
+  border-radius:12px;
+}
 
 </style>
 </head>
 
-<body class="light">
+<body>
 
 <!-- LOGIN -->
 <div id="login">
@@ -150,9 +184,9 @@ input, select{
 
     <button class="btn" onclick="entrar()">Entrar</button>
 
-    <div style="margin-top:10px;font-size:13px">
-      <div onclick="alert('Cadastro em breve')" style="cursor:pointer">Criar conta</div>
-      <div onclick="alert('Email enviado (simulado)')" style="cursor:pointer">Esqueci minha senha</div>
+    <div style="font-size:13px;margin-top:10px">
+      Criar conta<br>
+      Esqueci minha senha
     </div>
   </div>
 </div>
@@ -165,16 +199,18 @@ input, select{
 
   <button onclick="mostrar('lista')">Processos</button>
   <button onclick="mostrar('novo')">Novo</button>
-  <button onclick="trocarTema()">🌗 Tema</button>
+  <button onclick="toggleTema()">🌗 Tema</button>
   <button onclick="sair()">Sair</button>
 </div>
 
 <div class="main">
 
-<h2>Processos</h2>
+<div class="header">
+  <h2>Processos</h2>
+</div>
 
 <!-- FORM -->
-<div id="novo" class="form" style="display:none;">
+<div id="novo" class="form" style="display:none">
 <input id="titulo" placeholder="Título">
 <select id="area">
 <option>Cível</option>
@@ -185,7 +221,7 @@ input, select{
 <input id="parte" placeholder="Parte">
 <input id="prazo" type="date">
 
-<select id="status">
+<select id="statusSelect">
 <option value="ativo">Ativo</option>
 <option value="vencer">A vencer</option>
 <option value="finalizado">Finalizado</option>
@@ -207,11 +243,9 @@ input, select{
 let editando=null
 
 function entrar(){
-  if(email.value && senha.value){
-    login.style.display="none"
-    app.style.display="block"
-    listar()
-  }
+  login.style.display="none"
+  app.style.display="block"
+  listar()
 }
 
 function sair(){
@@ -233,7 +267,7 @@ function salvar(){
     p.area=area.value
     p.parte=parte.value
     p.prazo=prazo.value
-    p.status=status.value
+    p.status=statusSelect.value
   }else{
     dados.push({
       id:Date.now(),
@@ -241,7 +275,7 @@ function salvar(){
       area:area.value,
       parte:parte.value,
       prazo:prazo.value,
-      status:status.value,
+      status:statusSelect.value,
       data:new Date().toLocaleDateString()
     })
   }
@@ -249,6 +283,7 @@ function salvar(){
   localStorage.setItem("dados",JSON.stringify(dados))
   listar()
   novo.style.display="none"
+  editando=null
 }
 
 function listar(){
@@ -258,16 +293,21 @@ function listar(){
   dados.forEach(p=>{
     lista.innerHTML+=`
     <div class="card">
+
       <div class="actions">
         <button class="edit" onclick="editar(${p.id})">Editar</button>
         <button class="delete" onclick="excluir(${p.id})">Excluir</button>
       </div>
 
-      <span class="status ${p.status}">${p.status}</span><br><br>
-      <b>${p.titulo}</b><br>
-      ${p.area} - ${p.parte}<br>
-      Prazo: ${p.prazo || "—"}<br>
+      <div class="status ${p.status}">${p.status}</div>
+
+      <h3>${p.titulo}</h3>
+
+      <p><b>Área:</b> ${p.area}</p>
+      <p><b>Parte:</b> ${p.parte}</p>
+      <p><b>Prazo:</b> ${p.prazo || "—"}</p>
       <small>Criado: ${p.data}</small>
+
     </div>`
   })
 }
@@ -280,7 +320,7 @@ function editar(id){
   area.value=p.area
   parte.value=p.parte
   prazo.value=p.prazo
-  status.value=p.status
+  statusSelect.value=p.status
 
   editando=id
   mostrar("novo")
@@ -293,14 +333,8 @@ function excluir(id){
   listar()
 }
 
-function trocarTema(){
-  if(document.body.classList.contains("dark")){
-    document.body.classList.remove("dark")
-    document.body.classList.add("light")
-  }else{
-    document.body.classList.remove("light")
-    document.body.classList.add("dark")
-  }
+function toggleTema(){
+  document.body.classList.toggle("dark")
 }
 
 </script>
