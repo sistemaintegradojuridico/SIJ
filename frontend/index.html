@@ -2,194 +2,81 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>SIJ</title>
-
-<style>
-body {
-  font-family: Arial;
-  background: linear-gradient(135deg, #2a0010, #5a001f, #1a0008);
-  background-size: 400% 400%;
-  animation: bg 10s ease infinite;
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-@keyframes bg {
-  0% {background-position:0% 50%}
-  50% {background-position:100% 50%}
-  100% {background-position:0% 50%}
-}
-
-.box {
-  background: rgba(255,255,255,0.95);
-  padding: 25px;
-  border-radius: 14px;
-  width: 320px;
-  text-align: center;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-}
-
-input {
-  width: 100%;
-  margin: 8px 0;
-  padding: 10px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-}
-
-button {
-  width: 100%;
-  padding: 10px;
-  background: linear-gradient(45deg,#7a0028,#c0392b);
-  color: white;
-  border: none;
-  margin-top: 10px;
-  border-radius: 6px;
-}
-
-button:hover {
-  opacity: 0.9;
-}
-
-.hidden {
-  display: none;
-}
-</style>
+<title>SIJ PRO</title>
 </head>
 
 <body>
 
-<div class="box" id="loginBox">
-  <h2>⚖️ SIJ</h2>
-  <p style="font-size:12px;color:#555">Sistema Integrado Jurídico</p>
-  <input id="email" placeholder="Email">
-  <input id="senha" type="password" placeholder="Senha">
-  <button onclick="login()">Entrar</button>
-  <button onclick="mostrarCadastro()">Criar conta</button>
-</div>
+<h2>SIJ PRO</h2>
 
-<div class="box hidden" id="cadastroBox">
-  <h2>Criar conta</h2>
-  <input id="novoEmail" placeholder="Email">
-  <input id="novaSenha" type="password" placeholder="Senha">
-  <button onclick="register()">Cadastrar</button>
-  <button onclick="voltarLogin()">Voltar</button>
-</div>
+<input id="email" placeholder="email">
+<input id="senha" placeholder="senha">
+<button onclick="login()">Login</button>
+<button onclick="register()">Cadastrar</button>
 
-<div class="box hidden" id="appBox">
-  <h2>Processos</h2>
-  <input id="titulo" placeholder="Título">
-  <input id="descricao" placeholder="Descrição">
-  <button onclick="criar()">Salvar</button>
+<hr>
 
-  <div id="lista"></div>
+<input id="titulo" placeholder="titulo">
+<input id="descricao" placeholder="descricao">
+<button onclick="criar()">Salvar</button>
 
-  <button onclick="logout()" style="background:#333">Sair</button>
-</div>
+<div id="lista"></div>
+
+<hr>
+
+<input id="tema" placeholder="tema petição">
+<button onclick="gerar()">Gerar Petição IA</button>
+<pre id="resultado"></pre>
 
 <script>
-const API = "https://sij-backend.onrender.com"
-
-let user = null
-
-function mostrarCadastro(){
-  loginBox.classList.add("hidden")
-  cadastroBox.classList.remove("hidden")
-}
-
-function voltarLogin(){
-  cadastroBox.classList.add("hidden")
-  loginBox.classList.remove("hidden")
-}
+const API="https://sij-backend.onrender.com"
+let token=localStorage.getItem("token")
 
 async function register(){
-  const res = await fetch(API + "/register", {
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body: JSON.stringify({
-      email: novoEmail.value,
-      password: novaSenha.value
-    })
-  })
-
-  const data = await res.json()
-
-  if(data.ok){
-    alert("Conta criada!")
-    voltarLogin()
-  } else {
-    alert(data.error)
-  }
+  await fetch(API+"/register",{method:"POST",headers:{"Content-Type":"application/json"},
+  body:JSON.stringify({email:email.value,password:senha.value})})
+  alert("ok")
 }
 
 async function login(){
-  const res = await fetch(API + "/login", {
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body: JSON.stringify({
-      email: email.value,
-      password: senha.value
-    })
-  })
+  const res=await fetch(API+"/login",{method:"POST",headers:{"Content-Type":"application/json"},
+  body:JSON.stringify({email:email.value,password:senha.value})})
 
-  const data = await res.json()
-
-  if(res.ok){
-    user = data.user
-    loginBox.classList.add("hidden")
-    appBox.classList.remove("hidden")
-    listar()
-  } else {
-    alert(data.error)
-  }
+  const data=await res.json()
+  token=data.token
+  localStorage.setItem("token",token)
+  listar()
 }
 
 async function criar(){
-  await fetch(API + "/processos", {
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body: JSON.stringify({
-      titulo: titulo.value,
-      descricao: descricao.value,
-      user_id: user.id
-    })
-  })
-
-  titulo.value = ""
-  descricao.value = ""
-
+  await fetch(API+"/processos",{method:"POST",
+  headers:{"Content-Type":"application/json","Authorization":token},
+  body:JSON.stringify({titulo:titulo.value,descricao:descricao.value})})
   listar()
 }
 
 async function listar(){
-  const res = await fetch(API + "/processos/" + user.id)
-  const data = await res.json()
+  const res=await fetch(API+"/processos",{headers:{"Authorization":token}})
+  const data=await res.json()
 
-  lista.innerHTML = ""
-
-  data.forEach(p => {
-    lista.innerHTML += `
-      <p>
-        ${p.titulo} - ${p.descricao}
-        <button onclick="deletar(${p.id})">X</button>
-      </p>
-    `
+  lista.innerHTML=""
+  data.forEach(p=>{
+    lista.innerHTML+=`<p>${p.titulo} <button onclick="del(${p.id})">X</button></p>`
   })
 }
 
-async function deletar(id){
-  await fetch(API + "/processos/" + id, {
-    method:"DELETE"
-  })
+async function del(id){
+  await fetch(API+"/processos/"+id,{method:"DELETE",headers:{Authorization:token}})
   listar()
 }
 
-function logout(){
-  user = null
-  appBox.classList.add("hidden")
-  loginBox.classList.remove("hidden")
+async function gerar(){
+  const res=await fetch(API+"/ia/peticao",{method:"POST",
+  headers:{"Content-Type":"application/json","Authorization":token},
+  body:JSON.stringify({tema:tema.value})})
+
+  const data=await res.json()
+  resultado.innerText=data.texto
 }
 </script>
 
