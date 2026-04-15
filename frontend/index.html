@@ -5,28 +5,33 @@
 <title>SIJ PRO</title>
 
 <style>
+
+/* ===== VARIÁVEIS ===== */
 :root{
   --roxo:#5b21b6;
   --roxo-escuro:#3b0764;
-  --bg:#f5f6fa;
+  --bg:#f4f6fb;
   --card:#ffffff;
-  --text:#222;
+  --text:#1f2937;
+  --border:#e5e7eb;
 }
 
 .dark{
-  --bg:#1e1e2f;
-  --card:#2a2a3d;
-  --text:#eee;
+  --bg:#0f172a;
+  --card:#1e293b;
+  --text:#e5e7eb;
+  --border:#334155;
 }
 
+/* ===== GLOBAL ===== */
 body{
   margin:0;
-  font-family:Arial;
+  font-family:Arial, Helvetica, sans-serif;
   background:var(--bg);
   color:var(--text);
 }
 
-/* LOGIN */
+/* ===== LOGIN ===== */
 #login{
   height:100vh;
   display:flex;
@@ -35,26 +40,92 @@ body{
   background:linear-gradient(135deg,#5b21b6,#9333ea,#3b0764);
 }
 
-.box{
+.login-box{
   width:320px;
   padding:30px;
-  border-radius:15px;
+  border-radius:16px;
   background:rgba(255,255,255,0.1);
   backdrop-filter:blur(10px);
   text-align:center;
   color:white;
 }
 
-input, select{
+.login-box input{
   width:100%;
   padding:12px;
   margin:6px 0;
-  border-radius:8px;
   border:none;
+  border-radius:8px;
 }
 
-button{
+.login-box button{
   width:100%;
+  padding:12px;
+  border:none;
+  border-radius:8px;
+  background:#2e1065;
+  color:white;
+}
+
+/* ===== APP ===== */
+#app{display:none}
+
+/* ===== SIDEBAR ===== */
+.sidebar{
+  width:240px;
+  height:100vh;
+  position:fixed;
+  background:linear-gradient(#5b21b6,#3b0764);
+  padding:20px;
+  color:white;
+  box-sizing:border-box;
+}
+
+.sidebar h2{
+  margin-bottom:25px;
+}
+
+.sidebar button{
+  width:100%;
+  padding:10px;
+  margin-bottom:10px;
+  border:none;
+  border-radius:8px;
+  background:rgba(255,255,255,0.1);
+  color:white;
+  cursor:pointer;
+}
+
+/* ===== MAIN ===== */
+.main{
+  margin-left:240px;
+  padding:30px;
+}
+
+/* ===== HEADER ===== */
+.header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:20px;
+}
+
+/* ===== FORM ===== */
+.form{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-bottom:20px;
+}
+
+.form input, .form select{
+  padding:10px;
+  border-radius:8px;
+  border:1px solid var(--border);
+}
+
+.form button{
+  grid-column:span 2;
   padding:12px;
   border:none;
   border-radius:8px;
@@ -63,45 +134,25 @@ button{
   cursor:pointer;
 }
 
-/* APP */
-#app{display:none}
-
-/* SIDEBAR */
-.sidebar{
-  width:230px;
-  height:100vh;
-  position:fixed;
-  background:linear-gradient(#5b21b6,#3b0764);
-  padding:20px;
-  color:white;
+/* ===== GRID ===== */
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+  gap:15px;
 }
 
-.sidebar button{
-  margin:6px 0;
-  background:rgba(255,255,255,0.1);
-}
-
-/* MAIN */
-.main{
-  margin-left:230px;
-  padding:25px;
-}
-
-/* CARD */
+/* ===== CARD ===== */
 .card{
   background:var(--card);
-  padding:15px;
-  border-radius:10px;
-  margin-bottom:10px;
+  border-radius:12px;
+  padding:18px;
+  border:1px solid var(--border);
   position:relative;
 }
 
-.dark .card{
-  background:#2a2a3d;
-  color:white;
-}
-
+/* ===== STATUS ===== */
 .status{
+  display:inline-block;
   padding:4px 10px;
   border-radius:20px;
   font-size:12px;
@@ -115,26 +166,28 @@ button{
 .deferido{background:#3b82f6}
 .indeferido{background:#ef4444}
 
-/* SMALL BUTTONS */
+/* ===== ACTIONS ===== */
 .actions{
   position:absolute;
-  right:10px;
   top:10px;
+  right:10px;
 }
 
 .actions button{
-  width:auto;
   padding:5px 8px;
   font-size:11px;
+  border:none;
+  border-radius:6px;
   margin-left:5px;
+  cursor:pointer;
 }
 
-.edit{background:#5b21b6}
-.delete{background:#ef4444}
+.edit{background:var(--roxo);color:white}
+.delete{background:#ef4444;color:white}
 
-/* ALERTA */
+/* ===== ALERTA ===== */
 .alerta{
-  border-left:5px solid #ef4444;
+  border-left:4px solid red;
 }
 
 </style>
@@ -144,7 +197,7 @@ button{
 
 <!-- LOGIN -->
 <div id="login">
-  <div class="box">
+  <div class="login-box">
     <h2>SIJ PRO</h2>
     <input id="email" placeholder="Email">
     <input id="senha" type="password" placeholder="Senha">
@@ -156,43 +209,39 @@ button{
 <div id="app">
 
 <div class="sidebar">
-  <h3>SIJ</h3>
-  <button onclick="tela('processos')">Processos</button>
+  <h2>SIJ</h2>
   <button onclick="toggleTema()">🌗 Tema</button>
   <button onclick="sair()">Sair</button>
 </div>
 
 <div class="main">
 
-<div id="processos">
-<h2>Processos</h2>
-
-<input id="titulo" placeholder="Título">
-<input id="parte" placeholder="Parte">
-
-<select id="area">
-<option>Cível</option>
-<option>Previdenciário</option>
-<option>Família</option>
-<option>Trabalhista</option>
-</select>
-
-<input type="date" id="prazo">
-
-<select id="status">
-<option value="ativo">Ativo</option>
-<option value="vencer">A vencer</option>
-<option value="finalizado">Finalizado</option>
-<option value="deferido">Deferido</option>
-<option value="indeferido">Indeferido</option>
-</select>
-
-<input type="file" id="file">
-
-<button onclick="salvarProcesso()">Salvar</button>
-
-<div id="listaProcessos"></div>
+<div class="header">
+  <h2>Processos</h2>
 </div>
+
+<div class="form">
+  <input id="titulo" placeholder="Título">
+  <input id="parte" placeholder="Parte">
+  <select id="area">
+    <option>Cível</option>
+    <option>Previdenciário</option>
+    <option>Família</option>
+    <option>Trabalhista</option>
+  </select>
+  <input type="date" id="prazo">
+  <select id="status">
+    <option value="ativo">Ativo</option>
+    <option value="vencer">A vencer</option>
+    <option value="finalizado">Finalizado</option>
+    <option value="deferido">Deferido</option>
+    <option value="indeferido">Indeferido</option>
+  </select>
+  <input type="file" id="file">
+  <button onclick="salvar()">Salvar Processo</button>
+</div>
+
+<div id="lista" class="grid"></div>
 
 </div>
 </div>
@@ -204,7 +253,7 @@ let editando=null
 function entrar(){
   login.style.display="none"
   app.style.display="block"
-  renderProcessos()
+  render()
 }
 
 function sair(){
@@ -212,11 +261,11 @@ function sair(){
   login.style.display="flex"
 }
 
-function salvarProcesso(){
-  let dados = JSON.parse(localStorage.getItem("proc")||"[]")
+function salvar(){
+  let dados = JSON.parse(localStorage.getItem("dados")||"[]")
 
   let f = file.files[0]
-  let url = f ? URL.createObjectURL(f):null
+  let url = f ? URL.createObjectURL(f) : null
 
   if(editando){
     let p = dados.find(x=>x.id===editando)
@@ -240,57 +289,54 @@ function salvarProcesso(){
     })
   }
 
-  localStorage.setItem("proc",JSON.stringify(dados))
-  renderProcessos()
+  localStorage.setItem("dados",JSON.stringify(dados))
+  render()
 }
 
-function renderProcessos(){
-  let dados = JSON.parse(localStorage.getItem("proc")||"[]")
-  listaProcessos.innerHTML=""
+function render(){
+  let dados = JSON.parse(localStorage.getItem("dados")||"[]")
+  lista.innerHTML=""
 
   let hoje = new Date().toISOString().split("T")[0]
 
   dados.forEach(p=>{
-
     let alerta = (p.prazo && p.prazo < hoje) ? "alerta" : ""
 
-    listaProcessos.innerHTML+=`
+    lista.innerHTML+=`
     <div class="card ${alerta}">
+      <div class="actions">
+        <button class="edit" onclick="editar(${p.id})">Editar</button>
+        <button class="delete" onclick="excluir(${p.id})">Excluir</button>
+      </div>
 
-    <div class="actions">
-      <button class="edit" onclick="editar(${p.id})">Editar</button>
-      <button class="delete" onclick="del(${p.id})">Excluir</button>
-    </div>
+      <div class="status ${p.status}" onclick="trocarStatus(${p.id})">${p.status}</div>
 
-    <div class="status ${p.status}" onclick="trocarStatus(${p.id})">${p.status}</div>
+      <h3>${p.titulo}</h3>
+      <p><b>Área:</b> ${p.area}</p>
+      <p><b>Parte:</b> ${p.parte}</p>
+      <p><b>Prazo:</b> ${p.prazo || "-"}</p>
 
-    <h3>${p.titulo}</h3>
-    <p>${p.area}</p>
-    <p>${p.parte}</p>
-    <p>Prazo: ${p.prazo||"-"}</p>
+      ${p.file ? `<a href="${p.file}" target="_blank">📎 Ver anexo</a>` : ""}
 
-    ${p.file ? `<a href="${p.file}" target="_blank">📎 Anexo</a>`:""}
-
-    <br><small>${p.data}</small>
-
+      <br><small>Criado: ${p.data}</small>
     </div>`
   })
 }
 
 function trocarStatus(id){
-  let dados = JSON.parse(localStorage.getItem("proc"))
+  let dados = JSON.parse(localStorage.getItem("dados"))
   let ordem=["ativo","vencer","finalizado","deferido","indeferido"]
 
   let p = dados.find(x=>x.id===id)
   let i = ordem.indexOf(p.status)
   p.status = ordem[(i+1)%ordem.length]
 
-  localStorage.setItem("proc",JSON.stringify(dados))
-  renderProcessos()
+  localStorage.setItem("dados",JSON.stringify(dados))
+  render()
 }
 
 function editar(id){
-  let dados = JSON.parse(localStorage.getItem("proc"))
+  let dados = JSON.parse(localStorage.getItem("dados"))
   let p = dados.find(x=>x.id===id)
 
   titulo.value=p.titulo
@@ -302,11 +348,11 @@ function editar(id){
   editando=id
 }
 
-function del(id){
-  let d = JSON.parse(localStorage.getItem("proc"))
-  d = d.filter(x=>x.id!==id)
-  localStorage.setItem("proc",JSON.stringify(d))
-  renderProcessos()
+function excluir(id){
+  let dados = JSON.parse(localStorage.getItem("dados"))
+  dados = dados.filter(p=>p.id!==id)
+  localStorage.setItem("dados",JSON.stringify(dados))
+  render()
 }
 
 function toggleTema(){
