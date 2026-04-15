@@ -8,18 +8,13 @@
 body{
   margin:0;
   font-family:Arial;
-  background:linear-gradient(135deg,#2b0a3d,#5a0f4d,#7b1e57);
-  color:white;
+  background:#f4f6f9;
 }
 
-/* textura */
-body::after{
-  content:"";
-  position:fixed;
-  width:100%;
-  height:100%;
-  background:radial-gradient(circle at 20% 30%, rgba(255,255,255,0.05), transparent),
-             radial-gradient(circle at 80% 70%, rgba(255,255,255,0.05), transparent);
+/* DARK MODE */
+.dark{
+  background:#1e1e2f;
+  color:white;
 }
 
 /* LOGIN */
@@ -32,21 +27,25 @@ body::after{
   text-align:center;
 }
 
-/* INPUTS */
-input, select, button{
+input, select{
   width:100%;
   padding:12px;
-  margin:8px 0;
-  border:none;
-  border-radius:10px;
-  box-sizing:border-box;
+  margin:6px 0;
+  border-radius:8px;
+  border:1px solid #ccc;
 }
 
 button{
-  background:linear-gradient(90deg,#ff416c,#ff4b2b);
-  color:white;
-  font-weight:bold;
+  padding:10px;
+  border:none;
+  border-radius:8px;
   cursor:pointer;
+}
+
+/* BOTÃO PADRÃO */
+.btn{
+  background:#7b1e57;
+  color:white;
 }
 
 /* APP */
@@ -54,11 +53,12 @@ button{
   display:flex;
 }
 
-/* MENU */
+/* SIDEBAR */
 .sidebar{
   width:220px;
   height:100vh;
-  background:#1a1a2e;
+  background:#7b1e57;
+  color:white;
   padding:20px;
 }
 
@@ -67,7 +67,10 @@ button{
 }
 
 .sidebar button{
-  background:#292944;
+  width:100%;
+  margin:8px 0;
+  background:rgba(255,255,255,0.1);
+  color:white;
 }
 
 /* MAIN */
@@ -76,44 +79,50 @@ button{
   padding:20px;
 }
 
-/* FORM */
-.form{
-  max-width:500px;
+/* HEADER */
+.header{
+  display:flex;
+  justify-content:space-between;
+  margin-bottom:20px;
 }
 
-/* CARD */
+/* CARDS */
 .card{
   background:white;
-  color:black;
   padding:15px;
-  margin:15px 0;
-  border-radius:12px;
+  border-radius:10px;
+  margin-bottom:15px;
+  box-shadow:0 2px 8px rgba(0,0,0,0.1);
+}
+
+.dark .card{
+  background:#2a2a40;
+  color:white;
 }
 
 /* STATUS */
 .status{
-  padding:5px 12px;
+  padding:5px 10px;
   border-radius:20px;
   font-size:12px;
-  display:inline-block;
-  margin-bottom:10px;
-  cursor:pointer;
 }
 
 .ativo{background:#28a745;color:white;}
-.vencer{background:#ffc107;color:black;}
+.vencer{background:#ffc107;}
 .finalizado{background:#6c757d;color:white;}
 .deferido{background:#007bff;color:white;}
 .indeferido{background:#dc3545;color:white;}
 
-.small{
-  font-size:11px;
-  color:#555;
+.actions{
+  margin-top:10px;
+}
+
+.actions button{
+  margin-right:5px;
 }
 
 .hidden{display:none;}
 </style>
-
 </head>
 
 <body>
@@ -123,7 +132,7 @@ button{
   <h2>SIJ PRO</h2>
   <input id="email" placeholder="Email">
   <input id="senha" type="password" placeholder="Senha">
-  <button onclick="entrar()">Entrar</button>
+  <button class="btn" onclick="entrar()">Entrar</button>
 </div>
 
 <!-- APP -->
@@ -132,200 +141,135 @@ button{
 <div class="sidebar">
   <h2>SIJ</h2>
   <button onclick="mostrar('processos')">Processos</button>
-  <button onclick="mostrar('novo')">Novo Processo</button>
+  <button onclick="mostrar('novo')">Novo</button>
+  <button onclick="toggleDark()">🌙 Modo</button>
   <button onclick="sair()">Sair</button>
 </div>
 
 <div class="main">
 
+<div class="header">
+  <h2>Processos</h2>
+</div>
+
 <!-- FORM -->
-<div id="novo" class="form hidden">
-<h3>Novo / Editar Processo</h3>
-
+<div id="novo" class="hidden">
 <input id="titulo" placeholder="Título">
-
 <select id="area">
 <option>Cível</option>
 <option>Previdenciário</option>
 <option>Família</option>
 <option>Trabalhista</option>
-<option>Penal</option>
 </select>
-
-<input id="parte" placeholder="Nome da parte">
-<input id="descricao" placeholder="Descrição">
+<input id="parte" placeholder="Parte">
 <input id="prazo" type="date">
-<input id="arquivo" type="file">
-
-<button onclick="salvar()">Salvar</button>
+<button class="btn" onclick="salvar()">Salvar</button>
 </div>
 
 <!-- LISTA -->
-<div id="processos">
-<h3>Processos</h3>
-<div id="lista"></div>
-</div>
+<div id="processos"></div>
 
 </div>
 </div>
 
 <script>
 
-let editando = null
+let editando=null
 
 function entrar(){
   if(email.value && senha.value){
-    localStorage.setItem("logado","sim")
-    iniciar()
+    login.classList.add("hidden")
+    app.classList.remove("hidden")
+    listar()
   }
 }
 
 function sair(){
-  localStorage.removeItem("logado")
-  document.getElementById("app").classList.add("hidden")
-  document.getElementById("login").classList.remove("hidden")
+  app.classList.add("hidden")
+  login.classList.remove("hidden")
 }
 
-function iniciar(){
-  document.getElementById("login").classList.add("hidden")
-  document.getElementById("app").classList.remove("hidden")
-  mostrar("processos")
-  listar()
+function toggleDark(){
+  document.body.classList.toggle("dark")
 }
 
-function mostrar(tela){
-  document.getElementById("novo").classList.add("hidden")
-  document.getElementById("processos").classList.add("hidden")
-  document.getElementById(tela).classList.remove("hidden")
-}
+function mostrar(t){
+  novo.classList.add("hidden")
+  processos.classList.add("hidden")
 
-function getDados(){
-  return JSON.parse(localStorage.getItem("dados") || "[]")
-}
-
-function setDados(d){
-  localStorage.setItem("dados", JSON.stringify(d))
+  if(t==="novo"){
+    novo.classList.remove("hidden")
+  }else{
+    processos.classList.remove("hidden")
+  }
 }
 
 function salvar(){
+  let dados = JSON.parse(localStorage.getItem("dados")||"[]")
 
-  let lista = getDados()
-  let file = arquivo.files[0]
-  let reader = new FileReader()
-
-  reader.onload = function(e){
-
-    if(editando){
-      let p = lista.find(x=>x.id===editando)
-      p.titulo = titulo.value
-      p.area = area.value
-      p.parte = parte.value
-      p.descricao = descricao.value
-      p.prazo = prazo.value
-    }else{
-      lista.push({
-        id: Date.now(),
-        titulo: titulo.value,
-        area: area.value,
-        parte: parte.value,
-        descricao: descricao.value,
-        prazo: prazo.value,
-        data: new Date().toLocaleDateString(),
-        arquivo: e.target.result || null,
-        status:"ativo"
-      })
-    }
-
-    setDados(lista)
-    listar()
-    mostrar("processos")
-    limpar()
-    editando = null
-  }
-
-  if(file){
-    reader.readAsDataURL(file)
+  if(editando){
+    let p = dados.find(x=>x.id===editando)
+    p.titulo=titulo.value
+    p.area=area.value
+    p.parte=parte.value
+    p.prazo=prazo.value
   }else{
-    reader.onload({target:{result:null}})
+    dados.push({
+      id:Date.now(),
+      titulo:titulo.value,
+      area:area.value,
+      parte:parte.value,
+      prazo:prazo.value,
+      status:"ativo",
+      data:new Date().toLocaleDateString()
+    })
   }
-}
 
-function limpar(){
-  titulo.value=""
-  parte.value=""
-  descricao.value=""
-  prazo.value=""
-}
-
-function trocarStatus(id){
-  let lista = getDados()
-  let p = lista.find(x=>x.id===id)
-
-  const ordem = ["ativo","vencer","finalizado","deferido","indeferido"]
-  let i = ordem.indexOf(p.status)
-  p.status = ordem[(i+1)%ordem.length]
-
-  setDados(lista)
+  localStorage.setItem("dados",JSON.stringify(dados))
   listar()
+  mostrar("processos")
+  editando=null
+}
+
+function listar(){
+  let dados = JSON.parse(localStorage.getItem("dados")||"[]")
+  processos.innerHTML=""
+
+  dados.forEach(p=>{
+    processos.innerHTML+=`
+    <div class="card">
+      <span class="status ${p.status}">${p.status}</span><br>
+      <b>${p.titulo}</b><br>
+      ${p.area} - ${p.parte}<br>
+      Prazo: ${p.prazo || "—"}<br>
+      <small>Criado: ${p.data}</small>
+
+      <div class="actions">
+        <button onclick="editar(${p.id})">Editar</button>
+        <button onclick="excluir(${p.id})">Excluir</button>
+      </div>
+    </div>`
+  })
 }
 
 function editar(id){
-  let lista = getDados()
-  let p = lista.find(x=>x.id===id)
+  let dados = JSON.parse(localStorage.getItem("dados"))
+  let p = dados.find(x=>x.id===id)
 
-  titulo.value = p.titulo
-  area.value = p.area
-  parte.value = p.parte
-  descricao.value = p.descricao
-  prazo.value = p.prazo
+  titulo.value=p.titulo
+  area.value=p.area
+  parte.value=p.parte
+  prazo.value=p.prazo
 
-  editando = id
+  editando=id
   mostrar("novo")
 }
 
 function excluir(id){
-  let lista = getDados().filter(p=>p.id!==id)
-  setDados(lista)
+  let dados = JSON.parse(localStorage.getItem("dados"))
+  dados = dados.filter(p=>p.id!==id)
+  localStorage.setItem("dados",JSON.stringify(dados))
   listar()
-}
-
-function listar(){
-
-  let dados = getDados()
-  lista.innerHTML=""
-
-  dados.forEach(p=>{
-
-    lista.innerHTML += `
-      <div class="card">
-
-        <div class="status ${p.status}" onclick="trocarStatus(${p.id})">
-          ${p.status}
-        </div>
-
-        <b>${p.titulo}</b><br>
-        Área: ${p.area}<br>
-        Parte: ${p.parte}<br>
-        Prazo: ${p.prazo || "sem prazo"}<br>
-
-        ${p.arquivo ? `<a href="${p.arquivo}" target="_blank">📎 Ver Anexo</a><br>` : ""}
-
-        <div class="small">Criado em ${p.data}</div>
-
-        <br>
-        <button onclick="editar(${p.id})">Editar</button>
-        <button onclick="excluir(${p.id})">Excluir</button>
-
-      </div>
-    `
-  })
-}
-
-/* LOGIN CONTROLE */
-window.onload = function(){
-  if(localStorage.getItem("logado") === "sim"){
-    iniciar()
-  }
 }
 
 </script>
