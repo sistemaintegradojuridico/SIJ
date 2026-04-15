@@ -8,7 +8,7 @@
 body{
   margin:0;
   font-family:Arial;
-  background: linear-gradient(135deg,#2b0a2e,#5a0f3d,#7b1e4f);
+  background:#1e1e2f;
   color:white;
 }
 
@@ -19,27 +19,51 @@ body{
   text-align:center;
 }
 
-/* APP */
-.container{
-  width:90%;
-  max-width:600px;
-  margin:20px auto;
-}
-
 input, select, button{
   width:100%;
   padding:12px;
   margin:6px 0;
   border:none;
   border-radius:8px;
-  box-sizing:border-box;
 }
 
 button{
   background:linear-gradient(90deg,#ff416c,#ff4b2b);
   color:white;
-  font-weight:bold;
   cursor:pointer;
+}
+
+/* APP */
+#app{
+  display:flex;
+}
+
+/* MENU */
+.sidebar{
+  width:200px;
+  height:100vh;
+  background:#151521;
+  padding:20px;
+}
+
+.sidebar h2{
+  text-align:center;
+}
+
+.sidebar button{
+  background:none;
+  border:1px solid #444;
+}
+
+/* CONTEÚDO */
+.main{
+  flex:1;
+  padding:20px;
+}
+
+/* FORM */
+.form{
+  max-width:500px;
 }
 
 /* CARD */
@@ -47,7 +71,7 @@ button{
   background:white;
   color:black;
   padding:15px;
-  margin:15px auto;
+  margin:10px 0;
   border-radius:10px;
 }
 
@@ -73,8 +97,6 @@ button{
 }
 
 .hidden{display:none;}
-
-h3{text-align:center;}
 </style>
 
 </head>
@@ -92,9 +114,21 @@ h3{text-align:center;}
 <!-- APP -->
 <div id="app" class="hidden">
 
-<div class="container">
+<!-- MENU -->
+<div class="sidebar">
+  <h2>SIJ</h2>
+  <button onclick="mostrar('processos')">Processos</button>
+  <button onclick="mostrar('novo')">Novo Processo</button>
+  <button onclick="sair()">Sair</button>
+</div>
 
-<button onclick="sair()">Sair</button>
+<!-- CONTEÚDO -->
+<div class="main">
+
+<!-- NOVO -->
+<div id="novo" class="form hidden">
+
+<h3>Novo Processo</h3>
 
 <input id="titulo" placeholder="Título">
 
@@ -115,9 +149,13 @@ h3{text-align:center;}
 
 </div>
 
+<!-- LISTA -->
+<div id="processos">
 <h3>Processos</h3>
 <div id="lista"></div>
+</div>
 
+</div>
 </div>
 
 <script>
@@ -132,14 +170,21 @@ function entrar(){
 }
 
 function sair(){
-  localStorage.clear()
+  localStorage.removeItem("logado")
   location.reload()
 }
 
 function iniciar(){
   login.classList.add("hidden")
   app.classList.remove("hidden")
+  mostrar("processos")
   listar()
+}
+
+function mostrar(tela){
+  novo.classList.add("hidden")
+  processos.classList.add("hidden")
+  document.getElementById(tela).classList.remove("hidden")
 }
 
 function getDados(){
@@ -153,24 +198,20 @@ function setDados(d){
 function salvar(){
 
   let lista = getDados()
-
   let file = arquivo.files[0]
 
-  if(editando){
-    let p = lista.find(x=>x.id===editando)
+  let reader = new FileReader()
 
-    p.titulo = titulo.value
-    p.area = area.value
-    p.parte = parte.value
-    p.descricao = descricao.value
-    p.prazo = prazo.value
+  reader.onload = function(e){
 
-  }else{
-
-    let reader = new FileReader()
-
-    reader.onload = function(e){
-
+    if(editando){
+      let p = lista.find(x=>x.id===editando)
+      p.titulo = titulo.value
+      p.area = area.value
+      p.parte = parte.value
+      p.descricao = descricao.value
+      p.prazo = prazo.value
+    }else{
       lista.push({
         id: Date.now(),
         titulo: titulo.value,
@@ -182,32 +223,20 @@ function salvar(){
         arquivo: e.target.result || null,
         status:"ativo"
       })
-
-      setDados(lista)
-      listar()
     }
 
-    if(file){
-      reader.readAsDataURL(file)
-    }else{
-      lista.push({
-        id: Date.now(),
-        titulo: titulo.value,
-        area: area.value,
-        parte: parte.value,
-        descricao: descricao.value,
-        prazo: prazo.value,
-        data: new Date().toLocaleDateString(),
-        arquivo:null,
-        status:"ativo"
-      })
-
-      setDados(lista)
-      listar()
-    }
+    setDados(lista)
+    listar()
+    mostrar("processos")
+    limpar()
+    editando = null
   }
 
-  limpar()
+  if(file){
+    reader.readAsDataURL(file)
+  }else{
+    reader.onload({target:{result:null}})
+  }
 }
 
 function limpar(){
@@ -240,6 +269,7 @@ function editar(id){
   prazo.value = p.prazo
 
   editando = id
+  mostrar("novo")
 }
 
 function excluir(id){
