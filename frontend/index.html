@@ -8,7 +8,7 @@
 body{
   margin:0;
   font-family:Arial;
-  background:#1e1e2f;
+  background:linear-gradient(135deg,#3b0a45,#7a1c5c,#a8325f);
   color:white;
 }
 
@@ -22,15 +22,17 @@ body{
 input, select, button{
   width:100%;
   padding:12px;
-  margin:6px 0;
+  margin:8px 0;
   border:none;
-  border-radius:8px;
+  border-radius:10px;
+  box-sizing:border-box;
 }
 
 button{
   background:linear-gradient(90deg,#ff416c,#ff4b2b);
   color:white;
   cursor:pointer;
+  font-weight:bold;
 }
 
 /* APP */
@@ -40,9 +42,9 @@ button{
 
 /* MENU */
 .sidebar{
-  width:200px;
+  width:220px;
   height:100vh;
-  background:#151521;
+  background:#1a1a2e;
   padding:20px;
 }
 
@@ -51,8 +53,7 @@ button{
 }
 
 .sidebar button{
-  background:none;
-  border:1px solid #444;
+  background:#292944;
 }
 
 /* CONTEÚDO */
@@ -71,8 +72,8 @@ button{
   background:white;
   color:black;
   padding:15px;
-  margin:10px 0;
-  border-radius:10px;
+  margin:15px 0;
+  border-radius:12px;
 }
 
 /* STATUS */
@@ -93,7 +94,7 @@ button{
 
 .small{
   font-size:11px;
-  color:#666;
+  color:#555;
 }
 
 .hidden{display:none;}
@@ -170,20 +171,20 @@ function entrar(){
 }
 
 function sair(){
-  localStorage.removeItem("logado")
+  localStorage.clear()
   location.reload()
 }
 
 function iniciar(){
-  login.classList.add("hidden")
-  app.classList.remove("hidden")
+  document.getElementById("login").classList.add("hidden")
+  document.getElementById("app").classList.remove("hidden")
   mostrar("processos")
   listar()
 }
 
 function mostrar(tela){
-  novo.classList.add("hidden")
-  processos.classList.add("hidden")
+  document.getElementById("novo").classList.add("hidden")
+  document.getElementById("processos").classList.add("hidden")
   document.getElementById(tela).classList.remove("hidden")
 }
 
@@ -198,7 +199,7 @@ function setDados(d){
 function salvar(){
 
   let lista = getDados()
-  let file = arquivo.files[0]
+  let file = document.getElementById("arquivo").files[0]
 
   let reader = new FileReader()
 
@@ -310,8 +311,14 @@ function listar(){
   })
 }
 
-if(localStorage.getItem("logado") === "sim"){
-  iniciar()
+/* CONTROLE DE LOGIN CORRETO */
+window.onload = function(){
+  if(localStorage.getItem("logado") === "sim"){
+    iniciar()
+  }else{
+    document.getElementById("login").classList.remove("hidden")
+    document.getElementById("app").classList.add("hidden")
+  }
 }
 
 </script>
