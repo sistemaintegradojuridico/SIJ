@@ -10,65 +10,64 @@
 body{
   margin:0;
   font-family:'Segoe UI',sans-serif;
-  background:#f5f6fa;
+  background:#f6f7fb;
 }
 
 /* SIDEBAR */
 .sidebar{
-  width:70px;
+  width:220px;
   height:100vh;
   position:fixed;
-  background:linear-gradient(180deg,#2e1065,#4c1d95);
-  display:flex;
-  flex-direction:column;
-  align-items:center;
+  background:#1e293b;
+  color:#cbd5e1;
   padding-top:20px;
 }
 
-.sidebar i{
-  color:#cbd5e1;
-  font-size:22px;
-  margin:18px 0;
-  cursor:pointer;
+.sidebar h2{
+  padding:0 20px;
+  color:white;
+  font-size:18px;
 }
 
-.sidebar i:hover{
-  color:white;
+.menu{
+  margin-top:20px;
+}
+
+.menu div{
+  padding:12px 20px;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.menu div:hover{
+  background:#334155;
 }
 
 /* TOP */
 .top{
-  margin-left:70px;
+  margin-left:220px;
   height:60px;
   background:white;
   display:flex;
   align-items:center;
   justify-content:space-between;
-  padding:0 25px;
+  padding:0 20px;
   border-bottom:1px solid #eee;
 }
 
-.logo{
-  font-weight:600;
-}
-
-.user{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  cursor:pointer;
-}
-
-.user img{
-  width:35px;
-  height:35px;
-  border-radius:50%;
+.search{
+  background:#f1f5f9;
+  padding:8px 12px;
+  border-radius:6px;
+  width:300px;
 }
 
 /* MAIN */
 .main{
-  margin-left:70px;
-  padding:25px;
+  margin-left:220px;
+  padding:20px;
 }
 
 /* DASH */
@@ -76,72 +75,56 @@ body{
   display:grid;
   grid-template-columns:repeat(4,1fr);
   gap:15px;
-  margin-top:15px;
 }
 
 .card{
   background:white;
-  padding:18px;
+  padding:20px;
   border-radius:10px;
   border:1px solid #eee;
 }
 
-/* PROCESSOS */
-.form{
-  display:flex;
-  gap:10px;
-  margin-top:15px;
-  flex-wrap:wrap;
-}
-
-.form input{
-  padding:8px;
-  border:1px solid #ccc;
-  border-radius:5px;
-}
-
-.form button{
-  background:#4c1d95;
-  color:white;
-  border:none;
-  padding:8px 15px;
-  border-radius:5px;
-  cursor:pointer;
-}
-
-.lista{
-  margin-top:20px;
-}
-
-.item{
+/* TABELA */
+.table{
+  width:100%;
   background:white;
-  padding:15px;
-  border-radius:8px;
-  margin-bottom:10px;
+  border-radius:10px;
   border:1px solid #eee;
+  margin-top:15px;
 }
 
-/* PERFIL */
-.perfil img{
-  width:80px;
-  height:80px;
-  border-radius:50%;
-  margin-bottom:10px;
+.row{
+  display:flex;
+  justify-content:space-between;
+  padding:12px;
+  border-bottom:1px solid #eee;
 }
 
-.perfil input{
-  display:block;
-  margin:10px 0;
-  padding:8px;
+/* CRM */
+.kanban{
+  display:flex;
+  gap:15px;
 }
 
-.perfil button{
-  background:#4c1d95;
-  color:white;
-  border:none;
-  padding:8px 15px;
-  border-radius:5px;
-  cursor:pointer;
+.coluna{
+  background:#f1f5f9;
+  padding:10px;
+  width:250px;
+  border-radius:8px;
+}
+
+.card-kanban{
+  background:white;
+  padding:10px;
+  margin-top:10px;
+  border-radius:6px;
+}
+
+/* MODELOS */
+textarea{
+  width:100%;
+  height:200px;
+  margin-top:10px;
 }
 </style>
 </head>
@@ -149,32 +132,74 @@ body{
 <body>
 
 <div class="sidebar">
-  <i class="ri-home-line" onclick="trocar('dash')"></i>
-  <i class="ri-file-list-3-line" onclick="trocar('processos')"></i>
-  <i class="ri-calendar-line" onclick="trocar('agenda')"></i>
-  <i class="ri-user-line" onclick="trocar('perfil')"></i>
+  <h2>SIJ PRO</h2>
+
+  <div class="menu">
+    <div onclick="trocar('dash')"><i class="ri-home-line"></i> Dashboard</div>
+    <div onclick="trocar('agenda')"><i class="ri-calendar-line"></i> Agenda</div>
+    <div onclick="trocar('atividades')"><i class="ri-check-line"></i> Atividades</div>
+    <div onclick="trocar('crm')"><i class="ri-layout-grid-line"></i> CRM</div>
+    <div onclick="trocar('contatos')"><i class="ri-user-line"></i> Contatos</div>
+    <div onclick="trocar('processos')"><i class="ri-file-line"></i> Processos</div>
+    <div onclick="trocar('intimacoes')"><i class="ri-notification-line"></i> Intimações</div>
+    <div onclick="trocar('parceiros')"><i class="ri-group-line"></i> Parceiros</div>
+    <div onclick="trocar('modelos')"><i class="ri-file-text-line"></i> Modelos</div>
+  </div>
 </div>
 
 <div class="top">
-  <div class="logo">SIJ PRO</div>
-
-  <div class="user" onclick="trocar('perfil')">
-    <img id="fotoTopo" src="https://i.imgur.com/6VBx3io.png">
-    <span id="nomeTopo">Usuário</span>
-  </div>
+  <input class="search" placeholder="Digite / para pesquisar">
+  <div>Olá, Usuário</div>
 </div>
 
 <div class="main">
 
-<!-- DASH -->
+<!-- DASHBOARD -->
 <div id="dash">
   <h2>Dashboard</h2>
-
   <div class="cards">
-    <div class="card">Processos: <span id="countProc">0</span></div>
-    <div class="card">Tarefas: 5</div>
-    <div class="card">Prazos: 3</div>
-    <div class="card">Financeiro: R$ 2.500</div>
+    <div class="card">Tarefas concluídas: 52</div>
+    <div class="card">Pontos: 2549</div>
+    <div class="card">Pendentes: 32</div>
+    <div class="card">Meta: 80%</div>
+  </div>
+</div>
+
+<!-- ATIVIDADES -->
+<div id="atividades" style="display:none">
+  <h2>Atividades</h2>
+  <button>Nova tarefa</button>
+
+  <div class="table">
+    <div class="row">Elaborar petição inicial</div>
+    <div class="row">Analisar caso cliente</div>
+  </div>
+</div>
+
+<!-- CRM -->
+<div id="crm" style="display:none">
+  <h2>CRM</h2>
+
+  <div class="kanban">
+    <div class="coluna">
+      <b>Negociação</b>
+      <div class="card-kanban">Cliente INSS</div>
+    </div>
+
+    <div class="coluna">
+      <b>Judicial</b>
+      <div class="card-kanban">Processo ativo</div>
+    </div>
+  </div>
+</div>
+
+<!-- CONTATOS -->
+<div id="contatos" style="display:none">
+  <h2>Contatos</h2>
+
+  <div class="table">
+    <div class="row">João da Silva</div>
+    <div class="row">INSS</div>
   </div>
 </div>
 
@@ -182,105 +207,67 @@ body{
 <div id="processos" style="display:none">
   <h2>Processos</h2>
 
-  <div class="form">
-    <input id="titulo" placeholder="Título">
-    <input id="parte" placeholder="Parte">
-    <input type="file" id="anexo">
-    <button onclick="add()">Adicionar</button>
+  <div class="table">
+    <div class="row">Processo 0001 - INSS</div>
+    <div class="row">Processo 0002 - Cliente</div>
   </div>
-
-  <div id="lista" class="lista"></div>
 </div>
 
-<!-- AGENDA -->
-<div id="agenda" style="display:none">
-  <h2>Agenda</h2>
-  <p>(vamos colocar calendário real depois)</p>
+<!-- INTIMAÇÕES -->
+<div id="intimacoes" style="display:none">
+  <h2>Intimações</h2>
+
+  <div class="table">
+    <div class="row">Intimação TRF4</div>
+  </div>
 </div>
 
-<!-- PERFIL -->
-<div id="perfil" style="display:none" class="perfil">
-  <h2>Perfil</h2>
+<!-- PARCEIROS -->
+<div id="parceiros" style="display:none">
+  <h2>Parceiros</h2>
 
-  <img id="previewFoto" src="https://i.imgur.com/6VBx3io.png">
+  <div class="table">
+    <div class="row">Parceiro A</div>
+  </div>
+</div>
 
-  <input id="nomeInput" placeholder="Nome">
-  <input type="file" id="fotoInput">
+<!-- MODELOS -->
+<div id="modelos" style="display:none">
+  <h2>Modelos</h2>
 
-  <button onclick="salvarPerfil()">Salvar Perfil</button>
+  <input id="tituloModelo" placeholder="Título">
+  <textarea id="textoModelo"></textarea>
+  <button onclick="salvarModelo()">Salvar</button>
+
+  <div id="listaModelos"></div>
 </div>
 
 </div>
 
 <script>
-let processos = []
-
 function trocar(id){
-  ["dash","processos","agenda","perfil"].forEach(p=>{
-    document.getElementById(p).style.display="none"
+  let telas = ["dash","agenda","atividades","crm","contatos","processos","intimacoes","parceiros","modelos"]
+  telas.forEach(t=>{
+    let el = document.getElementById(t)
+    if(el) el.style.display="none"
   })
   document.getElementById(id).style.display="block"
 }
 
-function add(){
-  let titulo = document.getElementById("titulo").value
-  let parte = document.getElementById("parte").value
-  let file = document.getElementById("anexo").files[0]
+let modelos=[]
 
-  let url = file ? URL.createObjectURL(file) : null
+function salvarModelo(){
+  let titulo = document.getElementById("tituloModelo").value
+  let texto = document.getElementById("textoModelo").value
 
-  processos.push({titulo,parte,anexo:url})
+  modelos.push({titulo,texto})
 
-  render()
-}
-
-function render(){
-  let lista = document.getElementById("lista")
+  let lista = document.getElementById("listaModelos")
   lista.innerHTML=""
 
-  processos.forEach(p=>{
-    lista.innerHTML += `
-      <div class="item">
-        <b>${p.titulo}</b><br>
-        Parte: ${p.parte}<br>
-        ${p.anexo ? `<a href="${p.anexo}" target="_blank">Ver anexo</a>` : "Sem anexo"}
-      </div>
-    `
+  modelos.forEach(m=>{
+    lista.innerHTML += `<div class="row"><b>${m.titulo}</b></div>`
   })
-
-  document.getElementById("countProc").innerText = processos.length
-}
-
-function salvarPerfil(){
-  let nome = document.getElementById("nomeInput").value
-  let foto = document.getElementById("fotoInput").files[0]
-
-  if(nome){
-    localStorage.setItem("nome",nome)
-    document.getElementById("nomeTopo").innerText = nome
-  }
-
-  if(foto){
-    let url = URL.createObjectURL(foto)
-    localStorage.setItem("foto",url)
-
-    document.getElementById("fotoTopo").src = url
-    document.getElementById("previewFoto").src = url
-  }
-}
-
-window.onload = ()=>{
-  let nome = localStorage.getItem("nome")
-  let foto = localStorage.getItem("foto")
-
-  if(nome){
-    document.getElementById("nomeTopo").innerText = nome
-  }
-
-  if(foto){
-    document.getElementById("fotoTopo").src = foto
-    document.getElementById("previewFoto").src = foto
-  }
 }
 </script>
 
