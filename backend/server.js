@@ -1,52 +1,37 @@
-const express = require('express')
-const cors = require('cors')
+const express = require("express");
+const cors = require("cors");
+const Database = require("better-sqlite3");
 
-const app = express()
-app.use(cors())
-app.use(express.json())
+const app = express();
+app.use(cors());
+app.use(express.json());
 
-// banco fake (memória)
-let usuarios = []
-let processos = []
-let tarefas = []
+const db = new Database("sij.db");
 
-// LOGIN
-app.post('/login', (req, res) => {
-  const { email, senha } = req.body
+// Criar tabela
+db.prepare(`
+CREATE TABLE IF NOT EXISTS processos (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  titulo TEXT,
+  status TEXT
+)
+`).run();
 
-  const user = usuarios.find(u => u.email === email && u.senha === senha)
+// ROTAS
+app.get("/processos", (req, res) => {
+  const processos = db.prepare("SELECT * FROM processos").all();
+  res.json(processos);
+});
 
-  if (user) return res.json({ ok: true })
-  res.json({ ok: false })
-})
+app.post("/processos", (req, res) => {
+  const { titulo, status } = req.body;
+  const result = db
+    .prepare("INSERT INTO processos (titulo, status) VALUES (?, ?)")
+    .run(titulo, status);
 
-// CADASTRO
-app.post('/register', (req, res) => {
-  const { email, senha } = req.body
-  usuarios.push({ email, senha })
-  res.json({ ok: true })
-})
+  res.json({ id: result.lastInsertRowid });
+});
 
-// PROCESSOS
-app.post('/processo', (req, res) => {
-  processos.push(req.body)
-  res.json({ ok: true })
-})
-
-app.get('/processo', (req, res) => {
-  res.json(processos)
-})
-
-// AGENDA
-app.post('/tarefa', (req, res) => {
-  tarefas.push(req.body)
-  res.json({ ok: true })
-})
-
-app.get('/tarefa', (req, res) => {
-  res.json(tarefas)
-})
-
-app.listen(3000, () => {
-  console.log("Servidor rodando na porta 3000")
-})
+app.listen(3001, () => {
+  console.log("Servidor rodando na porta 3001");
+});
