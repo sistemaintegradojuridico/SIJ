@@ -2,274 +2,28 @@
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
-<title>SIJ PRO</title>
-
-<link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
-
-<style>
-body{margin:0;font-family:sans-serif;background:#f5f6fa}
-
-/* LOGIN */
-#login{
-  height:100vh;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-}
-.box{
-  background:white;
-  padding:30px;
-  border-radius:10px;
-  width:300px;
-}
-input,button,textarea{
-  width:100%;
-  margin-top:10px;
-  padding:8px;
-}
-button{
-  background:#3b82f6;
-  color:white;
-  border:none;
-}
-
-/* APP */
-#app{display:none}
-
-/* SIDEBAR */
-.sidebar{
-  width:220px;
-  height:100vh;
-  background:#0f172a;
-  color:white;
-  position:fixed;
-}
-.menu div{
-  padding:12px;
-  cursor:pointer;
-}
-.menu div:hover{background:#1e293b}
-
-/* TOP */
-.top{
-  margin-left:220px;
-  padding:10px;
-  background:white;
-}
-
-/* MAIN */
-.main{
-  margin-left:220px;
-  padding:20px;
-}
-
-.card{
-  background:white;
-  padding:10px;
-  margin-top:10px;
-}
-
-/* CRM */
-.colunas{
-  display:flex;
-  gap:10px;
-}
-.col{
-  background:#e2e8f0;
-  padding:10px;
-  width:200px;
-}
-.item{
-  background:white;
-  padding:8px;
-  margin-top:5px;
-}
-</style>
+<title>SIJ</title>
+<link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<!-- LOGIN -->
-<div id="login">
-  <div class="box">
-    <h3>Login</h3>
-    <input id="email" placeholder="Email">
-    <input id="senha" type="password" placeholder="Senha">
-    <button onclick="entrar()">Entrar</button>
-  </div>
+<header>
+  <img src="logo.png">
+  <h1>SIJ</h1>
+</header>
+
+<div class="topo">
+  <button onclick="criar()">+ Novo Processo</button>
 </div>
 
-<!-- APP -->
-<div id="app">
-
-<div class="sidebar">
-  <h3 style="padding:10px">SIJ PRO</h3>
-
-  <div class="menu">
-    <div onclick="trocar('dash')">Dashboard</div>
-    <div onclick="trocar('agenda')">Agenda</div>
-    <div onclick="trocar('atividades')">Atividades</div>
-    <div onclick="trocar('crm')">CRM</div>
-    <div onclick="trocar('contatos')">Contatos</div>
-    <div onclick="trocar('processos')">Processos</div>
-    <div onclick="trocar('intimacoes')">Intimações</div>
-    <div onclick="trocar('parceiros')">Parceiros</div>
-    <div onclick="trocar('modelos')">Modelos</div>
-  </div>
+<div class="container">
+  <div class="coluna" id="novo"><h2>Novo</h2></div>
+  <div class="coluna" id="andamento"><h2>Em andamento</h2></div>
+  <div class="coluna" id="finalizado"><h2>Finalizado</h2></div>
 </div>
 
-<div class="top">
-  <input placeholder="Pesquisar">
-</div>
-
-<div class="main">
-
-<!-- DASH -->
-<div id="dash">
-  <h2>Dashboard</h2>
-</div>
-
-<!-- AGENDA -->
-<div id="agenda" style="display:none">
-  <h2>Agenda</h2>
-  <input id="tarefaAgenda" placeholder="Nova tarefa">
-  <button onclick="addAgenda()">Adicionar</button>
-  <div id="listaAgenda"></div>
-</div>
-
-<!-- ATIVIDADES -->
-<div id="atividades" style="display:none">
-  <h2>Atividades</h2>
-  <input id="atividadeInput" placeholder="Nova atividade">
-  <button onclick="addAtividade()">Adicionar</button>
-  <div id="listaAtividades"></div>
-</div>
-
-<!-- CRM -->
-<div id="crm" style="display:none">
-  <h2>CRM</h2>
-  <input id="crmInput" placeholder="Novo cliente">
-  <button onclick="addCRM()">Adicionar</button>
-
-  <div class="colunas">
-    <div class="col">
-      <b>Negociação</b>
-      <div id="negociacao"></div>
-    </div>
-
-    <div class="col">
-      <b>Judicial</b>
-      <div id="judicial"></div>
-    </div>
-  </div>
-</div>
-
-<!-- CONTATOS -->
-<div id="contatos" style="display:none">
-  <h2>Contatos</h2>
-  <input id="contatoInput" placeholder="Nome">
-  <button onclick="addContato()">Adicionar</button>
-  <div id="listaContatos"></div>
-</div>
-
-<!-- PROCESSOS -->
-<div id="processos" style="display:none">
-  <h2>Processos</h2>
-  <input id="processoInput" placeholder="Processo">
-  <button onclick="addProcesso()">Adicionar</button>
-  <div id="listaProcessos"></div>
-</div>
-
-<!-- INTIMAÇÕES -->
-<div id="intimacoes" style="display:none">
-  <h2>Intimações</h2>
-  <input id="intimacaoInput">
-  <button onclick="addIntimacao()">Adicionar</button>
-  <div id="listaIntimacoes"></div>
-</div>
-
-<!-- PARCEIROS -->
-<div id="parceiros" style="display:none">
-  <h2>Parceiros</h2>
-  <input id="parceiroInput">
-  <button onclick="addParceiro()">Adicionar</button>
-  <div id="listaParceiros"></div>
-</div>
-
-<!-- MODELOS -->
-<div id="modelos" style="display:none">
-  <h2>Modelos</h2>
-
-  <input id="tituloModelo" placeholder="Título">
-  <textarea id="textoModelo"></textarea>
-  <button onclick="salvarModelo()">Salvar</button>
-
-  <div id="listaModelos"></div>
-</div>
-
-</div>
-</div>
-
-<script>
-function entrar(){
-  document.getElementById("login").style.display="none"
-  document.getElementById("app").style.display="block"
-}
-
-function trocar(id){
-  document.querySelectorAll(".main > div").forEach(d=>d.style.display="none")
-  document.getElementById(id).style.display="block"
-}
-
-/* AGENDA */
-function addAgenda(){
-  let val = tarefaAgenda.value
-  listaAgenda.innerHTML += `<div class="card">${val}</div>`
-}
-
-/* ATIVIDADE */
-function addAtividade(){
-  let val = atividadeInput.value
-  listaAtividades.innerHTML += `<div class="card">${val}</div>`
-}
-
-/* CRM */
-function addCRM(){
-  let val = crmInput.value
-  negociacao.innerHTML += `<div class="item">${val}</div>`
-}
-
-/* CONTATO */
-function addContato(){
-  let val = contatoInput.value
-  listaContatos.innerHTML += `<div class="card">${val}</div>`
-}
-
-/* PROCESSO */
-function addProcesso(){
-  let val = processoInput.value
-  listaProcessos.innerHTML += `<div class="card">${val}</div>`
-}
-
-/* INTIMAÇÃO */
-function addIntimacao(){
-  let val = intimacaoInput.value
-  listaIntimacoes.innerHTML += `<div class="card">${val}</div>`
-}
-
-/* PARCEIRO */
-function addParceiro(){
-  let val = parceiroInput.value
-  listaParceiros.innerHTML += `<div class="card">${val}</div>`
-}
-
-/* MODELOS */
-function salvarModelo(){
-  let titulo = tituloModelo.value
-  let texto = textoModelo.value
-  listaModelos.innerHTML += `<div class="card"><b>${titulo}</b></div>`
-}
-</script>
+<script src="script.js"></script>
 
 </body>
 </html>
