@@ -13,8 +13,12 @@ async function carregar() {
     el.className = "card";
     el.innerText = p.titulo;
 
+    // MOVER PROCESSO
     el.onclick = async () => {
-      const status = prompt("novo / andamento / finalizado");
+      const status = prompt(
+        "Para onde mover?\n\nDigite:\n- novo\n- andamento\n- finalizado"
+      );
+
       if (!status) return;
 
       await fetch(`${API}/${p.id}`, {
@@ -26,9 +30,10 @@ async function carregar() {
       carregar();
     };
 
+    // EXCLUIR COM BOTÃO DIREITO
     el.oncontextmenu = async (e) => {
       e.preventDefault();
-      if (confirm("Excluir processo?")) {
+      if (confirm("Deseja excluir este processo?")) {
         await fetch(`${API}/${p.id}`, { method: "DELETE" });
         carregar();
       }
@@ -38,14 +43,22 @@ async function carregar() {
   });
 }
 
+// CRIAR PROCESSO MELHORADO
 async function criar() {
-  const titulo = prompt("Nome do processo:");
-  if (!titulo) return;
+  const titulo = prompt("Digite o nome do processo:");
+
+  if (!titulo || titulo.trim() === "") {
+    alert("Nome inválido!");
+    return;
+  }
 
   await fetch(API, {
     method: "POST",
     headers: {"Content-Type":"application/json"},
-    body: JSON.stringify({ titulo, status: "novo" })
+    body: JSON.stringify({
+      titulo: titulo.trim(),
+      status: "novo"
+    })
   });
 
   carregar();
