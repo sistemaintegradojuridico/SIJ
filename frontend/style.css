@@ -1,8 +1,7 @@
 body {
   margin: 0;
   font-family: Arial;
-  background: url("bg.jpg") no-repeat center center fixed;
-  background-size: cover;
+  background: linear-gradient(135deg, #3b0a1a, #5a0f2d);
   color: #fff;
 }
 
@@ -10,6 +9,7 @@ header {
   display: flex;
   align-items: center;
   padding: 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
 }
 
 header img {
@@ -19,18 +19,20 @@ header img {
 
 h1 {
   color: gold;
+  letter-spacing: 2px;
 }
 
 .topo {
-  padding: 0 20px;
+  padding: 20px;
 }
 
 button {
-  background: gold;
+  background: linear-gradient(45deg, gold, #d4af37);
   border: none;
-  padding: 10px;
+  padding: 12px;
   cursor: pointer;
   font-weight: bold;
+  border-radius: 8px;
 }
 
 .container {
@@ -41,16 +43,21 @@ button {
 
 .coluna {
   flex: 1;
-  background: rgba(0,0,0,0.5);
+  background: rgba(255,255,255,0.05);
+  backdrop-filter: blur(10px);
   padding: 15px;
-  border-radius: 10px;
+  border-radius: 12px;
 }
 
 .card {
   background: white;
   color: black;
-  padding: 10px;
+  padding: 12px;
   margin-top: 10px;
   border-radius: 8px;
-  cursor: pointer;
+  transition: 0.2s;
+}
+
+.card:hover {
+  transform: scale(1.03);
 }
