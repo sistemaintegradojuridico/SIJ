@@ -1,67 +1,84 @@
-const API = "http://localhost:3001/processos";
+const SUPABASE_URL = "https://hufqiyhpuotksucwdprp.supabase.co";
+const SUPABASE_KEY = "sb_publishable_laIaX35XloOoAg7S7dKHHg_PfHaA3aM";
 
-async function carregar() {
-  const res = await fetch(API);
+const headers = {
+  "apikey": SUPABASE_KEY,
+  "Authorization": "Bearer " + SUPABASE_KEY,
+  "Content-Type": "application/json"
+};
+
+// ================= CLIENTES =================
+
+// Criar cliente
+async function criarCliente(nome, email, telefone) {
+  await fetch(${SUPABASE_URL}/rest/v1/clientes, {
+    method: "POST",
+    headers,
+    body: JSON.stringify({ nome, email, telefone })
+  });
+
+  listarClientes();
+}
+
+// Listar clientes
+async function listarClientes() {
+  const res = await fetch(${SUPABASE_URL}/rest/v1/clientes, {
+    headers
+  });
   const data = await res.json();
 
-  ["novo", "andamento", "finalizado"].forEach(id => {
-    document.getElementById(id).innerHTML = `<h2>${id}</h2>`;
-  });
-
-  data.forEach(p => {
-    const el = document.createElement("div");
-    el.className = "card";
-    el.innerText = p.titulo;
-
-    // MOVER PROCESSO
-    el.onclick = async () => {
-      const status = prompt(
-        "Para onde mover?\n\nDigite:\n- novo\n- andamento\n- finalizado"
-      );
-
-      if (!status) return;
-
-      await fetch(`${API}/${p.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status })
-      });
-
-      carregar();
-    };
-
-    // EXCLUIR COM BOTÃO DIREITO
-    el.oncontextmenu = async (e) => {
-      e.preventDefault();
-      if (confirm("Deseja excluir este processo?")) {
-        await fetch(`${API}/${p.id}`, { method: "DELETE" });
-        carregar();
-      }
-    };
-
-    document.getElementById(p.status).appendChild(el);
-  });
+  console.log("CLIENTES:", data);
 }
 
-// CRIAR PROCESSO MELHORADO
-async function criar() {
-  const titulo = prompt("Digite o nome do processo:");
+// ================= PROCESSOS =================
 
-  if (!titulo || titulo.trim() === "") {
-    alert("Nome inválido!");
-    return;
-  }
-
-  await fetch(API, {
+// Criar processo
+async function criarProcesso(titulo, status, cliente_id) {
+  await fetch(${SUPABASE_URL}/rest/v1/processo, {
     method: "POST",
-    headers: {"Content-Type":"application/json"},
-    body: JSON.stringify({
-      titulo: titulo.trim(),
-      status: "novo"
-    })
+    headers,
+    body: JSON.stringify({ titulo, status, cliente_id })
   });
 
-  carregar();
+  listarProcessos();
 }
 
-carregar();
+// Listar processos
+async function listarProcessos() {
+  const res = await fetch(${SUPABASE_URL}/rest/v1/processo?select=*, {
+    headers
+  });
+  const data = await res.json();
+
+  console.log("PROCESSOS:", data);
+}
+
+// ================= TAREFAS =================
+
+// Criar tarefa
+async function criarTarefa(titulo, processo_id) {
+  await fetch(${SUPABASE_URL}/rest/v1/tarefas, {
+    method: "POST",
+    headers,
+    body: JSON.stringify({ titulo, processo_id })
+  });
+
+  listarTarefas();
+}
+
+// Listar tarefas
+async function listarTarefas() {
+  const res = await fetch(${SUPABASE_URL}/rest/v1/tarefas, {
+    headers
+  });
+  const data = await res.json();
+
+  console.log("TAREFAS:", data);
+}
+
+// ================= TESTE =================
+
+// Testar tudo no console
+listarClientes();
+listarProcessos();
+listarTarefas();
