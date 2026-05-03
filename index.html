@@ -3,60 +3,98 @@
 <head>
   <meta charset="UTF-8">
   <title>SIJ - Sistema Jurídico</title>
+
+  <style>
+    body {
+      font-family: Arial;
+      margin: 0;
+      background: #f4f6f9;
+    }
+
+    .sidebar {
+      width: 220px;
+      height: 100vh;
+      background: #1e293b;
+      color: white;
+      position: fixed;
+      padding: 20px;
+    }
+
+    .sidebar h2 {
+      margin-bottom: 30px;
+    }
+
+    .sidebar button {
+      display: block;
+      width: 100%;
+      margin-bottom: 10px;
+      padding: 10px;
+      background: #334155;
+      border: none;
+      color: white;
+      cursor: pointer;
+    }
+
+    .content {
+      margin-left: 240px;
+      padding: 20px;
+    }
+
+    .card {
+      background: white;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+    }
+
+    input {
+      padding: 8px;
+      margin-right: 10px;
+      margin-bottom: 10px;
+    }
+
+    button.acao {
+      padding: 8px 12px;
+      background: #2563eb;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+  </style>
 </head>
+
 <body>
 
-<h1>SIJ - Sistema Jurídico</h1>
+<div class="sidebar">
+  <h2>SIJ</h2>
+  <button onclick="mostrar('clientes')">Clientes</button>
+  <button onclick="mostrar('processos')">Processos</button>
+  <button onclick="mostrar('tarefas')">Tarefas</button>
+</div>
 
-<hr>
+<div class="content">
 
-<h2>Clientes</h2>
-<input id="nome" placeholder="Nome">
-<input id="email" placeholder="Email">
-<input id="telefone" placeholder="Telefone">
-<button onclick="addCliente()">Criar Cliente</button>
+  <div id="clientes" class="card">
+    <h2>Clientes</h2>
+    <input id="nome" placeholder="Nome">
+    <input id="email" placeholder="Email">
+    <input id="telefone" placeholder="Telefone">
+    <button class="acao" onclick="addCliente()">Criar Cliente</button>
+  </div>
 
-<hr>
+  <div id="processos" class="card" style="display:none;">
+    <h2>Processos</h2>
+    <p>(vamos ativar depois)</p>
+  </div>
 
-<h2>Processos</h2>
-<input id="tituloProcesso" placeholder="Título">
-<input id="statusProcesso" placeholder="Status">
-<input id="clienteId" placeholder="ID do Cliente">
-<button onclick="addProcesso()">Criar Processo</button>
+  <div id="tarefas" class="card" style="display:none;">
+    <h2>Tarefas</h2>
+    <p>(vamos ativar depois)</p>
+  </div>
 
-<hr>
-
-<h2>Tarefas</h2>
-<input id="tituloTarefa" placeholder="Título">
-<input id="processoId" placeholder="ID do Processo">
-<button onclick="addTarefa()">Criar Tarefa</button>
+</div>
 
 <script src="script.js"></script>
-
-<script>
-function addCliente() {
-  const nome = document.getElementById("nome").value;
-  const email = document.getElementById("email").value;
-  const telefone = document.getElementById("telefone").value;
-
-  criarCliente(nome, email, telefone);
-}
-
-function addProcesso() {
-  const titulo = document.getElementById("tituloProcesso").value;
-  const status = document.getElementById("statusProcesso").value;
-  const cliente_id = document.getElementById("clienteId").value;
-
-  criarProcesso(titulo, status, cliente_id);
-}
-
-function addTarefa() {
-  const titulo = document.getElementById("tituloTarefa").value;
-  const processo_id = document.getElementById("processoId").value;
-
-  criarTarefa(titulo, processo_id);
-}
-</script>
 
 </body>
 </html>
