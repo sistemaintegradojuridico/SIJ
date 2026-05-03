@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>SIJ - Sistema Jurídico</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial;
+      background: #f1f5f9;
+    }
+
+    .sidebar {
+      width: 220px;
+      height: 100vh;
+      background: #0f172a;
+      color: white;
+      position: fixed;
+      padding: 20px;
+    }
+
+    .sidebar h2 {
+      margin-bottom: 20px;
+    }
+
+    .sidebar button {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: none;
+      background: #1e293b;
+      color: white;
+      cursor: pointer;
+    }
+
+    .content {
+      margin-left: 240px;
+      padding: 20px;
+    }
+
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+    }
+
+    input {
+      padding: 8px;
+      margin: 5px;
+    }
+
+    .btn {
+      padding: 8px 12px;
+      background: #2563eb;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="sidebar">
+  <h2>SIJ</h2>
+  <button onclick="mostrar('clientes')">Clientes</button>
+</div>
+
+<div class="content">
+
+  <div id="clientes" class="card">
+    <h2>Clientes</h2>
+
+    <input id="nome" placeholder="Nome">
+    <input id="email" placeholder="Email">
+    <input id="telefone" placeholder="Telefone">
+
+    <br>
+
+    <button class="btn" onclick="addCliente()">Criar Cliente</button>
+
+    <div id="listaClientes"></div>
+  </div>
+
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>
