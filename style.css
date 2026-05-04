@@ -1,60 +1,112 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <title>SIJ - Login</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
+body {
+  background: #f6f5f7;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  font-family: Arial;
+}
 
-<div class="container" id="container">
+.container {
+  background: #fff;
+  border-radius: 10px;
+  width: 900px;
+  min-height: 500px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 14px 28px rgba(0,0,0,0.25);
+}
 
-  <!-- SIGN UP -->
-  <div class="form-container sign-up-container">
-    <form>
-      <h1>Criar conta</h1>
-      <input type="text" placeholder="Nome" />
-      <input type="email" placeholder="Email" />
-      <input type="password" placeholder="Senha" />
-      <button id="btnCadastrar">Cadastrar</button>
-    </form>
-  </div>
+/* FORM */
+.form-container {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: 50%;
+  transition: all 0.6s ease-in-out;
+}
 
-  <!-- SIGN IN -->
-  <div class="form-container sign-in-container">
-    <form>
-      <h1>Acessar sistema</h1>
-      <input type="email" placeholder="Email" />
-      <input type="password" placeholder="Senha" />
-      <button id="btnEntrar">Entrar</button>
-      <a id="recuperarSenha">Recuperar senha</a>
-    </form>
-  </div>
+.sign-in-container { left: 0; z-index: 2; }
+.sign-up-container { left: 0; opacity: 0; z-index: 1; }
 
-  <!-- OVERLAY -->
-  <div class="overlay-container">
-    <div class="overlay">
+.container.right-panel-active .sign-in-container {
+  transform: translateX(100%);
+}
 
-      <div class="overlay-panel overlay-left">
-        <h1>Bem-vindo!</h1>
-        <p>Já tem conta?</p>
-        <button class="ghost" id="signIn">Entrar</button>
-      </div>
+.container.right-panel-active .sign-up-container {
+  transform: translateX(100%);
+  opacity: 1;
+  z-index: 5;
+}
 
-      <div class="overlay-panel overlay-right">
-        <h1>SIJ</h1>
-        <p>Sistema Inteligente Jurídico</p>
-        <button class="ghost" id="signUp">Criar conta</button>
-      </div>
+/* FORM */
+form {
+  display: flex;
+  flex-direction: column;
+  padding: 50px;
+  height: 100%;
+  justify-content: center;
+  align-items: center;
+}
 
-    </div>
-  </div>
+input {
+  padding: 12px;
+  margin: 8px 0;
+  width: 100%;
+}
 
-</div>
+button {
+  background: #7B1B38;
+  color: white;
+  padding: 12px 40px;
+  border: none;
+  margin-top: 10px;
+  cursor: pointer;
+  border-radius: 20px;
+}
 
-<!-- IMPORTANTE -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="script.js"></script>
+/* RECUPERAR */
+#recuperarSenha {
+  margin-top: 10px;
+  color: #7B1B38;
+  cursor: pointer;
+}
 
-</body>
-</html>
+/* OVERLAY */
+.overlay-container {
+  position: absolute;
+  left: 50%;
+  width: 50%;
+  height: 100%;
+}
+
+.overlay {
+  background: linear-gradient(135deg, #7B1B38, #a8325a);
+  color: white;
+  position: relative;
+  left: -100%;
+  width: 200%;
+  height: 100%;
+  transition: transform 0.6s ease-in-out;
+}
+
+.container.right-panel-active .overlay {
+  transform: translateX(50%);
+}
+
+.overlay-panel {
+  position: absolute;
+  width: 50%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.overlay-right { right: 0; }
+
+.ghost {
+  background: transparent;
+  border: 1px solid white;
+}
