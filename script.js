@@ -3,7 +3,18 @@ const supabase = window.supabase.createClient(
   "sb_publishable_laIaX35XloOoAg7S7dKHHg_PfHaA3aM"
 );
 
-// LOGIN
+const container = document.getElementById('container');
+
+// troca de tela
+document.getElementById("btnRegister").onclick = () => {
+  container.classList.add("right-panel-active");
+};
+
+document.getElementById("btnLogin").onclick = () => {
+  container.classList.remove("right-panel-active");
+};
+
+// login
 document.getElementById("btnEntrar").onclick = async () => {
   const email = document.getElementById("loginEmail").value;
   const senha = document.getElementById("loginSenha").value;
@@ -14,10 +25,10 @@ document.getElementById("btnEntrar").onclick = async () => {
   });
 
   if (error) alert(error.message);
-  else alert("Login feito!");
+  else alert("Login realizado!");
 };
 
-// CADASTRO
+// cadastro
 document.getElementById("btnCadastrar").onclick = async () => {
   const email = document.getElementById("cadastroEmail").value;
   const senha = document.getElementById("cadastroSenha").value;
@@ -28,5 +39,17 @@ document.getElementById("btnCadastrar").onclick = async () => {
   });
 
   if (error) alert(error.message);
-  else alert("Conta criada! Verifique seu email.");
+  else alert("Conta criada! Verifique o email.");
+};
+
+// recuperar senha
+document.getElementById("recuperarSenhaLogin").onclick = async () => {
+  const email = prompt("Digite seu email:");
+
+  if (!email) return;
+
+  const { error } = await supabase.auth.resetPasswordForEmail(email);
+
+  if (error) alert(error.message);
+  else alert("Email enviado!");
 };
