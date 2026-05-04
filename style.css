@@ -34,7 +34,6 @@ body {
   padding: 12px;
   border-radius: 6px;
   border: 1px solid #ccc;
-  font-size: 14px;
 }
 
 .form-box button {
@@ -45,27 +44,24 @@ body {
   border-radius: 6px;
   cursor: pointer;
   font-weight: bold;
-  transition: 0.3s;
-}
-
-.form-box button:hover {
-  opacity: 0.9;
 }
 
 /* RECUPERAR SENHA */
 .recuperar-senha {
-  margin-top: 10px;
+  margin-top: 12px;
   font-size: 14px;
   color: #7B1B38;
   text-align: center;
   cursor: pointer;
+  width: 100%;
+  display: block;
 }
 
 .recuperar-senha:hover {
   text-decoration: underline;
 }
 
-/* PAINEL LATERAL */
+/* PAINEL */
 .overlay {
   position: absolute;
   width: 50%;
@@ -81,14 +77,6 @@ body {
 
 .overlay-content {
   text-align: center;
-}
-
-.overlay h1 {
-  margin-bottom: 10px;
-}
-
-.overlay p {
-  margin-bottom: 20px;
 }
 
 .overlay button {
