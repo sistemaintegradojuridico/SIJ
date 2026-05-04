@@ -1,71 +1,37 @@
-const SUPABASE_URL = "https://hufqiyhpuotksucwdprp.supabase.co";
-const SUPABASE_KEY = "sb_publishable_laIaX35XloOoAg7S7dKHHg_PfHaA3aM";
+const API_URL = "https://hufqiyhpuotksucwdprp.supabase.co/rest/v1/clientes";
+const API_KEY = "sb_publishable_laIaX35XloOoAg7S7dKHHg_PfHaA3aM";
 
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+async function addCliente() {
+  const nome = document.getElementById("nome").value;
+  const email = document.getElementById("email").value;
+  const telefone = document.getElementById("telefone").value;
 
-// elementos
-const container = document.getElementById('container');
-const btnRegister = document.getElementById('btnRegister');
-const btnLogin = document.getElementById('btnLogin');
-const btnEntrar = document.getElementById('btnEntrar');
-const btnCadastrar = document.getElementById('btnCadastrar');
+  console.log("Enviando:", nome, email, telefone);
 
-// inputs
-const loginEmail = document.querySelector('.login-box input[type="email"]');
-const loginSenha = document.querySelector('.login-box input[type="password"]');
+  try {
+    const response = await fetch(API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "apikey": API_KEY,
+        "Authorization": `Bearer ${API_KEY}`
+      },
+      body: JSON.stringify({
+        nome: nome,
+        email: email,
+        telefone: telefone
+      })
+    });
 
-const cadastroNome = document.querySelector('.register-box input[type="text"]');
-const cadastroEmail = document.querySelector('.register-box input[type="email"]');
-const cadastroSenha = document.querySelector('.register-box input[type="password"]');
-
-// alternar telas
-btnRegister.onclick = () => container.classList.add('active');
-btnLogin.onclick = () => container.classList.remove('active');
-
-// LOGIN REAL
-btnEntrar.onclick = async () => {
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email: loginEmail.value,
-    password: loginSenha.value
-  });
-
-  if (error) {
-    alert("Erro: " + error.message);
-  } else {
-    alert("Login realizado com sucesso!");
-    // depois vamos redirecionar pro dashboard
-  }
-};
-
-// CADASTRO REAL
-btnCadastrar.onclick = async () => {
-  const { data, error } = await supabase.auth.signUp({
-    email: cadastroEmail.value,
-    password: cadastroSenha.value
-  });
-
-  if (error) {
-    alert("Erro: " + error.message);
-  } else {
-    alert("Conta criada! Verifique seu email.");
-  }
-};
-
-// recuperar senha
-const recuperarSenha = document.getElementById('recuperarSenhaLogin');
-
-if (recuperarSenha) {
-  recuperarSenha.onclick = async () => {
-    const email = prompt("Digite seu email para recuperação:");
-
-    if (!email) return;
-
-    const { error } = await supabase.auth.resetPasswordForEmail(email);
-
-    if (error) {
-      alert("Erro: " + error.message);
+    if (response.ok) {
+      alert("Cliente criado com sucesso!");
     } else {
-      alert("Email de recuperação enviado!");
+      const erro = await response.text();
+      console.error("Erro:", erro);
+      alert("Erro ao salvar cliente");
     }
-  };
+
+  } catch (error) {
+    console.error("Erro geral:", error);
+  }
 }
