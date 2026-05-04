@@ -7,7 +7,6 @@ body {
   background: #fff;
   border-radius: 10px;
   width: 900px;
-  max-width: 100%;
   min-height: 500px;
   margin: 50px auto;
   position: relative;
@@ -15,6 +14,7 @@ body {
   box-shadow: 0 14px 28px rgba(0,0,0,0.25);
 }
 
+/* FORMS */
 .form-container {
   position: absolute;
   top: 0;
@@ -25,11 +25,13 @@ body {
 
 .sign-in-container {
   left: 0;
+  z-index: 2;
 }
 
 .sign-up-container {
   left: 0;
   opacity: 0;
+  z-index: 1;
 }
 
 .container.right-panel-active .sign-in-container {
@@ -39,8 +41,10 @@ body {
 .container.right-panel-active .sign-up-container {
   transform: translateX(100%);
   opacity: 1;
+  z-index: 5;
 }
 
+/* FORM */
 form {
   background: #fff;
   display: flex;
@@ -48,29 +52,32 @@ form {
   padding: 50px;
   height: 100%;
   justify-content: center;
+  align-items: center;
 }
 
 input {
   padding: 12px;
   margin: 8px 0;
+  width: 100%;
 }
 
 button {
   background: #7B1B38;
   color: white;
-  padding: 12px;
+  padding: 12px 40px;
   border: none;
-  cursor: pointer;
   margin-top: 10px;
+  cursor: pointer;
 }
 
-.recuperar {
+/* RECUPERAR */
+#recuperarSenhaLogin {
   margin-top: 10px;
   color: #7B1B38;
-  text-align: center;
   cursor: pointer;
 }
 
+/* OVERLAY */
 .overlay-container {
   position: absolute;
   top: 0;
@@ -99,8 +106,8 @@ button {
   height: 100%;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
 }
 
 .overlay-left {
