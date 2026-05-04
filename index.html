@@ -3,57 +3,60 @@
 <head>
   <meta charset="UTF-8">
   <title>SIJ</title>
-
-  <!-- CSS -->
   <link rel="stylesheet" href="style.css">
-
 </head>
 <body>
 
-<div class="sij-container" id="container">
-
-  <!-- LOGIN -->
-  <div class="form-box login-box">
-    <h2>Acessar sistema</h2>
-
-    <input id="loginEmail" type="email" placeholder="Seu email">
-    <input id="loginSenha" type="password" placeholder="Sua senha">
-
-    <button id="btnEntrar">Entrar</button>
-
-    <p class="recuperar-senha" id="recuperarSenhaLogin">
-      Recuperar senha
-    </p>
-  </div>
+<div class="container" id="container">
 
   <!-- CADASTRO -->
-  <div class="form-box register-box">
-    <h2>Criar conta</h2>
+  <div class="form-container sign-up-container">
+    <form>
+      <h1>Criar conta</h1>
+      <input id="cadastroNome" type="text" placeholder="Nome completo" />
+      <input id="cadastroEmail" type="email" placeholder="Email" />
+      <input id="cadastroSenha" type="password" placeholder="Senha" />
+      <button type="button" id="btnCadastrar">Cadastrar</button>
+    </form>
+  </div>
 
-    <input id="cadastroNome" type="text" placeholder="Nome completo">
-    <input id="cadastroEmail" type="email" placeholder="Email">
-    <input id="cadastroSenha" type="password" placeholder="Senha">
+  <!-- LOGIN -->
+  <div class="form-container sign-in-container">
+    <form>
+      <h1>Acessar sistema</h1>
+      <input id="loginEmail" type="email" placeholder="Seu email" />
+      <input id="loginSenha" type="password" placeholder="Sua senha" />
 
-    <button id="btnCadastrar">Cadastrar</button>
+      <button type="button" id="btnEntrar">Entrar</button>
+
+      <p id="recuperarSenhaLogin" class="recuperar">
+        Recuperar senha
+      </p>
+    </form>
   </div>
 
   <!-- PAINEL -->
-  <div class="overlay">
-    <div class="overlay-content">
-      <h1>SIJ</h1>
-      <p>Sistema Inteligente Jurídico</p>
+  <div class="overlay-container">
+    <div class="overlay">
 
-      <button id="btnLogin">Já tenho conta</button>
-      <button id="btnRegister">Criar conta</button>
+      <div class="overlay-panel overlay-left">
+        <h1>Bem-vindo!</h1>
+        <p>Já tem conta?</p>
+        <button class="ghost" id="btnLogin">Entrar</button>
+      </div>
+
+      <div class="overlay-panel overlay-right">
+        <h1>SIJ</h1>
+        <p>Sistema Inteligente Jurídico</p>
+        <button class="ghost" id="btnRegister">Criar conta</button>
+      </div>
+
     </div>
   </div>
 
 </div>
 
-<!-- SUPABASE -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-<!-- SCRIPT -->
 <script src="script.js"></script>
 
 </body>
