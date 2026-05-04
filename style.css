@@ -1,54 +1,96 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="UTF-8">
-<title>SIJ</title>
-<link rel="stylesheet" href="style.css">
-</head>
-<body>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f4f4f4;
+}
 
-<div class="container" id="container">
+.sij-container {
+  width: 900px;
+  height: 500px;
+  margin: 50px auto;
+  display: flex;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  position: relative;
+}
 
-  <div class="form-container sign-up-container">
-    <form>
-      <h1>Criar conta</h1>
-      <input type="text" placeholder="Nome" />
-      <input type="email" placeholder="Email" />
-      <input type="password" placeholder="Senha" />
-      <button>Cadastrar</button>
-    </form>
-  </div>
+/* FORMULÁRIOS */
+.form-box {
+  width: 50%;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
 
-  <div class="form-container sign-in-container">
-    <form>
-      <h1>Acessar sistema</h1>
-      <input type="email" placeholder="Email" />
-      <input type="password" placeholder="Senha" />
-      <button>Entrar</button>
-      <p class="recuperar">Recuperar senha</p>
-    </form>
-  </div>
+.form-box h2 {
+  margin-bottom: 20px;
+}
 
-  <div class="overlay-container">
-    <div class="overlay">
+.form-box input {
+  margin-bottom: 15px;
+  padding: 12px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
 
-      <div class="overlay-panel overlay-left">
-        <h1>Bem-vindo!</h1>
-        <p>Já tem conta?</p>
-        <button class="ghost" id="signIn">Entrar</button>
-      </div>
+.form-box button {
+  padding: 12px;
+  border: none;
+  background: #7B1B38;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
 
-      <div class="overlay-panel overlay-right">
-        <h1>SIJ</h1>
-        <p>Sistema Inteligente Jurídico</p>
-        <button class="ghost" id="signUp">Criar conta</button>
-      </div>
+/* RECUPERAR SENHA */
+.recuperar-senha {
+  margin-top: 12px;
+  font-size: 14px;
+  color: #7B1B38;
+  text-align: center;
+  cursor: pointer;
+  width: 100%;
+  display: block;
+}
 
-    </div>
-  </div>
+.recuperar-senha:hover {
+  text-decoration: underline;
+}
 
-</div>
+/* PAINEL */
+.overlay {
+  position: absolute;
+  width: 50%;
+  height: 100%;
+  right: 0;
+  background: linear-gradient(135deg, #7B1B38, #a8325a);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.5s;
+}
 
-<script src="script.js"></script>
-</body>
-</html>
+.overlay-content {
+  text-align: center;
+}
+
+.overlay button {
+  margin: 10px;
+  padding: 10px 20px;
+  background: white;
+  color: #7B1B38;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+/* ANIMAÇÃO */
+.sij-container.active .overlay {
+  transform: translateX(-100%);
+}
