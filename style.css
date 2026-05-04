@@ -1,37 +1,65 @@
-const API_URL = "https://hufqiyhpuotksucwdprp.supabase.co/rest/v1/clientes";
-const API_KEY = "sb_publishable_laIaX35XloOoAg7S7dKHHg_PfHaA3aM";
+body {
+  margin: 0;
+  font-family: Arial;
+  background: #f4f4f4;
+}
 
-async function addCliente() {
-  const nome = document.getElementById("nome").value;
-  const email = document.getElementById("email").value;
-  const telefone = document.getElementById("telefone").value;
+.sij-container {
+  width: 900px;
+  height: 500px;
+  margin: 50px auto;
+  display: flex;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  position: relative;
+}
 
-  console.log("Enviando:", nome, email, telefone);
+/* FORM */
+.form-box {
+  width: 50%;
+  padding: 40px;
+}
 
-  try {
-    const response = await fetch(API_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "apikey": API_KEY,
-        "Authorization": `Bearer ${API_KEY}`
-      },
-      body: JSON.stringify({
-        nome: nome,
-        email: email,
-        telefone: telefone
-      })
-    });
+.form-box input {
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 10px;
+}
 
-    if (response.ok) {
-      alert("Cliente criado com sucesso!");
-    } else {
-      const erro = await response.text();
-      console.error("Erro:", erro);
-      alert("Erro ao salvar cliente");
-    }
+.form-box button {
+  width: 100%;
+  padding: 10px;
+  background: #7B1B38;
+  color: white;
+  border: none;
+}
 
-  } catch (error) {
-    console.error("Erro geral:", error);
-  }
+.recuperar-senha {
+  text-align: center;
+  color: #7B1B38;
+  margin-top: 10px;
+  cursor: pointer;
+}
+
+/* OVERLAY */
+.overlay {
+  position: absolute;
+  right: 0;
+  width: 50%;
+  height: 100%;
+  background: #7B1B38;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.overlay-content {
+  text-align: center;
+}
+
+.overlay button {
+  margin: 10px;
 }
