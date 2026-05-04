@@ -1,3 +1,5 @@
+alert("JS carregou")
+
 const container = document.getElementById('container');
 
 const btnRegister = document.getElementById('btnRegister');
