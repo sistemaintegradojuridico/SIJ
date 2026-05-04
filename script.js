@@ -1,39 +1,32 @@
-const container = document.getElementById('container');
+const supabase = window.supabase.createClient(
+  "https://hufqiyhpuotksucwdprp.supabase.co",
+  "sb_publishable_laIaX35XloOoAg7S7dKHHg_PfHaA3aM"
+);
 
-const btnRegister = document.getElementById('btnRegister');
-const btnLogin = document.getElementById('btnLogin');
+// LOGIN
+document.getElementById("btnEntrar").onclick = async () => {
+  const email = document.getElementById("loginEmail").value;
+  const senha = document.getElementById("loginSenha").value;
 
-const btnEntrar = document.getElementById('btnEntrar');
-const btnCadastrar = document.getElementById('btnCadastrar');
-
-const recuperarSenha = document.getElementById('recuperarSenhaLogin');
-
-// alternar telas
-btnRegister.addEventListener('click', () => {
-  container.classList.add('active');
-});
-
-btnLogin.addEventListener('click', () => {
-  container.classList.remove('active');
-});
-
-// botão entrar
-if (btnEntrar) {
-  btnEntrar.addEventListener('click', () => {
-    alert('Login será conectado ao banco em breve');
+  const { error } = await supabase.auth.signInWithPassword({
+    email,
+    password: senha
   });
-}
 
-// botão cadastrar
-if (btnCadastrar) {
-  btnCadastrar.addEventListener('click', () => {
-    alert('Cadastro será conectado ao banco em breve');
-  });
-}
+  if (error) alert(error.message);
+  else alert("Login feito!");
+};
 
-// recuperar senha
-if (recuperarSenha) {
-  recuperarSenha.addEventListener('click', () => {
-    alert('Recuperação de senha será implementada em breve');
+// CADASTRO
+document.getElementById("btnCadastrar").onclick = async () => {
+  const email = document.getElementById("cadastroEmail").value;
+  const senha = document.getElementById("cadastroSenha").value;
+
+  const { error } = await supabase.auth.signUp({
+    email,
+    password: senha
   });
-}
+
+  if (error) alert(error.message);
+  else alert("Conta criada! Verifique seu email.");
+};
