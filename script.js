@@ -3,9 +3,9 @@ const supabase = window.supabase.createClient(
   "sb_publishable_laIaX35XloOoAg7S7dKHHg_PfHaA3aM"
 );
 
-const container = document.getElementById('container');
+const container = document.getElementById("container");
 
-// troca de tela
+// animação
 document.getElementById("btnRegister").onclick = () => {
   container.classList.add("right-panel-active");
 };
@@ -25,7 +25,7 @@ document.getElementById("btnEntrar").onclick = async () => {
   });
 
   if (error) alert(error.message);
-  else alert("Login realizado!");
+  else alert("Login feito!");
 };
 
 // cadastro
@@ -39,12 +39,12 @@ document.getElementById("btnCadastrar").onclick = async () => {
   });
 
   if (error) alert(error.message);
-  else alert("Conta criada! Verifique o email.");
+  else alert("Conta criada!");
 };
 
 // recuperar senha
 document.getElementById("recuperarSenhaLogin").onclick = async () => {
-  const email = prompt("Digite seu email:");
+  const email = prompt("Digite seu email");
 
   if (!email) return;
 
