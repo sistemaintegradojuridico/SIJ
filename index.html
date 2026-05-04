@@ -3,32 +3,35 @@
 <head>
   <meta charset="UTF-8">
   <title>SIJ - Login</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
 <div class="container" id="container">
 
+  <!-- CADASTRO -->
   <div class="form-container sign-up-container">
     <form>
       <h1>Criar conta</h1>
       <input type="text" placeholder="Nome" />
       <input type="email" placeholder="Email" />
       <input type="password" placeholder="Senha" />
-      <button id="btnCadastrar">Cadastrar</button>
+      <button type="button" id="btnCadastrar">Cadastrar</button>
     </form>
   </div>
 
+  <!-- LOGIN -->
   <div class="form-container sign-in-container">
     <form>
       <h1>Acessar sistema</h1>
       <input type="email" placeholder="Email" />
       <input type="password" placeholder="Senha" />
-      <button id="btnEntrar">Entrar</button>
+      <button type="button" id="btnEntrar">Entrar</button>
       <a id="recuperarSenha">Recuperar senha</a>
     </form>
   </div>
 
+  <!-- OVERLAY -->
   <div class="overlay-container">
     <div class="overlay">
 
@@ -49,8 +52,6 @@
 
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="script.js"></script>
-
+<script src="js/script.js"></script>
 </body>
 </html>
