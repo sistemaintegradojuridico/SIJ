@@ -1,96 +1,71 @@
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: #f4f4f4;
-}
+const SUPABASE_URL = "https://hufqiyhpuotksucwdprp.supabase.co";
+const SUPABASE_KEY = "sb_publishable_laIaX35XloOoAg7S7dKHHg_PfHaA3aM";
 
-.sij-container {
-  width: 900px;
-  height: 500px;
-  margin: 50px auto;
-  display: flex;
-  background: white;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-  position: relative;
-}
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-/* FORMULÁRIOS */
-.form-box {
-  width: 50%;
-  padding: 40px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
+// elementos
+const container = document.getElementById('container');
+const btnRegister = document.getElementById('btnRegister');
+const btnLogin = document.getElementById('btnLogin');
+const btnEntrar = document.getElementById('btnEntrar');
+const btnCadastrar = document.getElementById('btnCadastrar');
 
-.form-box h2 {
-  margin-bottom: 20px;
-}
+// inputs
+const loginEmail = document.querySelector('.login-box input[type="email"]');
+const loginSenha = document.querySelector('.login-box input[type="password"]');
 
-.form-box input {
-  margin-bottom: 15px;
-  padding: 12px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-}
+const cadastroNome = document.querySelector('.register-box input[type="text"]');
+const cadastroEmail = document.querySelector('.register-box input[type="email"]');
+const cadastroSenha = document.querySelector('.register-box input[type="password"]');
 
-.form-box button {
-  padding: 12px;
-  border: none;
-  background: #7B1B38;
-  color: white;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
-}
+// alternar telas
+btnRegister.onclick = () => container.classList.add('active');
+btnLogin.onclick = () => container.classList.remove('active');
 
-/* RECUPERAR SENHA */
-.recuperar-senha {
-  margin-top: 12px;
-  font-size: 14px;
-  color: #7B1B38;
-  text-align: center;
-  cursor: pointer;
-  width: 100%;
-  display: block;
-}
+// LOGIN REAL
+btnEntrar.onclick = async () => {
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email: loginEmail.value,
+    password: loginSenha.value
+  });
 
-.recuperar-senha:hover {
-  text-decoration: underline;
-}
+  if (error) {
+    alert("Erro: " + error.message);
+  } else {
+    alert("Login realizado com sucesso!");
+    // depois vamos redirecionar pro dashboard
+  }
+};
 
-/* PAINEL */
-.overlay {
-  position: absolute;
-  width: 50%;
-  height: 100%;
-  right: 0;
-  background: linear-gradient(135deg, #7B1B38, #a8325a);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: 0.5s;
-}
+// CADASTRO REAL
+btnCadastrar.onclick = async () => {
+  const { data, error } = await supabase.auth.signUp({
+    email: cadastroEmail.value,
+    password: cadastroSenha.value
+  });
 
-.overlay-content {
-  text-align: center;
-}
+  if (error) {
+    alert("Erro: " + error.message);
+  } else {
+    alert("Conta criada! Verifique seu email.");
+  }
+};
 
-.overlay button {
-  margin: 10px;
-  padding: 10px 20px;
-  background: white;
-  color: #7B1B38;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
-}
+// recuperar senha
+const recuperarSenha = document.getElementById('recuperarSenhaLogin');
 
-/* ANIMAÇÃO */
-.sij-container.active .overlay {
-  transform: translateX(-100%);
+if (recuperarSenha) {
+  recuperarSenha.onclick = async () => {
+    const email = prompt("Digite seu email para recuperação:");
+
+    if (!email) return;
+
+    const { error } = await supabase.auth.resetPasswordForEmail(email);
+
+    if (error) {
+      alert("Erro: " + error.message);
+    } else {
+      alert("Email de recuperação enviado!");
+    }
+  };
 }
