@@ -1,5 +1,3 @@
-
-
 const supabase = window.supabase.createClient(
   "https://hufqiyhpuotksucwdprp.supabase.co",
   "sb_publishable_laIaX35XloOoAg7S7dKHHg_PfHaA3aM"
