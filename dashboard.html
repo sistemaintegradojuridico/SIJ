@@ -1,9 +1,109 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
-  <title>SIJ</title>
+  <meta charset="UTF-8">
+  <title>SIJ - Dashboard</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial;
+      display: flex;
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+      width: 250px;
+      height: 100vh;
+      background: #7B1B38;
+      color: white;
+      padding: 20px;
+    }
+
+    .sidebar h2 {
+      margin-bottom: 30px;
+    }
+
+    .menu-item {
+      margin: 15px 0;
+      cursor: pointer;
+    }
+
+    .menu-item:hover {
+      opacity: 0.7;
+    }
+
+    /* CONTEÚDO */
+    .main {
+      flex: 1;
+      padding: 30px;
+      background: #f6f5f7;
+    }
+
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    button {
+      background: #7B1B38;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #5a1328;
+    }
+  </style>
 </head>
 <body>
-  <h1>Bem-vindo ao SIJ 🚀</h1>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <h2>SIJ 🚀</h2>
+    <div class="menu-item">Dashboard</div>
+    <div class="menu-item">Processos</div>
+    <div class="menu-item">Clientes</div>
+    <div class="menu-item">Tarefas</div>
+    <div class="menu-item">Documentos</div>
+  </div>
+
+  <!-- CONTEÚDO -->
+  <div class="main">
+
+    <div class="topbar">
+      <h1>Bem-vindo ao SIJ</h1>
+      <button onclick="logout()">Sair</button>
+    </div>
+
+    <div class="card">
+      <h3>📊 Resumo</h3>
+      <p>Você tem 5 processos ativos</p>
+    </div>
+
+    <div class="card">
+      <h3>📅 Agenda</h3>
+      <p>Nenhum compromisso hoje</p>
+    </div>
+
+  </div>
+
+<script>
+function logout() {
+  window.location.href = "index.html";
+}
+</script>
+
 </body>
 </html>
