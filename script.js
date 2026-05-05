@@ -15,15 +15,15 @@ signInButton.addEventListener('click', () => {
   container.classList.remove("right-panel-active");
 });
 
-// TESTES
+// BOTÕES
 btnEntrar.addEventListener('click', () => {
-  window.location.href = "dashboard.html";
+  alert("Login será conectado ao banco em breve");
 });
 
 btnCadastrar.addEventListener('click', () => {
-  alert("Conta criada (simulação)");
+  alert("Cadastro será conectado ao banco em breve");
 });
 
 recuperarSenha.addEventListener('click', () => {
-  alert("Recuperação em breve");
+  alert("Recuperação de senha será implementada");
 });
