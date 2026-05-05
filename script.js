@@ -1,29 +1,42 @@
-const signUpButton = document.getElementById('signUp');
-const signInButton = document.getElementById('signIn');
 const container = document.getElementById('container');
 
-const btnEntrar = document.getElementById('btnEntrar');
-const btnCadastrar = document.getElementById('btnCadastrar');
-const recuperarSenha = document.getElementById('recuperarSenha');
-
-// ANIMAÇÃO
-signUpButton.addEventListener('click', () => {
+document.getElementById('signUp').onclick = () => {
   container.classList.add("right-panel-active");
-});
+};
 
-signInButton.addEventListener('click', () => {
+document.getElementById('signIn').onclick = () => {
   container.classList.remove("right-panel-active");
+};
+
+// CADASTRO
+document.getElementById("formCadastro").addEventListener("submit", (e) => {
+  e.preventDefault();
+
+  const user = {
+    nome: nomeCadastro.value,
+    email: emailCadastro.value,
+    senha: senhaCadastro.value
+  };
+
+  localStorage.setItem("userSIJ", JSON.stringify(user));
+
+  alert("Conta criada!");
 });
 
-// LOGIN REAL (simples por enquanto)
-btnEntrar.addEventListener('click', () => {
-  window.location.href = "dashboard.html";
-});
+// LOGIN
+document.getElementById("formLogin").addEventListener("submit", (e) => {
+  e.preventDefault();
 
-btnCadastrar.addEventListener('click', () => {
-  alert("Conta criada (simulação)");
-});
+  const user = JSON.parse(localStorage.getItem("userSIJ"));
 
-recuperarSenha.addEventListener('click', () => {
-  alert("Recuperação de senha em breve");
+  if (!user) {
+    alert("Crie uma conta primeiro");
+    return;
+  }
+
+  if (emailLogin.value === user.email && senhaLogin.value === user.senha) {
+    window.location.href = "dashboard.html";
+  } else {
+    alert("Dados inválidos");
+  }
 });
