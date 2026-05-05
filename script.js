@@ -1,3 +1,4 @@
+// ELEMENTOS
 const signUpButton = document.getElementById('signUp');
 const signInButton = document.getElementById('signIn');
 const container = document.getElementById('container');
@@ -6,24 +7,47 @@ const btnEntrar = document.getElementById('btnEntrar');
 const btnCadastrar = document.getElementById('btnCadastrar');
 const recuperarSenha = document.getElementById('recuperarSenha');
 
-// ANIMAÇÃO
-signUpButton.addEventListener('click', () => {
-  container.classList.add("right-panel-active");
-});
+// =========================
+// ANIMAÇÃO (troca de tela)
+// =========================
+if (signUpButton) {
+  signUpButton.addEventListener('click', () => {
+    container.classList.add("right-panel-active");
+  });
+}
 
-signInButton.addEventListener('click', () => {
-  container.classList.remove("right-panel-active");
-});
+if (signInButton) {
+  signInButton.addEventListener('click', () => {
+    container.classList.remove("right-panel-active");
+  });
+}
 
-// BOTÕES
-btnEntrar.addEventListener('click', () => {
-  alert("Login será conectado ao banco em breve");
-});
+// =========================
+// LOGIN → DASHBOARD
+// =========================
+if (btnEntrar) {
+  btnEntrar.addEventListener('click', (e) => {
+    e.preventDefault(); // 🔥 ISSO EVITA QUEBRAR O SITE
+    window.location.href = "dashboard.html";
+  });
+}
 
-btnCadastrar.addEventListener('click', () => {
-  alert("Cadastro será conectado ao banco em breve");
-});
+// =========================
+// CADASTRO
+// =========================
+if (btnCadastrar) {
+  btnCadastrar.addEventListener('click', (e) => {
+    e.preventDefault();
+    alert("Cadastro será conectado ao banco em breve");
+  });
+}
 
-recuperarSenha.addEventListener('click', () => {
-  alert("Recuperação de senha será implementada");
-});
+// =========================
+// RECUPERAR SENHA
+// =========================
+if (recuperarSenha) {
+  recuperarSenha.addEventListener('click', (e) => {
+    e.preventDefault();
+    alert("Recuperação de senha será implementada");
+  });
+}
