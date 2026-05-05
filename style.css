@@ -1,3 +1,7 @@
+* {
+  box-sizing: border-box;
+}
+
 body {
   background: #f6f5f7;
   display: flex;
@@ -18,7 +22,6 @@ body {
   box-shadow: 0 14px 28px rgba(0,0,0,0.25);
 }
 
-/* FORM */
 .form-container {
   position: absolute;
   top: 0;
@@ -48,7 +51,6 @@ body {
   z-index: 5;
 }
 
-/* FORM STYLE */
 form {
   background: #fff;
   display: flex;
@@ -68,7 +70,6 @@ input {
   border: 1px solid #ccc;
 }
 
-/* BOTÃO */
 button {
   border-radius: 20px;
   border: none;
@@ -78,26 +79,18 @@ button {
   padding: 12px 45px;
   margin-top: 10px;
   cursor: pointer;
-  transition: 0.3s;
 }
 
 button:hover {
   background: #5a1328;
 }
 
-/* RECUPERAR SENHA */
 #recuperarSenha {
   margin-top: 15px;
   color: #7B1B38;
   cursor: pointer;
-  font-size: 14px;
 }
 
-#recuperarSenha:hover {
-  text-decoration: underline;
-}
-
-/* OVERLAY */
 .overlay-container {
   position: absolute;
   top: 0;
