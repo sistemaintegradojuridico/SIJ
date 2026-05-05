@@ -25,3 +25,4 @@ btnCadastrar.addEventListener('click', () => {
 recuperarSenha.addEventListener('click', () => {
   alert("Recuperação de senha em breve");
 });
+ 
