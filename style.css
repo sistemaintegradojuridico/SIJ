@@ -1,66 +1,136 @@
-// ELEMENTOS
-const signUpButton = document.getElementById('signUp');
-const signInButton = document.getElementById('signIn');
-const container = document.getElementById('container');
+* {
+  box-sizing: border-box;
+}
 
-const btnEntrar = document.getElementById('btnEntrar');
-const btnCadastrar = document.getElementById('btnCadastrar');
-const recuperarSenha = document.getElementById('recuperarSenha');
+body {
+  background: #f6f5f7;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  font-family: Arial;
+}
 
-// ANIMAÇÃO
-signUpButton.addEventListener('click', () => {
-  container.classList.add("right-panel-active");
-});
+.container {
+  background: #fff;
+  border-radius: 10px;
+  width: 900px;
+  height: 500px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 14px 28px rgba(0,0,0,0.25);
+}
 
-signInButton.addEventListener('click', () => {
-  container.classList.remove("right-panel-active");
-});
+/* FORM */
+.form-container {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: 50%;
+  transition: all 0.6s ease-in-out;
+}
 
-// CADASTRAR (FUNCIONAL)
-btnCadastrar.addEventListener('click', (e) => {
-  e.preventDefault();
+.sign-in-container {
+  left: 0;
+  z-index: 2;
+}
 
-  const inputs = document.querySelectorAll('.sign-up-container input');
+.sign-up-container {
+  left: 0;
+  opacity: 0;
+  z-index: 1;
+}
 
-  const user = {
-    nome: inputs[0].value,
-    email: inputs[1].value,
-    senha: inputs[2].value
-  };
+/* ANIMAÇÃO DOS FORMS */
+.container.right-panel-active .sign-in-container {
+  transform: translateX(100%);
+}
 
-  localStorage.setItem("userSIJ", JSON.stringify(user));
+.container.right-panel-active .sign-up-container {
+  transform: translateX(100%);
+  opacity: 1;
+  z-index: 5;
+}
 
-  alert("Conta criada com sucesso!");
+/* FORM STYLE */
+form {
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  padding: 50px;
+  height: 100%;
+  justify-content: center;
+  align-items: center;
+}
 
-  // 👉 JÁ VAI PRO LOGIN AUTOMATICO
-  container.classList.remove("right-panel-active");
-});
+input {
+  background: #eee;
+  border: none;
+  padding: 12px;
+  margin: 8px 0;
+  width: 100%;
+}
 
-// LOGIN (FUNCIONAL)
-btnEntrar.addEventListener('click', (e) => {
-  e.preventDefault();
+/* BOTÕES */
+button {
+  border-radius: 20px;
+  border: none;
+  background: #7B1B38;
+  color: white;
+  padding: 12px 45px;
+  margin-top: 10px;
+  cursor: pointer;
+}
 
-  const inputs = document.querySelectorAll('.sign-in-container input');
+button.ghost {
+  background: transparent;
+  border: 1px solid #fff;
+}
 
-  const email = inputs[0].value;
-  const senha = inputs[1].value;
+/* OVERLAY */
+.overlay-container {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 50%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 100;
+}
 
-  const user = JSON.parse(localStorage.getItem("userSIJ"));
+.overlay {
+  background: linear-gradient(to right, #7B1B38, #a8325a);
+  color: #fff;
+  position: relative;
+  left: -100%;
+  height: 100%;
+  width: 200%;
+  transform: translateX(0);
+  transition: transform 0.6s ease-in-out;
+}
 
-  if (!user) {
-    alert("Crie uma conta primeiro!");
-    return;
-  }
+/* 🔥 AQUI É A MÁGICA */
+.container.right-panel-active .overlay {
+  transform: translateX(50%);
+}
 
-  if (email === user.email && senha === user.senha) {
-    alert("Login realizado!");
-    window.location.href = "dashboard.html";
-  } else {
-    alert("Email ou senha inválidos");
-  }
-});
+/* PAINÉIS */
+.overlay-panel {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+  text-align: center;
+  height: 100%;
+  width: 50%;
+}
 
-// RECUPERAR SENHA
-recuperarSenha.addEventListener('click', () => {
-  alert("Funcionalidade em breve");
-});
+.overlay-left {
+  transform: translateX(-20%);
+}
+
+.overlay-right {
+  right: 0;
+}
