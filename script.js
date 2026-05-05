@@ -1,42 +1,66 @@
+// ELEMENTOS
+const signUpButton = document.getElementById('signUp');
+const signInButton = document.getElementById('signIn');
 const container = document.getElementById('container');
 
-document.getElementById('signUp').onclick = () => {
+const btnEntrar = document.getElementById('btnEntrar');
+const btnCadastrar = document.getElementById('btnCadastrar');
+const recuperarSenha = document.getElementById('recuperarSenha');
+
+// ANIMAÇÃO
+signUpButton.addEventListener('click', () => {
   container.classList.add("right-panel-active");
-};
+});
 
-document.getElementById('signIn').onclick = () => {
+signInButton.addEventListener('click', () => {
   container.classList.remove("right-panel-active");
-};
+});
 
-// CADASTRO
-document.getElementById("formCadastro").addEventListener("submit", (e) => {
+// CADASTRAR (FUNCIONAL)
+btnCadastrar.addEventListener('click', (e) => {
   e.preventDefault();
 
+  const inputs = document.querySelectorAll('.sign-up-container input');
+
   const user = {
-    nome: nomeCadastro.value,
-    email: emailCadastro.value,
-    senha: senhaCadastro.value
+    nome: inputs[0].value,
+    email: inputs[1].value,
+    senha: inputs[2].value
   };
 
   localStorage.setItem("userSIJ", JSON.stringify(user));
 
-  alert("Conta criada!");
+  alert("Conta criada com sucesso!");
+
+  // 👉 JÁ VAI PRO LOGIN AUTOMATICO
+  container.classList.remove("right-panel-active");
 });
 
-// LOGIN
-document.getElementById("formLogin").addEventListener("submit", (e) => {
+// LOGIN (FUNCIONAL)
+btnEntrar.addEventListener('click', (e) => {
   e.preventDefault();
+
+  const inputs = document.querySelectorAll('.sign-in-container input');
+
+  const email = inputs[0].value;
+  const senha = inputs[1].value;
 
   const user = JSON.parse(localStorage.getItem("userSIJ"));
 
   if (!user) {
-    alert("Crie uma conta primeiro");
+    alert("Crie uma conta primeiro!");
     return;
   }
 
-  if (emailLogin.value === user.email && senhaLogin.value === user.senha) {
+  if (email === user.email && senha === user.senha) {
+    alert("Login realizado!");
     window.location.href = "dashboard.html";
   } else {
-    alert("Dados inválidos");
+    alert("Email ou senha inválidos");
   }
+});
+
+// RECUPERAR SENHA
+recuperarSenha.addEventListener('click', () => {
+  alert("Funcionalidade em breve");
 });
