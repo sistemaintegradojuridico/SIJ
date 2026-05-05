@@ -1,123 +1,66 @@
-* {
-  box-sizing: border-box;
-}
+// ELEMENTOS
+const signUpButton = document.getElementById('signUp');
+const signInButton = document.getElementById('signIn');
+const container = document.getElementById('container');
 
-body {
-  font-family: 'Arial', sans-serif;
-  background: #f6f5f7;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-}
+const btnEntrar = document.getElementById('btnEntrar');
+const btnCadastrar = document.getElementById('btnCadastrar');
+const recuperarSenha = document.getElementById('recuperarSenha');
 
-.container {
-  background: #fff;
-  border-radius: 10px;
-  width: 768px;
-  max-width: 100%;
-  min-height: 480px;
-  position: relative;
-  overflow: hidden;
-}
+// ANIMAÇÃO
+signUpButton.addEventListener('click', () => {
+  container.classList.add("right-panel-active");
+});
 
-.form-container {
-  position: absolute;
-  top: 0;
-  height: 100%;
-  width: 50%;
-  transition: 0.6s;
-}
+signInButton.addEventListener('click', () => {
+  container.classList.remove("right-panel-active");
+});
 
-.sign-in-container {
-  left: 0;
-  z-index: 2;
-}
+// CADASTRAR (FUNCIONAL)
+btnCadastrar.addEventListener('click', (e) => {
+  e.preventDefault();
 
-.sign-up-container {
-  left: 0;
-  opacity: 0;
-  z-index: 1;
-}
+  const inputs = document.querySelectorAll('.sign-up-container input');
 
-.container.right-panel-active .sign-in-container {
-  transform: translateX(100%);
-}
+  const user = {
+    nome: inputs[0].value,
+    email: inputs[1].value,
+    senha: inputs[2].value
+  };
 
-.container.right-panel-active .sign-up-container {
-  transform: translateX(100%);
-  opacity: 1;
-  z-index: 5;
-}
+  localStorage.setItem("userSIJ", JSON.stringify(user));
 
-form {
-  background: #fff;
-  display: flex;
-  flex-direction: column;
-  padding: 40px;
-  height: 100%;
-  justify-content: center;
-  text-align: center;
-}
+  alert("Conta criada com sucesso!");
 
-input {
-  background: #eee;
-  border: none;
-  padding: 12px;
-  margin: 8px 0;
-}
+  // 👉 JÁ VAI PRO LOGIN AUTOMATICO
+  container.classList.remove("right-panel-active");
+});
 
-button {
-  background: #7B1B38;
-  color: #fff;
-  border: none;
-  padding: 12px;
-  margin-top: 10px;
-  cursor: pointer;
-}
+// LOGIN (FUNCIONAL)
+btnEntrar.addEventListener('click', (e) => {
+  e.preventDefault();
 
-.overlay-container {
-  position: absolute;
-  left: 50%;
-  width: 50%;
-  height: 100%;
-  overflow: hidden;
-}
+  const inputs = document.querySelectorAll('.sign-in-container input');
 
-.overlay {
-  background: linear-gradient(to right, #7B1B38, #a83250);
-  color: #fff;
-  position: relative;
-  left: -100%;
-  width: 200%;
-  height: 100%;
-  transition: transform 0.6s;
-}
+  const email = inputs[0].value;
+  const senha = inputs[1].value;
 
-.container.right-panel-active .overlay {
-  transform: translateX(50%);
-}
+  const user = JSON.parse(localStorage.getItem("userSIJ"));
 
-.overlay-panel {
-  position: absolute;
-  width: 50%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  padding: 40px;
-  text-align: center;
-}
+  if (!user) {
+    alert("Crie uma conta primeiro!");
+    return;
+  }
 
-.overlay-left {
-  transform: translateX(-20%);
-}
+  if (email === user.email && senha === user.senha) {
+    alert("Login realizado!");
+    window.location.href = "dashboard.html";
+  } else {
+    alert("Email ou senha inválidos");
+  }
+});
 
-.container.right-panel-active .overlay-left {
-  transform: translateX(0);
-}
-
-.overlay-right {
-  right: 0;
-}
+// RECUPERAR SENHA
+recuperarSenha.addEventListener('click', () => {
+  alert("Funcionalidade em breve");
+});
