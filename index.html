@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>SIJ - Login</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="./style.css">
 </head>
 <body>
 
@@ -13,10 +13,10 @@
   <div class="form-container sign-up-container">
     <form>
       <h1>Criar conta</h1>
-      <input type="text" placeholder="Nome" />
-      <input type="email" placeholder="Email" />
-      <input type="password" placeholder="Senha" />
-      <button id="btnCadastrar">Cadastrar</button>
+      <input type="text" placeholder="Nome" required />
+      <input type="email" placeholder="Email" required />
+      <input type="password" placeholder="Senha" required />
+      <button type="button" id="btnCadastrar">Cadastrar</button>
     </form>
   </div>
 
@@ -24,10 +24,9 @@
   <div class="form-container sign-in-container">
     <form>
       <h1>Acessar sistema</h1>
-      <input type="email" placeholder="Email" />
-      <input type="password" placeholder="Senha" />
-      <button id="btnEntrar">Entrar</button>
-
+      <input type="email" placeholder="Email" required />
+      <input type="password" placeholder="Senha" required />
+      <button type="button" id="btnEntrar">Entrar</button>
       <a id="recuperarSenha">Recuperar senha</a>
     </form>
   </div>
@@ -53,6 +52,6 @@
 
 </div>
 
-<script src="script.js"></script>
+<script src="./script.js"></script>
 </body>
 </html>
