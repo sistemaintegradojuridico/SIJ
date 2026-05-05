@@ -6,7 +6,7 @@ const btnEntrar = document.getElementById('btnEntrar');
 const btnCadastrar = document.getElementById('btnCadastrar');
 const recuperarSenha = document.getElementById('recuperarSenha');
 
-// animação
+// ANIMAÇÃO
 signUpButton.addEventListener('click', () => {
   container.classList.add("right-panel-active");
 });
@@ -15,18 +15,15 @@ signInButton.addEventListener('click', () => {
   container.classList.remove("right-panel-active");
 });
 
-// login
+// BOTÕES
 btnEntrar.addEventListener('click', () => {
-  alert("Login funcionando (próximo passo: banco)");
-  window.location.href = "pages/dashboard.html";
+  alert("Login será conectado ao banco em breve");
 });
 
-// cadastro
 btnCadastrar.addEventListener('click', () => {
-  alert("Cadastro funcionando");
+  alert("Cadastro será conectado ao banco em breve");
 });
 
-// recuperar senha
 recuperarSenha.addEventListener('click', () => {
-  alert("Recuperação em breve");
+  alert("Recuperação de senha será implementada");
 });
